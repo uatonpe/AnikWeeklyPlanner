@@ -3,323 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anik Fin Strategic Portal</title>
-    <!-- CSS & Fonts -->
+    <title>Anik Fin - High Level Strategic Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f6ff; color: #1e293b; }
-        .pro-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-        .sidebar-accent { border-left: 5px solid #0056b3; }
-        .nav-gradient { background: #ffffff; border-bottom: 2px solid #eef2f6; }
-        
-        /* Loading Spinner */
-        .loader-wrapper { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .spinner { width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid #0056b3; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Mobile Responsive Table */
-        @media (max-width: 768px) {
-            .desktop-table { display: none; }
-            .mobile-card-view { display: block; }
-        }
-        @media (min-width: 769px) {
-            .desktop-table { display: table; }
-            .mobile-card-view { display: none; }
-        }
-
-        .input-pro { width: 100%; padding: 10px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; transition: 0.2s; }
-        .input-pro:focus { border-color: #0056b3; box-shadow: 0 0 0 3px rgba(0,86,179,0.1); }
-        .btn-primary { background: #0056b3; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; transition: 0.3s; }
-        .btn-primary:hover { background: #004494; transform: translateY(-2px); }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .tab-btn { padding: 10px 20px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.3s; }
+        .tab-active { border-bottom: 3px solid #0056b3; color: #0056b3; background: #ebf4ff; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .input-box { border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 8px; font-size: 13px; outline: none; width: 100%; }
+        .input-box:focus { border-color: #0056b3; }
+        .loader { position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
-<body>
+<body class="text-slate-900">
 
-    <!-- Loader -->
-    <div id="loader" class="loader-wrapper">
-        <div class="spinner"></div>
-        <p class="mt-4 font-bold text-blue-900 tracking-wide">डेटा सिंक होत आहे...</p>
-    </div>
+    <div id="loading" class="loader"><div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div><p class="mt-2 font-bold text-blue-800">डेटा सिंक होत आहे...</p></div>
 
-    <!-- Navigation Bar -->
-    <nav class="nav-gradient sticky top-0 z-50 p-4 shadow-sm">
+    <nav class="bg-white border-b sticky top-0 z-40 p-4">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" alt="Anik Fin Logo" class="h-10 md:h-12 object-contain">
-            
-            <div class="flex items-center gap-3 w-full md:w-auto">
-                <span class="text-xs font-bold text-gray-400 uppercase hidden md:block">Manager:</span>
-                <select id="mgrSelector" onchange="initPortal()" class="w-full md:w-64 p-3 rounded-xl border-2 border-blue-50 bg-blue-50/50 font-bold text-blue-900 outline-none focus:border-blue-500">
-                    <option value="">लोड होत आहे...</option>
+            <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-10">
+            <div class="flex items-center gap-3">
+                <select id="mgrSelect" onchange="syncData()" class="p-3 rounded-xl border-2 border-blue-100 bg-blue-50 font-bold text-blue-900 outline-none">
+                    <option value="">मॅनेजर निवडा...</option>
                 </select>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+    <main id="mainArea" class="max-w-7xl mx-auto p-4 md:p-8 space-y-8 hidden">
         
-        <!-- Dashboard Placeholder -->
-        <div id="welcomeScreen" class="text-center py-20 flex flex-col items-center">
-            <div class="bg-blue-100 p-6 rounded-full mb-6 animate-bounce">📊</div>
-            <h2 class="text-2xl font-black text-blue-900">Anik Fin Strategic Planning Portal</h2>
-            <p class="text-gray-500 mt-2">सुरू करण्यासाठी कृपया तुमची ओळख निवडा</p>
+        <!-- Tabs -->
+        <div class="flex border-b">
+            <div id="tab1" class="tab-btn tab-active" onclick="switchTab(1)">Planning & Achievement</div>
+            <div id="tab2" class="tab-btn" onclick="switchTab(2)">Master Data History</div>
         </div>
 
-        <!-- Dashboard Content -->
-        <div id="dashboard" class="hidden space-y-8 animate-in fade-in">
-            
-            <!-- KPI Summary Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                <div class="pro-card p-5 sidebar-accent">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase">वाटप टार्गेट</p>
-                    <h3 id="statDisb" class="text-xl md:text-2xl font-black text-blue-900 mt-1">₹ 0</h3>
-                </div>
-                <div class="pro-card p-5 sidebar-accent border-emerald-500" style="border-left-color: #10b981;">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase">सरासरी अचीव्हमेंट</p>
-                    <h3 id="statAch" class="text-xl md:text-2xl font-black text-emerald-600 mt-1">0%</h3>
-                </div>
-                <div class="pro-card p-5 sidebar-accent border-orange-400" style="border-left-color: #fb923c;">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase">एकूण OD खाते</p>
-                    <h3 id="statOd" class="text-xl md:text-2xl font-black text-orange-600 mt-1">0</h3>
-                </div>
-                <div class="pro-card p-5 sidebar-accent border-purple-500" style="border-left-color: #a855f7;">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase">FX युनिट्स</p>
-                    <h3 id="statUnits" class="text-xl md:text-2xl font-black text-purple-600 mt-1">0</h3>
-                </div>
+        <!-- Dashboard KPIs -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="card p-5"><p class="text-[10px] font-bold text-gray-400 uppercase">Target Disb.</p><h3 id="kpiT" class="text-xl font-black text-blue-900">₹ 0</h3></div>
+            <div class="card p-5"><p class="text-[10px] font-bold text-gray-400 uppercase">Actual Disb.</p><h3 id="kpiA" class="text-xl font-black text-emerald-600">₹ 0</h3></div>
+            <div class="card p-5"><p class="text-[10px] font-bold text-gray-400 uppercase">Achievement</p><h3 id="kpiP" class="text-xl font-black text-orange-500">0%</h3></div>
+            <div class="card p-5"><p class="text-[10px] font-bold text-gray-400 uppercase">Total FX</p><h3 id="kpiF" class="text-xl font-black text-purple-600">0</h3></div>
+        </div>
+
+        <!-- Section 1: Planning & Achievement -->
+        <div id="section1" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-[300px]">
+                <div class="card p-4"><canvas id="chart1"></canvas></div>
+                <div class="card p-4"><canvas id="chart2"></canvas></div>
             </div>
 
-            <!-- Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="pro-card p-6 h-[300px]">
-                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-4 tracking-widest">मागील अचीव्हमेंट विश्लेषण</h4>
-                    <canvas id="achChart"></canvas>
+            <form id="planForm" class="card overflow-hidden">
+                <div class="p-6 bg-slate-50 border-b flex flex-col md:flex-row gap-4">
+                    <div class="flex-grow"><label class="text-[11px] font-bold text-gray-500 block uppercase">Start Date</label><input type="date" id="sDate" required class="input-box"></div>
+                    <div class="flex-grow"><label class="text-[11px] font-bold text-gray-500 block uppercase">End Date</label><input type="date" id="eDate" required class="input-box"></div>
                 </div>
-                <div class="pro-card p-6 h-[300px]">
-                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-4 tracking-widest">OD कव्हरेज ट्रेंड</h4>
-                    <canvas id="odChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Planning Form -->
-            <form id="planningForm" class="pro-card overflow-hidden">
-                <div class="bg-blue-50/50 p-6 md:p-8 border-b border-blue-100">
-                    <h3 class="text-lg font-bold text-blue-900 mb-4">साप्ताहिक प्लॅन तपशील</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="text-[11px] font-bold text-gray-500 uppercase mb-2 block">कालावधी पासून</label>
-                            <input type="date" id="planStart" required class="input-pro font-bold text-blue-900">
-                        </div>
-                        <div>
-                            <label class="text-[11px] font-bold text-gray-500 uppercase mb-2 block">कालावधी पर्यंत</label>
-                            <input type="date" id="planEnd" required class="input-pro font-bold text-blue-900">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4 md:p-0">
-                    <!-- Desktop View -->
-                    <table class="w-full desktop-table">
-                        <thead class="bg-gray-50 text-[11px] text-gray-400 uppercase">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-100 text-[10px] font-bold uppercase">
                             <tr>
-                                <th class="p-4 text-left">FX युनिट</th>
-                                <th class="p-4">वाटप रक्कम</th>
-                                <th class="p-4">अॅटो पे</th>
-                                <th class="p-4">OD (Qty | Amt)</th>
-                                <th class="p-4">ॲक्शन प्लॅन</th>
-                                <th class="p-4">Ach %</th>
+                                <th class="p-4 text-left">FX Unit</th>
+                                <th class="p-4">Target Disb</th>
+                                <th class="p-4">Actual Disb</th>
+                                <th class="p-4">OD (Plan|Act)</th>
+                                <th class="p-4">Past Due Action</th>
                             </tr>
                         </thead>
-                        <tbody id="fxDesktopBody"></tbody>
+                        <tbody id="fxTable"></tbody>
                     </table>
-
-                    <!-- Mobile View -->
-                    <div id="fxMobileBody" class="mobile-card-view space-y-4 p-2"></div>
-
-                    <div class="p-8 flex justify-center bg-gray-50/50">
-                        <button type="submit" class="btn-primary w-full md:w-auto shadow-xl">प्लॅन सबमिट करा</button>
-                    </div>
                 </div>
+                <div class="p-6 text-center"><button type="submit" class="bg-blue-700 text-white px-10 py-3 rounded-xl font-bold hover:scale-105 transition">Submit Week Plan/Results</button></div>
             </form>
+        </div>
+
+        <!-- Section 2: Master Data History -->
+        <div id="section2" class="hidden animate-in fade-in">
+            <div class="card overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-800 text-white text-[10px] uppercase">
+                        <tr>
+                            <th class="p-4 text-left">Period</th>
+                            <th class="p-4">Total Target</th>
+                            <th class="p-4">Total Achieved</th>
+                            <th class="p-4">Efficiency</th>
+                            <th class="p-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTable"></tbody>
+                </table>
+            </div>
         </div>
     </main>
 
-    <footer class="p-10 text-center text-gray-400 text-xs">
-        &copy; 2025 Anik Financial Services | Pro Management Suite
-    </footer>
-
     <script>
-        // API URL
-        const APP_URL = "https://script.google.com/macros/s/AKfycbwHg4SmoLrehfinJj3uwMbXiyxIZZ_ZaBT09dmxwUxoFzBg3ULbEz_0xJez3HvxV37f/exec";
-        let c1, c2;
+        const API = "https://script.google.com/macros/s/AKfycbzJfEgqkdMqr_OFA-xgHt2j3kTmq730XQiUJrDEuyr8qLkKgfFtxYmhHAjKWO5NJ6Sd/exec";
+        let managerData = { fxList: [], history: [] };
+        let charts = {};
 
-        // १. लोड मॅनेजर
-        window.onload = async () => {
+        window.onload = () => {
             toggleLoader(true);
-            try {
-                const res = await fetch(`${APP_URL}?action=getManagers`);
-                const managers = await res.json();
-                const sel = document.getElementById('mgrSelector');
-                sel.innerHTML = '<option value="">-- निवडा --</option>';
-                managers.forEach(m => sel.add(new Option(m, m)));
-            } catch (e) { alert("सर्व्हर कनेक्ट होऊ शकला नाही!"); }
-            toggleLoader(false);
+            fetch(`${API}?action=getManagers`).then(r => r.json()).then(d => {
+                const s = document.getElementById('mgrSelect');
+                d.forEach(m => s.add(new Option(m,m)));
+                toggleLoader(false);
+            });
         };
 
-        // २. इनिशियलाइज डॅशबोर्ड
-        async function initPortal() {
-            const manager = document.getElementById('mgrSelector').value;
-            if (!manager) {
-                document.getElementById('welcomeScreen').classList.remove('hidden');
-                document.getElementById('dashboard').classList.add('hidden');
-                return;
-            }
-
+        async function syncData() {
+            const m = document.getElementById('mgrSelect').value;
+            if(!m) return;
             toggleLoader(true);
-            const res = await fetch(`${APP_URL}?action=getDetails&manager=${encodeURIComponent(manager)}`);
-            const { fxList, prevData } = await res.json();
-
-            document.getElementById('welcomeScreen').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
-            document.getElementById('statUnits').innerText = fxList.length;
-
-            renderInputs(fxList);
-            if(prevData) renderCharts(prevData.fxDetails);
+            const r = await fetch(`${API}?action=getManagerFullData&manager=${encodeURIComponent(m)}`);
+            managerData = await r.json();
+            
+            document.getElementById('mainArea').classList.remove('hidden');
+            renderTable();
+            renderHistory();
+            updateKPIs();
             toggleLoader(false);
         }
 
-        // ३. रेंडर फॉर्म (मोबाईल + डेस्कटॉप दोन्हीसाठी)
-        function renderInputs(list) {
-            const dBody = document.getElementById('fxDesktopBody');
-            const mBody = document.getElementById('fxMobileBody');
-            dBody.innerHTML = ""; mBody.innerHTML = "";
-
-            list.forEach(fx => {
-                // Desktop Row
-                dBody.insertAdjacentHTML('beforeend', `
-                    <tr class="border-b">
-                        <td class="p-4 font-bold text-blue-900">${fx}<input type="hidden" class="fx-name" value="${fx}"></td>
-                        <td class="p-2"><input type="number" class="fx-disb input-pro" oninput="liveCalc()"></td>
-                        <td class="p-2"><input type="number" class="fx-auto input-pro"></td>
-                        <td class="p-2 flex gap-1"><input type="number" class="fx-odq w-16 input-pro" oninput="liveCalc()"><input type="number" class="fx-oda flex-grow input-pro"></td>
-                        <td class="p-2"><input type="text" class="fx-pd input-pro"></td>
-                        <td class="p-2"><input type="number" class="fx-ach input-pro bg-blue-50 font-bold"></td>
-                    </tr>
-                `);
-
-                // Mobile Card
-                mBody.insertAdjacentHTML('beforeend', `
-                    <div class="pro-card p-5 space-y-3">
-                        <div class="font-bold text-blue-900 border-b pb-2 mb-2 flex justify-between">
-                            <span>${fx}</span> <span class="text-[10px] text-blue-400 uppercase">Unit</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div><label class="text-[10px] font-bold text-gray-400 uppercase">वाटप रक्कम</label><input type="number" class="fx-disb-m input-pro" oninput="liveCalc()"></div>
-                            <div><label class="text-[10px] font-bold text-gray-400 uppercase">अॅटो पे</label><input type="number" class="fx-auto-m input-pro"></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div><label class="text-[10px] font-bold text-gray-400 uppercase">OD संख्या</label><input type="number" class="fx-odq-m input-pro" oninput="liveCalc()"></div>
-                            <div><label class="text-[10px] font-bold text-gray-400 uppercase">OD रक्कम</label><input type="number" class="fx-oda-m input-pro"></div>
-                        </div>
-                        <div><label class="text-[10px] font-bold text-gray-400 uppercase">ॲक्शन प्लॅन</label><input type="text" class="fx-pd-m input-pro"></div>
-                        <div><label class="text-[10px] font-bold text-gray-400 uppercase">अचीव्हमेंट %</label><input type="number" class="fx-ach-m input-pro bg-blue-50"></div>
-                    </div>
-                `);
-            });
+        function renderTable() {
+            const b = document.getElementById('fxTable');
+            b.innerHTML = managerData.fxList.map(fx => `
+                <tr class="border-b">
+                    <td class="p-4 font-bold text-blue-900">${fx}<input type="hidden" class="fx-name" value="${fx}"></td>
+                    <td class="p-2"><input type="number" class="t-disb input-box" placeholder="Target ₹" oninput="updateKPIs()"></td>
+                    <td class="p-2"><input type="number" class="a-disb input-box bg-emerald-50" placeholder="Actual ₹" oninput="updateKPIs()"></td>
+                    <td class="p-2 flex gap-1"><input type="number" class="t-od w-1/2 input-box" placeholder="P"><input type="number" class="a-od w-1/2 input-box bg-emerald-50" placeholder="A"></td>
+                    <td class="p-2"><input type="text" class="p-action input-box" placeholder="Action taken..."></td>
+                </tr>
+            `).join('');
         }
 
-        // ४. चार्ट्स (Power BI Style)
-        function renderCharts(data) {
-            const labels = data.map(f => f.name);
-            const achs = data.map(f => f.ach || 0);
-            const ods = data.map(f => f.odCount || 0);
-
-            const avg = (achs.reduce((a, b) => a + Number(b), 0) / achs.length).toFixed(1);
-            document.getElementById('statAch').innerText = avg + "%";
-
-            if(c1) c1.destroy();
-            c1 = new Chart(document.getElementById('achChart'), {
-                type: 'bar',
-                data: { labels: labels, datasets: [{ label: 'Achievement %', data: achs, backgroundColor: '#0056b3', borderRadius: 8 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
-
-            if(c2) c2.destroy();
-            c2 = new Chart(document.getElementById('odChart'), {
-                type: 'line',
-                data: { labels: labels, datasets: [{ label: 'OD Target', data: ods, borderColor: '#fb923c', tension: 0.4, fill: true, backgroundColor: 'rgba(251, 146, 60, 0.1)' }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
-        }
-
-        // ५. लाईव्ह आकडेमोड
-        function liveCalc() {
-            let totalD = 0, totalO = 0;
-            const isMobile = window.innerWidth <= 768;
+        function updateKPIs() {
+            let tD = 0, aD = 0;
+            document.querySelectorAll('.t-disb').forEach(i => tD += Number(i.value || 0));
+            document.querySelectorAll('.a-disb').forEach(i => aD += Number(i.value || 0));
             
-            const disbInputs = isMobile ? document.querySelectorAll('.fx-disb-m') : document.querySelectorAll('.fx-disb');
-            const odInputs = isMobile ? document.querySelectorAll('.fx-odq-m') : document.querySelectorAll('.fx-odq');
+            document.getElementById('kpiT').innerText = "₹ " + tD.toLocaleString();
+            document.getElementById('kpiA').innerText = "₹ " + aD.toLocaleString();
+            document.getElementById('kpiP').innerText = tD > 0 ? ((aD/tD)*100).toFixed(1) + "%" : "0%";
+            document.getElementById('kpiF').innerText = managerData.fxList.length;
 
-            disbInputs.forEach(i => totalD += Number(i.value || 0));
-            odInputs.forEach(i => totalO += Number(i.value || 0));
-
-            document.getElementById('statDisb').innerText = "₹ " + totalD.toLocaleString('hi-IN');
-            document.getElementById('statOd').innerText = totalO;
+            renderCharts(tD, aD);
         }
 
-        // ६. सबमिट
-        document.getElementById('planningForm').onsubmit = async (e) => {
+        function renderCharts(t, a) {
+            const ctx1 = document.getElementById('chart1');
+            if(charts.c1) charts.c1.destroy();
+            charts.c1 = new Chart(ctx1, {
+                type: 'doughnut',
+                data: { labels: ['Planned', 'Achieved'], datasets: [{ data: [t, a], backgroundColor: ['#e2e8f0', '#0056b3'] }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function renderHistory() {
+            const b = document.getElementById('historyTable');
+            b.innerHTML = managerData.history.map(h => {
+                let hT = 0, hA = 0;
+                h.details.forEach(d => { hT += Number(d.tDisb); hA += Number(d.aDisb); });
+                return `
+                <tr class="border-b hover:bg-gray-50 text-xs">
+                    <td class="p-4 font-bold">${h.sDate} to ${h.eDate}</td>
+                    <td class="p-4">₹ ${hT.toLocaleString()}</td>
+                    <td class="p-4 font-bold text-emerald-600">₹ ${hA.toLocaleString()}</td>
+                    <td class="p-4 font-bold text-orange-600">${((hA/hT)*100).toFixed(1)}%</td>
+                    <td class="p-4"><button onclick='viewDetails(${JSON.stringify(h.details)})' class="text-blue-600 font-bold underline">View</button></td>
+                </tr>`;
+            }).reverse().join('');
+        }
+
+        document.getElementById('planForm').onsubmit = async (e) => {
             e.preventDefault();
             toggleLoader(true);
-            const isMobile = window.innerWidth <= 768;
             const fxDetails = [];
-
-            if(isMobile) {
-                document.querySelectorAll('#fxMobileBody .pro-card').forEach(card => {
-                    fxDetails.push({
-                        name: card.querySelector('.font-bold span').innerText,
-                        disb: card.querySelector('.fx-disb-m').value,
-                        auto: card.querySelector('.fx-auto-m').value,
-                        odCount: card.querySelector('.fx-odq-m').value,
-                        odAmt: card.querySelector('.fx-oda-m').value,
-                        pd: card.querySelector('.fx-pd-m').value,
-                        ach: card.querySelector('.fx-ach-m').value
-                    });
+            document.querySelectorAll('#fxTable tr').forEach(row => {
+                fxDetails.push({
+                    name: row.querySelector('.fx-name').value,
+                    tDisb: row.querySelector('.t-disb').value,
+                    aDisb: row.querySelector('.a-disb').value,
+                    tOd: row.querySelector('.t-od').value,
+                    aOd: row.querySelector('.a-od').value,
+                    pd: row.querySelector('.p-action').value
                 });
-            } else {
-                document.querySelectorAll('#fxDesktopBody tr').forEach(row => {
-                    fxDetails.push({
-                        name: row.querySelector('.fx-name').value,
-                        disb: row.querySelector('.fx-disb').value,
-                        auto: row.querySelector('.fx-auto').value,
-                        odCount: row.querySelector('.fx-odq').value,
-                        odAmt: row.querySelector('.fx-oda').value,
-                        pd: row.querySelector('.fx-pd').value,
-                        ach: row.querySelector('.fx-ach').value
-                    });
-                });
-            }
+            });
 
             const payload = {
-                manager: document.getElementById('mgrSelector').value,
-                sDate: document.getElementById('planStart').value,
-                eDate: document.getElementById('planEnd').value,
+                manager: document.getElementById('mgrSelect').value,
+                sDate: document.getElementById('sDate').value,
+                eDate: document.getElementById('eDate').value,
                 fxDetails: fxDetails
             };
 
-            try {
-                const res = await fetch(APP_URL, { method: "POST", body: JSON.stringify(payload) });
-                const result = await res.json();
-                if(result.status === "SUCCESS") {
-                    alert("साप्ताहिक प्लॅन यशस्वीरित्या सेव्ह झाला!");
-                    location.reload();
-                }
-            } catch (e) { alert("Error: सबमिट होऊ शकले नाही."); }
+            const r = await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+            const res = await r.json();
+            alert(res.message);
+            if(res.status === "SUCCESS") location.reload();
             toggleLoader(false);
         };
 
-        function toggleLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
+        function switchTab(n) {
+            document.getElementById('section1').classList.toggle('hidden', n !== 1);
+            document.getElementById('section2').classList.toggle('hidden', n !== 2);
+            document.getElementById('tab1').classList.toggle('tab-active', n === 1);
+            document.getElementById('tab2').classList.toggle('tab-active', n === 2);
+        }
+
+        function toggleLoader(s) { document.getElementById('loading').style.display = s ? 'flex' : 'none'; }
     </script>
 </body>
 </html>
