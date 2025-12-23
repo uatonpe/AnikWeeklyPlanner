@@ -3,22 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Anik Fin Pro Portal</title>
+    <title>Anik Fin Pro Portal | Premium Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f7ff; }
-        .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50; }
-        .card { background: white; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid #f0f4f8; overflow: hidden; }
-        .input-pro { width: 100%; padding: 12px; border: 2px solid #edf2f7; border-radius: 12px; font-size: 14px; outline: none; transition: 0.2s; }
-        .input-pro:focus { border-color: #3b82f6; background: #fff; }
-        .btn-main { background: #1e40af; color: white; padding: 16px; border-radius: 16px; font-weight: 800; width: 100%; transition: 0.3s; box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.3); }
-        .btn-main:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
-        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
-        .loader-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        :root {
+            --primary: #1e40af;
+            --secondary: #3b82f6;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --bg-light: #f8fafc;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg-light);
+            color: #1e293b;
+        }
+
+        .glass-header { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(12px); 
+            border-bottom: 2px solid #e2e8f0; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+
+        .card { 
+            background: white; 
+            border-radius: 24px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1); 
+            border: 1px solid #f1f5f9; 
+            transition: transform 0.2s ease;
+        }
+
+        .input-pro { 
+            width: 100%; 
+            padding: 14px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 14px; 
+            font-size: 14px; 
+            font-weight: 600;
+            outline: none; 
+            transition: all 0.3s; 
+        }
+
+        .input-pro:focus { 
+            border-color: var(--secondary); 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-locked {
+            background-color: #f1f5f9 !important;
+            color: #64748b !important;
+            cursor: not-allowed;
+            border-color: #cbd5e1 !important;
+        }
+
+        .btn-main { 
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white; 
+            padding: 18px; 
+            border-radius: 16px; 
+            font-weight: 800; 
+            width: 100%; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(30, 64, 175, 0.5);
+        }
+
+        .btn-main:active { transform: translateY(0); }
+
+        .btn-main:disabled { 
+            background: #cbd5e1; 
+            box-shadow: none; 
+            cursor: not-allowed; 
+            transform: none;
+        }
+
+        .status-badge { 
+            padding: 6px 14px; 
+            border-radius: 30px; 
+            font-size: 10px; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+
+        .loader-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(255,255,255,0.95); 
+            z-index: 2000; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        .kpi-card {
+            position: relative;
+            overflow: hidden;
+        }
         
-        /* Mobile List Optimization */
+        .kpi-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .kpi-disb { border-bottom-color: #3b82f6; }
+        .kpi-od { border-bottom-color: #f59e0b; }
+        .kpi-eff { border-bottom-color: #10b981; }
+
         @media (max-width: 640px) {
             .table-container { display: none; }
             .mobile-list { display: block; }
@@ -27,129 +137,210 @@
             .table-container { display: block; }
             .mobile-list { display: none; }
         }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="pb-10">
+<body class="pb-20">
 
+    <!-- Loader -->
     <div id="loader" class="loader-overlay">
-        <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p class="mt-4 font-bold text-blue-900">Securely Connecting...</p>
+        <div class="relative">
+            <div class="w-20 h-20 border-4 border-blue-100 rounded-full"></div>
+            <div class="w-20 h-20 border-4 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0"></div>
+        </div>
+        <p class="mt-6 font-black text-blue-900 tracking-widest animate-pulse">डेटा लोड होत आहे...</p>
     </div>
 
+    <!-- Header -->
     <nav class="glass-header p-4">
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
-            <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-8 md:h-10">
-            <select id="manager" onchange="loadData()" class="bg-blue-50 border-none rounded-xl p-2 text-sm font-bold text-blue-900 outline-none">
-                <option value="">निवडा...</option>
-            </select>
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-8 md:h-12 object-contain">
+            <div class="flex items-center gap-4">
+                <div class="hidden md:block text-right">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">निवडलेला मॅनेजर</p>
+                    <p id="managerDisplay" class="text-sm font-black text-blue-900">--</p>
+                </div>
+                <select id="manager" onchange="loadData()" class="bg-blue-50 border-2 border-blue-100 rounded-2xl px-4 py-2 text-sm font-black text-blue-900 focus:ring-4 focus:ring-blue-100 outline-none">
+                    <option value="">मॅनेजर निवडा</option>
+                </select>
+            </div>
         </div>
     </nav>
 
-    <main id="mainContent" class="max-w-5xl mx-auto p-4 space-y-6 hidden">
+    <main id="mainContent" class="max-w-6xl mx-auto p-4 md:p-8 space-y-8 hidden">
         
-        <!-- Blocker Message for Last Week Achievement -->
-        <div id="blocker" class="hidden card bg-red-50 border-red-200 p-6 flex items-center gap-4 animate-pulse">
-            <span class="text-3xl">⚠️</span>
+        <!-- Manager Prominent Name -->
+        <div class="text-center md:text-left">
+            <h1 id="prominentManagerName" class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">--</h1>
+            <p class="text-slate-500 font-medium mt-1">तुमच्या साप्ताहिक कामगिरीचा अहवाल येथे पहा.</p>
+        </div>
+
+        <!-- Blocker Alert -->
+        <div id="blocker" class="hidden card bg-red-50 border-red-200 p-6 flex items-center gap-6 animate-bounce">
+            <div class="bg-red-500 text-white p-4 rounded-2xl shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
             <div>
-                <h4 class="font-extrabold text-red-800 uppercase text-xs tracking-widest">Achievement Pending</h4>
-                <p class="text-red-600 text-sm">तुम्ही मागील आठवड्याचे Achievement भरलेले नाही. कृपया आधी मागील प्लॅन अपडेट करा.</p>
+                <h4 class="font-black text-red-900 uppercase text-sm tracking-wider">Achievement Pending!</h4>
+                <p class="text-red-700 text-sm">तुम्ही मागील आठवड्याचे अचीव्हमेंट (Actual) भरलेले नाही. आधी ते पूर्ण करा.</p>
             </div>
         </div>
 
-        <!-- Dynamic KPIs -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="card p-4 text-center">
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Target</p>
-                <p id="kpiT" class="text-lg font-black text-slate-900">₹ 0</p>
+        <!-- Dynamic KPI Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div class="card p-6 kpi-card kpi-disb">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Disb. Target</p>
+                <p id="kpiT" class="text-xl md:text-2xl font-black text-slate-900 mt-1">₹ 0</p>
             </div>
-            <div class="card p-4 text-center border-emerald-100">
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Actual</p>
-                <p id="kpiA" class="text-lg font-black text-emerald-600">₹ 0</p>
+            <div class="card p-6 kpi-card kpi-disb">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Disb. Actual</p>
+                <p id="kpiA" class="text-xl md:text-2xl font-black text-emerald-600 mt-1">₹ 0</p>
             </div>
-            <div class="card p-4 text-center">
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Eff. %</p>
-                <p id="kpiE" class="text-lg font-black text-orange-500">0%</p>
+            <div class="card p-6 kpi-card kpi-od">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total OD Actual</p>
+                <p id="kpiOD" class="text-xl md:text-2xl font-black text-orange-600 mt-1">₹ 0</p>
             </div>
-            <div class="card p-4 text-center">
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Units</p>
-                <p id="kpiU" class="text-lg font-black text-blue-700">0</p>
+            <div class="card p-6 kpi-card kpi-eff text-white bg-blue-900">
+                <p class="text-[10px] font-bold text-blue-300 uppercase tracking-widest">Disb. Efficiency</p>
+                <p id="kpiE" class="text-xl md:text-2xl font-black mt-1">0%</p>
             </div>
         </div>
 
-        <!-- Navigation Tabs -->
-        <div class="flex gap-2 p-1 bg-white rounded-2xl border w-full md:w-fit">
-            <button onclick="tab(1)" id="t1" class="flex-1 px-6 py-2 rounded-xl font-bold text-xs transition bg-blue-600 text-white">Create Plan</button>
-            <button onclick="tab(2)" id="t2" class="flex-1 px-6 py-2 rounded-xl font-bold text-xs transition text-slate-500">History</button>
+        <!-- Section Navigation -->
+        <div class="flex p-1.5 bg-slate-200/50 rounded-2xl w-full md:w-fit">
+            <button onclick="tab(1)" id="t1" class="flex-1 px-8 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-white shadow-sm text-blue-700">Planning & Achievement</button>
+            <button onclick="tab(2)" id="t2" class="flex-1 px-8 py-3 rounded-xl font-bold text-sm transition-all duration-300 text-slate-600">Reports & History</button>
         </div>
 
         <!-- FORM SECTION -->
-        <div id="sec1">
+        <div id="sec1" class="space-y-8 animate-fadeIn">
             <form id="pForm" class="space-y-6">
-                <div class="card p-6 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white">
-                    <div><label class="text-[10px] font-bold uppercase text-slate-400">Start Date</label><input type="date" id="sDate" required class="input-pro font-bold"></div>
-                    <div><label class="text-[10px] font-bold uppercase text-slate-400">End Date</label><input type="date" id="eDate" required class="input-pro font-bold"></div>
+                <div class="card p-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white shadow-xl">
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">पिरियड सुरूवात दिनांक</label>
+                        <input type="date" id="sDate" required class="input-pro">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">पिरियड शेवट दिनांक</label>
+                        <input type="date" id="eDate" required class="input-pro">
+                    </div>
                 </div>
 
-                <div class="table-container card">
-                    <table class="w-full text-sm">
-                        <thead class="bg-slate-50 text-[10px] font-bold uppercase text-slate-500">
+                <!-- Desktop Table -->
+                <div class="table-container card overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b-2 border-slate-100">
                             <tr>
-                                <th class="p-4 text-left">FX Unit</th>
-                                <th class="p-4">Target (₹)</th>
-                                <th class="p-4">Actual (₹)</th>
-                                <th class="p-4">OD (P|A)</th>
-                                <th class="p-4">Action Plan</th>
+                                <th class="p-5 text-[10px] font-black uppercase text-slate-500">FX Unit Name</th>
+                                <th class="p-5 text-[10px] font-black uppercase text-slate-500">Target (₹)</th>
+                                <th class="p-5 text-[10px] font-black uppercase text-slate-500">Actual (₹)</th>
+                                <th class="p-5 text-[10px] font-black uppercase text-slate-500">OD (Plan|Act)</th>
+                                <th class="p-5 text-[10px] font-black uppercase text-slate-500">Action Plan / Remarks</th>
                             </tr>
                         </thead>
-                        <tbody id="pcRows"></tbody>
+                        <tbody id="pcRows" class="divide-y divide-slate-100">
+                            <!-- JS Inject -->
+                        </tbody>
                     </table>
                 </div>
 
-                <!-- Pro Mobile Card List -->
-                <div id="mobRows" class="mobile-list space-y-4"></div>
+                <!-- Mobile Cards -->
+                <div id="mobRows" class="mobile-list space-y-4">
+                    <!-- JS Inject -->
+                </div>
 
-                <button type="submit" id="submitBtn" class="btn-main">सबमिट प्लॅन</button>
+                <div class="card p-6 bg-blue-50 border-blue-100">
+                    <button type="submit" id="submitBtn" class="btn-main">सबमिट प्लॅन</button>
+                    <p class="text-center text-[10px] text-slate-400 mt-4 font-bold uppercase tracking-widest">नोंदणी करण्यापूर्वी सर्व माहिती तपासून घ्या</p>
+                </div>
             </form>
         </div>
 
         <!-- HISTORY SECTION -->
-        <div id="sec2" class="hidden space-y-4">
-            <div id="historyList" class="space-y-4"></div>
+        <div id="sec2" class="hidden space-y-6">
+            <div class="card p-6 bg-white flex flex-col md:flex-row gap-4 items-end">
+                <div class="flex-1">
+                    <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">पासून</label>
+                    <input type="date" id="filterFrom" class="input-pro">
+                </div>
+                <div class="flex-1">
+                    <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">पर्यंत</label>
+                    <input type="date" id="filterTo" class="input-pro">
+                </div>
+                <button onclick="renderHistory()" class="bg-slate-900 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-black transition">फिल्टर करा</button>
+            </div>
+            
+            <div id="historyList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- History Cards -->
+            </div>
         </div>
 
     </main>
 
     <script>
+        // API URL (Your Google Script Link)
         const API = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec";
-        let state = { fx: [], history: [], pendingAch: false };
-
-        window.onload = () => {
-            toggleLoader(true);
-            fetch(`${API}?action=getManagers`).then(r => r.json()).then(d => {
-                const s = document.getElementById('manager');
-                d.forEach(m => s.add(new Option(m,m)));
-                toggleLoader(false);
-            });
+        
+        // Global State
+        let state = { 
+            fx: [], 
+            history: [], 
+            pendingAch: false,
+            currentManager: "" 
         };
 
+        // Initialize
+        window.onload = () => {
+            toggleLoader(true);
+            fetch(`${API}?action=getManagers`)
+                .then(r => r.json())
+                .then(d => {
+                    const s = document.getElementById('manager');
+                    d.forEach(m => s.add(new Option(m,m)));
+                    toggleLoader(false);
+                })
+                .catch(err => alert("Error loading managers: " + err));
+        };
+
+        // Load Manager Data
         async function loadData() {
             const m = document.getElementById('manager').value;
-            if(!m) return;
-            toggleLoader(true);
-            const r = await fetch(`${API}?action=getManagerData&manager=${encodeURIComponent(m)}`);
-            const d = await r.json();
-            state.fx = d.fxList;
-            state.history = d.history;
+            if(!m) {
+                document.getElementById('mainContent').classList.add('hidden');
+                return;
+            }
             
-            checkPending();
-            renderTable();
-            document.getElementById('mainContent').classList.remove('hidden');
+            state.currentManager = m;
+            document.getElementById('managerDisplay').innerText = m;
+            document.getElementById('prominentManagerName').innerText = m;
+            
+            toggleLoader(true);
+            try {
+                const r = await fetch(`${API}?action=getManagerData&manager=${encodeURIComponent(m)}`);
+                const d = await r.json();
+                state.fx = d.fxList;
+                state.history = d.history;
+                
+                checkPending();
+                renderTable();
+                document.getElementById('mainContent').classList.remove('hidden');
+            } catch (e) {
+                alert("डेटा लोड करताना त्रुटी आली.");
+            }
             toggleLoader(false);
         }
 
+        // Logic to check if last entry needs Actual Achievement
         function checkPending() {
             if(state.history.length > 0) {
                 const last = state.history[state.history.length - 1];
+                // If actual disbursement is empty for any entry, it means achievement is pending
                 let incomplete = false;
                 last.details.forEach(item => { if(!item.aDisb) incomplete = true; });
                 
@@ -162,16 +353,22 @@
                     document.getElementById('sDate').value = last.sDate;
                     document.getElementById('eDate').value = last.eDate;
                     document.getElementById('sDate').readOnly = true;
-                    btn.innerText = "मागील अचीव्हमेंट अपडेट करा";
+                    document.getElementById('eDate').readOnly = true;
+                    btn.innerText = "अचीव्हमेंट अपडेट करा";
+                    btn.classList.replace('from-blue-600', 'from-emerald-600');
                 } else {
                     b.classList.add('hidden');
                     document.getElementById('sDate').value = "";
+                    document.getElementById('eDate').value = "";
                     document.getElementById('sDate').readOnly = false;
+                    document.getElementById('eDate').readOnly = false;
                     btn.innerText = "नवीन प्लॅन सबमिट करा";
+                    btn.classList.replace('from-emerald-600', 'from-blue-600');
                 }
             }
         }
 
+        // Render Data Rows
         function renderTable() {
             const pc = document.getElementById('pcRows');
             const mb = document.getElementById('mobRows');
@@ -182,28 +379,69 @@
             state.fx.forEach((name, i) => {
                 const prev = lastData ? lastData.find(ld => ld.name === name) : { tDisb: '', aDisb: '', tOd: '', aOd: '', pd: '' };
                 
-                // Desktop
+                const targetLocked = state.pendingAch ? "input-locked" : "";
+                const actualLocked = !state.pendingAch ? "input-locked" : "";
+
+                // Desktop Row
                 pc.innerHTML += `
-                    <tr class="border-b">
-                        <td class="p-4 font-bold text-blue-900">${name}</td>
-                        <td class="p-2"><input type="number" class="val-tDisb input-pro" value="${prev.tDisb}" ${state.pendingAch ? 'readonly' : ''} oninput="liveKPI()"></td>
-                        <td class="p-2"><input type="number" class="val-aDisb input-pro bg-emerald-50" value="${prev.aDisb}" oninput="liveKPI()"></td>
-                        <td class="p-2 flex gap-1"><input type="number" class="val-tOd w-12 input-pro" value="${prev.tOd}"><input type="number" class="val-aOd w-12 input-pro bg-emerald-50" value="${prev.aOd}"></td>
-                        <td class="p-2"><input type="text" class="val-pd input-pro" value="${prev.pd}"></td>
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-5 font-extrabold text-blue-900">${name}</td>
+                        <td class="p-3">
+                            <input type="number" class="val-tDisb input-pro ${targetLocked}" 
+                            value="${prev.tDisb}" ${state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
+                        </td>
+                        <td class="p-3">
+                            <input type="number" class="val-aDisb input-pro bg-emerald-50 ${actualLocked}" 
+                            value="${prev.aDisb}" ${!state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
+                        </td>
+                        <td class="p-3">
+                            <div class="flex gap-1">
+                                <input type="number" class="val-tOd w-20 input-pro ${targetLocked}" placeholder="T" 
+                                value="${prev.tOd}" ${state.pendingAch ? 'readonly' : ''}>
+                                <input type="number" class="val-aOd w-20 input-pro bg-orange-50 ${actualLocked}" placeholder="A" 
+                                value="${prev.aOd}" ${!state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
+                            </div>
+                        </td>
+                        <td class="p-3">
+                            <input type="text" class="val-pd input-pro" value="${prev.pd || ''}" placeholder="रिस्पॉन्स लिहा...">
+                        </td>
                         <input type="hidden" class="val-name" value="${name}">
                     </tr>`;
                 
                 // Mobile Card View
                 mb.innerHTML += `
-                    <div class="card p-5 space-y-4">
-                        <div class="flex justify-between items-center border-b pb-2"><span class="font-black text-blue-900">${name}</span><span class="status-badge bg-blue-100 text-blue-600">Unit ${i+1}</span></div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div><label class="text-[9px] font-black text-slate-400 uppercase">Target ₹</label><input type="number" class="val-tDisb input-pro" value="${prev.tDisb}" ${state.pendingAch ? 'readonly' : ''} oninput="liveKPI()"></div>
-                            <div><label class="text-[9px] font-black text-slate-400 uppercase">Actual ₹</label><input type="number" class="val-aDisb input-pro bg-emerald-50" value="${prev.aDisb}" oninput="liveKPI()"></div>
+                    <div class="card p-6 space-y-5 border-l-8 border-l-blue-600 shadow-md">
+                        <div class="flex justify-between items-center border-b pb-3">
+                            <span class="font-black text-blue-900 text-lg">${name}</span>
+                            <span class="status-badge bg-blue-100 text-blue-600">FX Unit ${i+1}</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div><label class="text-[9px] font-black text-slate-400 uppercase">OD (P|A)</label><div class="flex gap-1"><input type="number" class="val-tOd w-1/2 input-pro" value="${prev.tOd}"><input type="number" class="val-aOd w-1/2 input-pro bg-emerald-50" value="${prev.aOd}"></div></div>
-                            <div><label class="text-[9px] font-black text-slate-400 uppercase">Past Due Action</label><input type="text" class="val-pd input-pro" value="${prev.pd}"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase">Target Disbursement</label>
+                                <input type="number" class="val-tDisb input-pro mt-1 ${targetLocked}" 
+                                value="${prev.tDisb}" ${state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase">Actual Disbursement</label>
+                                <input type="number" class="val-aDisb input-pro mt-1 bg-emerald-50 ${actualLocked}" 
+                                value="${prev.aDisb}" ${!state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase">OD (Target | Actual)</label>
+                                <div class="flex gap-1 mt-1">
+                                    <input type="number" class="val-tOd w-1/2 input-pro ${targetLocked}" 
+                                    value="${prev.tOd}" ${state.pendingAch ? 'readonly' : ''}>
+                                    <input type="number" class="val-aOd w-1/2 input-pro bg-orange-50 ${actualLocked}" 
+                                    value="${prev.aOd}" ${!state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase">Action Plan</label>
+                                <input type="text" class="val-pd input-pro mt-1" 
+                                value="${prev.pd || ''}" placeholder="...">
+                            </div>
                         </div>
                     </div>`;
             });
@@ -211,22 +449,30 @@
             renderHistory();
         }
 
+        // Live Calculation for KPIs
         function liveKPI() {
-            let t = 0, a = 0;
+            let totalT = 0, totalA = 0, totalOD = 0;
             const isMob = window.innerWidth <= 640;
-            const container = isMob ? document.getElementById('mobRows') : document.getElementById('pcRows');
+            const context = isMob ? document.getElementById('mobRows') : document.getElementById('pcRows');
             
-            container.querySelectorAll('.val-tDisb').forEach(i => t += Number(i.value || 0));
-            container.querySelectorAll('.val-aDisb').forEach(i => a += Number(i.value || 0));
+            context.querySelectorAll('.val-tDisb').forEach(i => totalT += Number(i.value || 0));
+            context.querySelectorAll('.val-aDisb').forEach(i => totalA += Number(i.value || 0));
+            context.querySelectorAll('.val-aOd').forEach(i => totalOD += Number(i.value || 0));
             
-            document.getElementById('kpiT').innerText = "₹ " + t.toLocaleString();
-            document.getElementById('kpiA').innerText = "₹ " + a.toLocaleString();
-            document.getElementById('kpiE').innerText = t > 0 ? ((a/t)*100).toFixed(1) + "%" : "0%";
-            document.getElementById('kpiU').innerText = state.fx.length;
+            document.getElementById('kpiT').innerText = "₹ " + totalT.toLocaleString();
+            document.getElementById('kpiA').innerText = "₹ " + totalA.toLocaleString();
+            document.getElementById('kpiOD').innerText = "₹ " + totalOD.toLocaleString();
+            
+            const eff = totalT > 0 ? ((totalA/totalT)*100).toFixed(1) : 0;
+            document.getElementById('kpiE').innerText = eff + "%";
         }
 
+        // Form Submit
         document.getElementById('pForm').onsubmit = async (e) => {
             e.preventDefault();
+            
+            if(!confirm("तुम्ही दिलेली माहिती बरोबर आहे का?")) return;
+
             toggleLoader(true);
             const isMob = window.innerWidth <= 640;
             const rows = isMob ? document.querySelectorAll('#mobRows > .card') : document.querySelectorAll('#pcRows tr');
@@ -241,45 +487,97 @@
             }));
 
             const payload = {
-                manager: document.getElementById('manager').value,
+                manager: state.currentManager,
                 sDate: document.getElementById('sDate').value,
                 eDate: document.getElementById('eDate').value,
                 fxDetails
             };
 
-            const r = await fetch(API, { method: "POST", body: JSON.stringify(payload) });
-            const res = await r.json();
-            alert(res.message);
-            location.reload();
+            try {
+                const r = await fetch(API, { method: "POST", body: JSON.stringify(payload) });
+                const res = await r.json();
+                alert(res.message);
+                location.reload();
+            } catch (err) {
+                alert("सबमिट करताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.");
+                toggleLoader(false);
+            }
         };
 
+        // Render History with Date Filtering
         function renderHistory() {
-            const h = document.getElementById('historyList');
-            h.innerHTML = state.history.map(row => {
+            const hList = document.getElementById('historyList');
+            const fromDate = document.getElementById('filterFrom').value;
+            const toDate = document.getElementById('filterTo').value;
+            
+            let filtered = state.history;
+
+            if(fromDate && toDate) {
+                filtered = state.history.filter(item => {
+                    return item.sDate >= fromDate && item.eDate <= toDate;
+                });
+            }
+
+            if(filtered.length === 0) {
+                hList.innerHTML = `<div class="col-span-full p-10 text-center font-bold text-slate-400">या तारखांमध्ये कोणताही डेटा उपलब्ध नाही.</div>`;
+                return;
+            }
+
+            hList.innerHTML = filtered.map(row => {
                 let t = 0, a = 0;
                 row.details.forEach(d => { t += Number(d.tDisb); a += Number(d.aDisb); });
                 const eff = t > 0 ? ((a/t)*100).toFixed(1) : 0;
+                
+                let badgeClass = "bg-red-100 text-red-600";
+                if(eff >= 90) badgeClass = "bg-emerald-100 text-emerald-600";
+                else if(eff >= 50) badgeClass = "bg-orange-100 text-orange-600";
+
                 return `
-                <div class="card p-4 flex justify-between items-center bg-white border-l-4 border-blue-600">
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">${row.sDate} to ${row.eDate}</p>
-                        <p class="text-xs font-black">Achieved: <span class="text-emerald-600">₹ ${a.toLocaleString()}</span> / Target: ₹ ${t.toLocaleString()}</p>
+                <div class="card p-6 bg-white border-l-4 border-l-blue-600 hover:shadow-xl transition-all cursor-pointer">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">कालावधी</p>
+                            <p class="text-sm font-bold text-slate-800">${row.sDate} ते ${row.eDate}</p>
+                        </div>
+                        <span class="status-badge ${badgeClass}">${eff}% Efficiency</span>
                     </div>
-                    <div class="text-right">
-                        <span class="status-badge ${eff >= 90 ? 'bg-emerald-100 text-emerald-600' : 'bg-orange-100 text-orange-600'}">${eff}% Eff.</span>
+                    <div class="grid grid-cols-2 gap-4 border-t pt-4">
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Target Disb.</p>
+                            <p class="font-black text-slate-700">₹ ${t.toLocaleString()}</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Actual Disb.</p>
+                            <p class="font-black text-emerald-600">₹ ${a.toLocaleString()}</p>
+                        </div>
                     </div>
                 </div>`;
             }).reverse().join('');
         }
 
+        // Tab Switching Logic
         function tab(n) {
             document.getElementById('sec1').classList.toggle('hidden', n !== 1);
             document.getElementById('sec2').classList.toggle('hidden', n !== 2);
-            document.getElementById('t1').className = n === 1 ? 'flex-1 px-6 py-2 rounded-xl font-bold text-xs bg-blue-600 text-white' : 'flex-1 px-6 py-2 rounded-xl font-bold text-xs text-slate-500';
-            document.getElementById('t2').className = n === 2 ? 'flex-1 px-6 py-2 rounded-xl font-bold text-xs bg-blue-600 text-white' : 'flex-1 px-6 py-2 rounded-xl font-bold text-xs text-slate-500';
+            
+            const t1 = document.getElementById('t1');
+            const t2 = document.getElementById('t2');
+
+            if(n === 1) {
+                t1.className = "flex-1 px-8 py-3 rounded-xl font-bold text-sm bg-white shadow-sm text-blue-700 transition-all";
+                t2.className = "flex-1 px-8 py-3 rounded-xl font-bold text-sm text-slate-600 transition-all";
+            } else {
+                t2.className = "flex-1 px-8 py-3 rounded-xl font-bold text-sm bg-white shadow-sm text-blue-700 transition-all";
+                t1.className = "flex-1 px-8 py-3 rounded-xl font-bold text-sm text-slate-600 transition-all";
+                renderHistory();
+            }
         }
 
-        function toggleLoader(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
+        // UI Helpers
+        function toggleLoader(show) {
+            document.getElementById('loader').style.display = show ? 'flex' : 'none';
+        }
+
     </script>
 </body>
 </html>
