@@ -1,165 +1,326 @@
 <!DOCTYPE html>
-<html>
+<html lang="mr">
 <head>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>FX Executive Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    body { background-color: #f0f4f8; font-family: 'Inter', sans-serif; }
-    .glass-card { background: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-    .fx-row { border-bottom: 1px solid #edf2f7; padding: 15px 0; }
-    .label-custom { font-size: 11px; font-weight: 700; color: #4a5568; text-transform: uppercase; }
-    input { border: 1px solid #cbd5e0; border-radius: 5px; padding: 5px 8px; font-size: 14px; width: 100%; }
-    input:focus { border-color: #667eea; outline: none; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
+    .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+    .input-focus:focus { ring: 2px; ring-color: #6366f1; border-color: transparent; }
+    .gradient-bg { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); }
+    .tab-active { border-bottom: 3px solid #6366f1; color: #6366f1; }
+    .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 100; display: none; }
   </style>
 </head>
-<body class="p-4">
+<body class="text-slate-800">
 
-<div class="max-w-6xl mx-auto">
-  <!-- Top Bar -->
-  <div class="glass-card p-6 mb-6 flex flex-col md:flex-row justify-between items-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
-    <div>
-      <h1 class="text-2xl font-bold">Weekly Performance Planner</h1>
-      <p class="opacity-80">मॅनेजर डॅशबोर्ड</p>
-    </div>
-    <div class="mt-4 md:mt-0 w-full md:w-64">
-      <label class="text-white text-xs font-bold">मॅनेजर निवडा</label>
-      <select id="mgrSelect" onchange="loadManagerData()" class="w-full p-2 rounded text-gray-900 font-semibold">
-        <option value="">-- निवडा --</option>
-      </select>
-    </div>
+  <!-- Loader -->
+  <div id="loader" class="loading-overlay flex flex-col items-center justify-center">
+    <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+    <p class="mt-4 font-semibold text-indigo-900">प्रक्रिया सुरू आहे...</p>
   </div>
 
-  <!-- Dashboard Stats (Power BI View) -->
-  <div id="statsSection" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 hidden">
-    <div class="glass-card p-4 border-t-4 border-blue-500">
-      <p class="label-custom">मागील अचीव्हमेंट ट्रेंड</p>
-      <canvas id="achChart" height="150"></canvas>
-    </div>
-    <div class="glass-card p-4 border-t-4 border-green-500 flex flex-col justify-center items-center">
-      <p class="label-custom">एकूण FX संख्या</p>
-      <h2 id="fxCountHeader" class="text-5xl font-black text-indigo-600">0</h2>
-    </div>
-    <div class="glass-card p-4 border-t-4 border-purple-500">
-      <p class="label-custom">मागील ओडी कव्हरेज</p>
-      <canvas id="odChart" height="150"></canvas>
-    </div>
+  <!-- Sidebar/Nav -->
+  <div class="min-h-screen flex flex-col">
+    <!-- Top Header -->
+    <header class="gradient-bg text-white p-6 shadow-xl">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <h1 class="text-3xl font-extrabold tracking-tight">FX Strategic Portal v2.0</h1>
+          <p class="text-indigo-200 text-sm">Corporate Manager Weekly Performance Tracking</p>
+        </div>
+        
+        <div class="w-full md:w-80 bg-white/10 p-3 rounded-xl border border-white/20">
+          <label class="block text-xs font-bold uppercase text-indigo-200 mb-1">मॅनेजर निवडा</label>
+          <select id="managerSelect" onchange="initManagerSession()" class="w-full bg-slate-900 text-white rounded-lg p-2 outline-none focus:ring-2 ring-indigo-400 transition-all">
+            <option value="">-- मॅनेजर निवडा --</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-8">
+      
+      <!-- Placeholder when no manager selected -->
+      <div id="welcomeScreen" class="text-center py-20">
+        <div class="text-6xl mb-4">📊</div>
+        <h2 class="text-2xl font-bold text-slate-400">सुरू करण्यासाठी मॅनेजरचे नाव निवडा</h2>
+      </div>
+
+      <!-- Main Content (Hidden until manager selected) -->
+      <div id="mainDashboard" class="hidden animate-fade-in">
+        
+        <!-- Power BI Stats Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="glass p-6 rounded-2xl card-shadow border-l-8 border-indigo-600">
+            <p class="text-slate-500 text-xs font-bold uppercase">एकूण टार्गेट रक्कम</p>
+            <h3 id="statTotalDisb" class="text-2xl font-black text-slate-900 mt-2">₹ 0</h3>
+          </div>
+          <div class="glass p-6 rounded-2xl card-shadow border-l-8 border-emerald-500">
+            <p class="text-slate-500 text-xs font-bold uppercase">मागील अचीव्हमेंट %</p>
+            <h3 id="statAvgAch" class="text-2xl font-black text-emerald-600 mt-2">0%</h3>
+          </div>
+          <div class="glass p-6 rounded-2xl card-shadow border-l-8 border-amber-500">
+            <p class="text-slate-500 text-xs font-bold uppercase">OD खाते संख्या</p>
+            <h3 id="statOdCount" class="text-2xl font-black text-amber-600 mt-2">0</h3>
+          </div>
+          <div class="glass p-6 rounded-2xl card-shadow border-l-8 border-rose-500">
+            <p class="text-slate-500 text-xs font-bold uppercase">मॅप केलेले FX</p>
+            <h3 id="statFxCount" class="text-2xl font-black text-rose-600 mt-2">0</h3>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div class="glass p-6 rounded-2xl card-shadow">
+            <h4 class="font-bold text-slate-700 mb-4 flex items-center">
+              <span class="w-3 h-3 bg-indigo-600 rounded-full mr-2"></span> मागील परफॉर्मन्स अॅनॅलिसिस
+            </h4>
+            <div class="h-64">
+              <canvas id="performanceChart"></canvas>
+            </div>
+          </div>
+          <div class="glass p-6 rounded-2xl card-shadow">
+            <h4 class="font-bold text-slate-700 mb-4 flex items-center">
+              <span class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></span> OD कव्हरेज डिस्ट्रीब्युशन
+            </h4>
+            <div class="h-64">
+              <canvas id="odChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Planning Form -->
+        <form id="planningForm" class="glass rounded-2xl card-shadow overflow-hidden">
+          <div class="bg-slate-50 p-6 border-b border-slate-200">
+            <h4 class="text-lg font-bold text-indigo-900">नवीन साप्ताहिक प्लॅन तयार करा</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <div>
+                <label class="block text-sm font-semibold text-slate-600 mb-1">प्लॅन कालावधी पासून:</label>
+                <input type="date" id="startDate" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-slate-600 mb-1">प्लॅन कालावधी पर्यंत:</label>
+                <input type="date" id="endDate" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 ring-indigo-500">
+              </div>
+            </div>
+          </div>
+
+          <div class="p-6">
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[1000px]">
+                <thead>
+                  <tr class="text-left text-slate-400 text-xs uppercase tracking-wider">
+                    <th class="pb-4 px-2">FX नाव</th>
+                    <th class="pb-4 px-2">वाटप रक्कम (₹)</th>
+                    <th class="pb-4 px-2">अॅटो पे (₹)</th>
+                    <th class="pb-4 px-2">OD (संख्या | रक्कम)</th>
+                    <th class="pb-4 px-2">Past Due ॲक्शन प्लॅन</th>
+                    <th class="pb-4 px-2 text-indigo-600">मागील अचीव्हमेंट %</th>
+                  </tr>
+                </thead>
+                <tbody id="fxTableBody">
+                  <!-- Dynamic Rows Load Here -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-8 flex justify-end">
+              <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-12 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-1">
+                प्लॅन सबमिट करा आणि सेव्ह करा
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <footer class="p-6 text-center text-slate-400 text-sm">
+      &copy; 2024 Corporate FX Management System | Built with Super Power Functions
+    </footer>
   </div>
 
-  <!-- Planning Form -->
-  <form id="planForm" class="hidden">
-    <div class="glass-card p-6 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div><label class="label-custom">दिनांक पासून</label><input type="date" id="sDate" required></div>
-        <div><label class="label-custom">दिनांक पर्यंत</label><input type="date" id="eDate" required></div>
-      </div>
+  <script>
+    // Global State
+    let currentManager = "";
+    let myCharts = {};
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-gray-50">
-              <th class="p-3 label-custom">FX नाव</th>
-              <th class="p-3 label-custom">वाटप रक्कम</th>
-              <th class="p-3 label-custom">अॅटो पे</th>
-              <th class="p-3 label-custom">OD (संख्या/रक्कम)</th>
-              <th class="p-3 label-custom">Past Due ॲक्शन</th>
-              <th class="p-3 label-custom text-red-500">मागील अचीव्हमेंट %</th>
-            </tr>
-          </thead>
-          <tbody id="fxTableBody">
-            <!-- FX Rows will be injected here -->
-          </tbody>
-        </table>
-      </div>
+    // १. सुरुवातीला मॅनेजर लिस्ट भरणे
+    window.onload = function() {
+      showLoader(true);
+      google.script.run.withSuccessHandler(managers => {
+        const select = document.getElementById('managerSelect');
+        managers.forEach(m => {
+          let opt = new Option(m, m);
+          select.add(opt);
+        });
+        showLoader(false);
+      }).getManagers();
+    };
 
-      <div class="mt-8 text-right">
-        <button type="submit" class="bg-indigo-600 text-white px-10 py-3 rounded-full font-bold shadow-xl hover:bg-indigo-700 transition transform hover:scale-105">
-          वीकली प्लॅन सबमिट करा
-        </button>
-      </div>
-    </div>
-  </form>
-</div>
+    // २. मॅनेजर निवडल्यावर पूर्ण डॅशबोर्ड लोड करणे
+    function initManagerSession() {
+      currentManager = document.getElementById('managerSelect').value;
+      if (!currentManager) {
+        document.getElementById('welcomeScreen').classList.remove('hidden');
+        document.getElementById('mainDashboard').classList.add('hidden');
+        return;
+      }
 
-<script>
-  // १. लोड मॅनेजर लिस्ट
-  window.onload = function() {
-    google.script.run.withSuccessHandler(list => {
-      let sel = document.getElementById('mgrSelect');
-      list.forEach(m => { let opt = new Option(m, m); sel.add(opt); });
-    }).getManagers();
-  };
+      showLoader(true);
+      document.getElementById('welcomeScreen').classList.add('hidden');
+      document.getElementById('mainDashboard').classList.remove('hidden');
 
-  // २. मॅनेजर निवडल्यावर त्याचे FX आणि चार्ट्स लोड करणे
-  function loadManagerData() {
-    let mgr = document.getElementById('mgrSelect').value;
-    if(!mgr) return;
+      // FX मॅपिंग मिळवणे
+      google.script.run.withSuccessHandler(fxList => {
+        buildPlanningTable(fxList);
+        document.getElementById('statFxCount').innerText = fxList.length;
+        
+        // मागील आठवड्याचा डेटा मिळवणे
+        google.script.run.withSuccessHandler(prevData => {
+          updateDashboardUI(prevData);
+          showLoader(false);
+        }).getPreviousData(currentManager);
 
-    // FX लिस्ट मिळवणे
-    google.script.run.withSuccessHandler(fxList => {
+      }).getFXMapping(currentManager);
+    }
+
+    // ३. प्लॅनिंग टेबल तयार करणे
+    function buildPlanningTable(fxList) {
       const tbody = document.getElementById('fxTableBody');
       tbody.innerHTML = "";
-      document.getElementById('fxCountHeader').innerText = fxList.length;
-      
-      fxList.forEach(fx => {
-        let row = `
-          <tr class="fx-row">
-            <td class="p-3 font-bold text-indigo-700">${fx}<input type="hidden" class="fx-name" value="${fx}"></td>
-            <td class="p-3"><input type="number" class="fx-disb" placeholder="₹"></td>
-            <td class="p-3"><input type="number" class="fx-auto" placeholder="₹"></td>
-            <td class="p-3"><input type="text" class="fx-od" placeholder="उदा. 5 / 20000"></td>
-            <td class="p-3"><input type="text" class="fx-pd" placeholder="ॲक्शन काय?"></td>
-            <td class="p-3"><input type="number" class="fx-prev" placeholder="0-100"></td>
+
+      fxList.forEach((fx, index) => {
+        const row = `
+          <tr class="border-b border-slate-100 group hover:bg-indigo-50/30 transition-colors">
+            <td class="py-4 px-2">
+              <span class="font-bold text-indigo-900">${fx}</span>
+              <input type="hidden" class="fx-name" value="${fx}">
+            </td>
+            <td class="py-4 px-2"><input type="number" class="fx-disb w-full p-2 border rounded-lg" placeholder="0.00" oninput="calcStats()"></td>
+            <td class="py-4 px-2"><input type="number" class="fx-auto w-full p-2 border rounded-lg" placeholder="0.00"></td>
+            <td class="py-4 px-2 flex gap-1">
+              <input type="number" class="fx-od-count w-1/3 p-2 border rounded-lg" placeholder="Qty" oninput="calcStats()">
+              <input type="number" class="fx-od-amt w-2/3 p-2 border rounded-lg" placeholder="Amt">
+            </td>
+            <td class="py-4 px-2"><input type="text" class="fx-pd-action w-full p-2 border rounded-lg" placeholder="काय ॲक्शन घेणार?"></td>
+            <td class="py-4 px-2"><input type="number" class="fx-ach w-full p-2 border rounded-lg bg-indigo-50 font-bold text-indigo-700" placeholder="0-100"></td>
           </tr>
         `;
         tbody.insertAdjacentHTML('beforeend', row);
       });
-      document.getElementById('planForm').classList.remove('hidden');
-      document.getElementById('statsSection').classList.remove('hidden');
-    }).getFXListForManager(mgr);
+    }
 
-    // मागील चार्ट डेटा लोड करणे
-    google.script.run.withSuccessHandler(data => {
-      if(data) renderCharts(data.fxData);
-    }).getLastPlan(mgr);
-  }
+    // ४. डॅशबोर्डवर मागील डेटा अपडेट करणे
+    function updateDashboardUI(data) {
+      if (!data) return;
 
-  function renderCharts(fxData) {
-    const labels = fxData.map(d => d.name);
-    const achs = fxData.map(d => d.ach);
-    
-    new Chart(document.getElementById('achChart'), {
-      type: 'bar',
-      data: { labels: labels, datasets: [{ label: 'Achievement %', data: achs, backgroundColor: '#6366f1' }] },
-      options: { plugins: { legend: { display: false } } }
-    });
-  }
+      const fxDetails = data.fxDetails;
+      const labels = fxDetails.map(f => f.name);
+      const achValues = fxDetails.map(f => f.ach || 0);
+      const odValues = fxDetails.map(f => f.odCount || 0);
 
-  // ३. सबमिट करणे
-  document.getElementById('planForm').onsubmit = function(e) {
-    e.preventDefault();
-    let payload = {
-      manager: document.getElementById('mgrSelect').value,
-      sDate: document.getElementById('sDate').value,
-      eDate: document.getElementById('eDate').value,
-      fxDetails: []
+      // आकडेवारी अपडेट
+      const avgAch = (achValues.reduce((a, b) => a + Number(b), 0) / achValues.length).toFixed(1);
+      document.getElementById('statAvgAch').innerText = avgAch + "%";
+
+      // चार्ट्स रेंडर करणे
+      renderPerformanceChart(labels, achValues);
+      renderOdChart(labels, odValues);
+    }
+
+    function renderPerformanceChart(labels, values) {
+      if (myCharts.perf) myCharts.perf.destroy();
+      const ctx = document.getElementById('performanceChart').getContext('2d');
+      myCharts.perf = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Achievement %',
+            data: values,
+            backgroundColor: '#6366f1',
+            borderRadius: 8
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
+
+    function renderOdChart(labels, values) {
+      if (myCharts.od) myCharts.od.destroy();
+      const ctx = document.getElementById('odChart').getContext('2d');
+      myCharts.od = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'OD Accounts',
+            data: values,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
+
+    // ५. रिअलटाइम आकडेमोड (Form Calculation)
+    function calcStats() {
+      let totalDisb = 0;
+      let totalOd = 0;
+      document.querySelectorAll('.fx-disb').forEach(input => totalDisb += Number(input.value || 0));
+      document.querySelectorAll('.fx-od-count').forEach(input => totalOd += Number(input.value || 0));
+
+      document.getElementById('statTotalDisb').innerText = "₹ " + totalDisb.toLocaleString('hi-IN');
+      document.getElementById('statOdCount').innerText = totalOd;
+    }
+
+    // ६. फॉर्म सबमिशन
+    document.getElementById('planningForm').onsubmit = function(e) {
+      e.preventDefault();
+      showLoader(true);
+
+      const fxData = [];
+      document.querySelectorAll('#fxTableBody tr').forEach(row => {
+        fxData.push({
+          name: row.querySelector('.fx-name').value,
+          disb: row.querySelector('.fx-disb').value,
+          auto: row.querySelector('.fx-auto').value,
+          odCount: row.querySelector('.fx-od-count').value,
+          odAmt: row.querySelector('.fx-od-amt').value,
+          pdAction: row.querySelector('.fx-pd-action').value,
+          ach: row.querySelector('.fx-ach').value
+        });
+      });
+
+      const payload = {
+        manager: currentManager,
+        sDate: document.getElementById('startDate').value,
+        eDate: document.getElementById('endDate').value,
+        fxDetails: fxData
+      };
+
+      google.script.run.withSuccessHandler(res => {
+        showLoader(false);
+        if (res.status === "SUCCESS") {
+          alert(res.message);
+          location.reload();
+        } else {
+          alert("Error: " + res.message);
+        }
+      }).submitPlan(payload);
     };
 
-    document.querySelectorAll('#fxTableBody tr').forEach(row => {
-      payload.fxDetails.push({
-        name: row.querySelector('.fx-name').value,
-        disb: row.querySelector('.fx-disb').value,
-        auto: row.querySelector('.fx-auto').value,
-        od: row.querySelector('.fx-od').value,
-        pd: row.querySelector('.fx-pd').value,
-        ach: row.querySelector('.fx-prev').value
-      });
-    });
-
-    google.script.run.withSuccessHandler(msg => {
-      alert(msg);
-      location.reload();
-    }).saveData(payload);
-  };
-</script>
+    function showLoader(show) {
+      document.getElementById('loader').style.display = show ? 'flex' : 'none';
+    }
+  </script>
 </body>
 </html>
