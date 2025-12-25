@@ -2,455 +2,612 @@
 <html lang="mr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anik Fin Pro | Management Portal</title>
-    <!-- Tailwind for Layout, Chart.js for Analysis, Font for Branding -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Anik Fin Pro | Management Intelligence Portal</title>
+    
+    <!-- External Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
+        /* CSS VARIABLE DEFINITIONS */
         :root {
-            --anik-red: #d32f2f;
-            --anik-blue: #1976d2;
-            --anik-bg: #f4f7f9;
+            --primary-blue: #1e40af;
+            --secondary-blue: #3b82f6;
+            --success-green: #059669;
+            --warning-amber: #d97706;
+            --danger-red: #dc2626;
+            --anik-bg: #f8fafc;
+            --anik-card: #ffffff;
+            --anik-border: #e2e8f0;
         }
 
+        /* GLOBAL STYLES */
         body { 
-            font-family: 'Poppins', sans-serif; 
+            font-family: 'Inter', sans-serif; 
             background-color: var(--anik-bg);
-            color: #333;
+            color: #1e293b;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .anik-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            border: 1px solid #e1e8ed;
-            transition: all 0.3s ease;
+        /* COMPONENT STYLES */
+        .glass-header { 
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(15px); 
+            border-bottom: 2px solid var(--anik-border); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
 
-        .anik-card:hover { transform: translateY(-5px); }
-
-        .header-gradient {
-            background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
-            border-bottom: 3px solid var(--anik-blue);
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
         }
 
-        .kpi-target { border-left: 5px solid var(--anik-blue); }
-        .kpi-achieved { border-left: 5px solid #2e7d32; }
-        .kpi-pending { border-left: 5px solid #f9a825; }
-
-        .input-field {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 10px;
-            outline: none;
-            transition: 0.3s;
-            font-weight: 600;
+        .anik-card-ui { 
+            background: var(--anik-card); 
+            border-radius: 20px; 
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
+            border: 1px solid var(--anik-border); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
 
-        .input-field:focus { border-color: var(--anik-blue); box-shadow: 0 0 10px rgba(25, 118, 210, 0.1); }
-        
-        .btn-submit {
-            background: linear-gradient(to right, var(--anik-blue), #0d47a1);
-            color: white;
-            font-weight: 800;
-            padding: 15px 30px;
-            border-radius: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 5px 15px rgba(13, 71, 161, 0.3);
+        .anik-card-ui:hover {
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            transform: translateY(-2px);
         }
 
-        .locked-field { background-color: #f1f5f9 !important; color: #64748b; cursor: not-allowed; }
-
-        /* Smooth Animations */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade { animation: fadeIn 0.5s ease forwards; }
-
-        .ai-glow {
+        .kpi-border-accent {
             position: relative;
-            border: 2px solid #6200ea;
-            box-shadow: 0 0 15px rgba(98, 0, 234, 0.2);
+        }
+        
+        .kpi-border-accent::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .kpi-blue::after { background-color: var(--secondary-blue); }
+        .kpi-green::after { background-color: var(--success-green); }
+        .kpi-orange::after { background-color: var(--warning-amber); }
+        .kpi-red::after { background-color: var(--danger-red); }
+
+        /* FORM FIELD STYLES */
+        .input-pro-system { 
+            width: 100%; 
+            padding: 0.875rem 1rem; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 12px; 
+            font-size: 0.95rem; 
+            font-weight: 600;
+            color: #334155;
+            background-color: #fff;
+            outline: none; 
+            transition: all 0.2s; 
+        }
+
+        .input-pro-system:focus { 
+            border-color: var(--secondary-blue); 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-pro-system:disabled {
+            background-color: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+            border-color: #cbd5e1;
+        }
+
+        /* BUTTON STYLES */
+        .btn-anik-primary { 
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white; 
+            padding: 1.125rem 2rem; 
+            border-radius: 14px; 
+            font-weight: 800; 
+            font-size: 1rem;
+            width: 100%; 
+            transition: all 0.3s;
+            box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-anik-primary:hover {
+            filter: brightness(110%);
+            transform: scale(1.01);
+        }
+
+        .btn-anik-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* LOADER STYLES */
+        .system-loader { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(255,255,255,0.9); 
+            z-index: 9999; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        /* MARATHI TEXT ENHANCEMENT */
+        .text-marathi {
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.01em;
+        }
+
+        /* ANIMATIONS */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        /* CHART CONTAINER */
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
         }
     </style>
 </head>
 <body>
 
-    <!-- Top Header Section -->
-    <header class="header-gradient px-6 py-4 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" alt="Anik Logo" class="h-12 object-contain">
-                <div class="h-10 w-[2px] bg-gray-300 hidden md:block"></div>
-                <h1 class="text-xl font-extrabold text-blue-900 uppercase tracking-tighter">Weekly Planner</h1>
+    <!-- SYSTEM LOADER -->
+    <div id="loader" class="system-loader">
+        <div class="relative">
+            <div class="w-24 h-24 border-8 border-blue-100 rounded-full"></div>
+            <div class="w-24 h-24 border-8 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0"></div>
+        </div>
+        <p class="mt-8 font-black text-blue-900 text-lg animate-pulse tracking-widest text-marathi">माहिती लोड होत आहे, कृपया थांबा...</p>
+    </div>
+
+    <!-- NAVIGATION HEADER -->
+    <nav class="glass-header">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-6">
+                <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-10 md:h-14 object-contain" alt="Anik Logo">
+                <div class="h-10 w-0.5 bg-slate-200 hidden md:block"></div>
+                <h1 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight text-marathi uppercase">Weekly / Daily Planner</h1>
             </div>
             
-            <div class="flex items-center gap-3">
-                <label class="font-bold text-sm text-gray-600">Choose Manager:</label>
-                <select id="managerSelect" onchange="initManagerSession()" class="input-field py-2 bg-white">
-                    <option value="">-- निवडा --</option>
-                    <option value="Manager_A">Manager A (Sunil Deshmukh)</option>
-                    <option value="Manager_B">Manager B (Rahul Patil)</option>
-                    <option value="Manager_C">Manager C (Priya Sharma)</option>
-                </select>
+            <div class="flex items-center gap-4 w-full md:w-auto">
+                <div class="flex-1 md:flex-initial">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase mb-1 px-1">Choose Manager</p>
+                    <select id="managerSelect" onchange="initManagerWorkflow()" class="input-pro-system py-2 text-sm">
+                        <option value="">-- लोड होत आहे --</option>
+                    </select>
+                </div>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="main-container space-y-10">
         
-        <!-- Welcome & AI Performance Insight -->
-        <div id="welcomeZone" class="hidden animate-fade">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2">
-                    <h2 class="text-3xl font-black text-gray-800">नमस्ते, <span id="displayName" class="text-blue-700">मॅनेजर</span>!</h2>
-                    <p class="text-gray-500 font-medium">तुमच्या साप्ताहिक रिपोर्टचे आणि टार्गेटचे खालीलप्रमाणे व्यवस्थापन करा.</p>
+        <!-- WELCOME & PERFORMANCE INSIGHT SECTION -->
+        <section id="welcomeSection" class="hidden animate-slide-up">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 flex flex-col justify-center">
+                    <h2 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter text-marathi">
+                        नमस्ते, <span id="displayManagerName" class="text-blue-600">मॅनेजर</span>!
+                    </h2>
+                    <p class="text-lg text-slate-500 font-medium mt-3 text-marathi">
+                        तुमचे आजचे टार्गेट आणि साप्ताहिक प्रगतीचा अहवाल खालीलप्रमाणे आहे.
+                    </p>
                 </div>
                 
-                <!-- AI INSIGHT BOX -->
-                <div class="anik-card ai-glow p-5 bg-indigo-50">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="bg-indigo-600 text-white text-[10px] px-2 py-1 rounded-full font-bold">AI ANALYST</span>
-                        <p class="text-xs font-black text-indigo-900 uppercase">Performance Insight</p>
+                <!-- AI INSIGHT CARD -->
+                <div class="anik-card-ui p-6 bg-indigo-50 border-indigo-100 shadow-indigo-100/50">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-indigo-600 rounded-lg text-white">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <p class="text-xs font-black text-indigo-900 uppercase tracking-widest">AI Analyst Insight</p>
                     </div>
-                    <p id="aiInsightText" class="text-sm font-semibold text-indigo-800 leading-snug italic">
-                        "डेटा लोड करा, मी तुमच्या कामगिरीचे विश्लेषण करून मार्गदर्शन करेन."
+                    <p id="aiInsightText" class="text-sm font-bold text-indigo-800 leading-relaxed italic text-marathi">
+                        "तुमच्या मागील परफॉर्मन्सचा डेटा तपासला जात आहे, कृपया मॅनेजर निवडा."
                     </p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- KPI DASHBOARD -->
-        <div id="kpiDashboard" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade">
-            <div class="anik-card p-5 kpi-target">
-                <p class="text-[10px] font-bold text-gray-400 uppercase">Total Disb. Target</p>
-                <h4 id="dashTarget" class="text-xl font-black text-gray-800">₹ 0</h4>
+        <!-- KPI SUMMARY GRID -->
+        <section id="kpiSection" class="hidden grid grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up" style="animation-delay: 0.1s">
+            <div class="anik-card-ui p-6 kpi-border-accent kpi-blue">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Disb. Target</p>
+                <h3 id="statTotalTarget" class="text-2xl md:text-3xl font-black text-slate-900">₹ 0</h3>
             </div>
-            <div class="anik-card p-5 kpi-achieved">
-                <p class="text-[10px] font-bold text-gray-400 uppercase">Total Achievement</p>
-                <h4 id="dashActual" class="text-xl font-black text-green-600">₹ 0</h4>
+            <div class="anik-card-ui p-6 kpi-border-accent kpi-green">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Achieved</p>
+                <h3 id="statTotalAchieved" class="text-2xl md:text-3xl font-black text-emerald-600">₹ 0</h3>
             </div>
-            <div class="anik-card p-5 kpi-pending">
-                <p class="text-[10px] font-bold text-gray-400 uppercase">Efficiency Rate</p>
-                <h4 id="dashEff" class="text-xl font-black text-yellow-600">0%</h4>
+            <div class="anik-card-ui p-6 kpi-border-accent kpi-orange">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Efficiency Rate</p>
+                <h3 id="statEfficiency" class="text-2xl md:text-3xl font-black text-orange-600">0%</h3>
             </div>
-            <div class="anik-card p-5 border-l-5 border-l-red-600">
-                <p class="text-[10px] font-bold text-gray-400 uppercase">Pending Entries</p>
-                <h4 id="dashPending" class="text-xl font-black text-red-600">0</h4>
+            <div class="anik-card-ui p-6 kpi-border-accent kpi-red">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">OD Actual</p>
+                <h3 id="statTotalOD" class="text-2xl md:text-3xl font-black text-rose-600">₹ 0</h3>
             </div>
-        </div>
+        </section>
 
-        <!-- PLANNING FORM SECTION -->
-        <div id="formSection" class="hidden anik-card p-6 md:p-8 space-y-8 animate-fade">
-            <div class="flex flex-col md:flex-row justify-between items-end gap-6 border-b pb-6">
-                <div class="grid grid-cols-2 gap-4 w-full md:w-auto">
-                    <div>
-                        <label class="text-xs font-black text-gray-400 uppercase mb-2 block">Date From</label>
-                        <input type="date" id="dateFrom" class="input-field" onchange="checkExistingPlan()">
+        <!-- SUBMISSION & DATA ENTRY FORM -->
+        <section id="formSection" class="hidden space-y-8 animate-slide-up" style="animation-delay: 0.2s">
+            <div class="anik-card-ui p-8">
+                <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-10 pb-10 border-b-2 border-slate-50">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full md:w-2/3">
+                        <div>
+                            <label class="text-[11px] font-black text-slate-400 uppercase mb-2 block px-1 tracking-widest">Period From</label>
+                            <input type="date" id="inputDateFrom" class="input-pro-system" onchange="syncFormData()">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-black text-slate-400 uppercase mb-2 block px-1 tracking-widest">Period To</label>
+                            <input type="date" id="inputDateTo" class="input-pro-system" onchange="syncFormData()">
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-xs font-black text-gray-400 uppercase mb-2 block">Date To</label>
-                        <input type="date" id="dateTo" class="input-field" onchange="checkExistingPlan()">
+                    <div id="reportStatusBadge" class="hidden px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-sm">
+                        Loading Status...
                     </div>
                 </div>
-                <div id="statusBadge" class="hidden px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest"></div>
-            </div>
 
-            <!-- DYNAMIC TABLE -->
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50 text-gray-500 text-[11px] font-black uppercase tracking-wider">
-                            <th class="p-4 border-b">FX Wise Unit / Questions</th>
-                            <th class="p-4 border-b w-44">Weekly Target (₹)</th>
-                            <th class="p-4 border-b w-44">Achieved Actual (₹)</th>
-                            <th class="p-4 border-b">Action Plan / Tarhets</th>
-                        </tr>
-                    </thead>
-                    <tbody id="plannerRows" class="divide-y">
-                        <!-- Rows injected by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
+                <!-- DYNAMIC REPORT TABLE -->
+                <div class="overflow-x-auto rounded-xl border border-slate-100">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50/80">
+                            <tr>
+                                <th class="p-5 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b">FX Wise Unit / Indicators</th>
+                                <th class="p-5 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b w-48">Target (₹)</th>
+                                <th class="p-5 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b w-48">Actual (₹)</th>
+                                <th class="p-5 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b w-32 text-center">OD Plan</th>
+                                <th class="p-5 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b">Action Plan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody" class="divide-y divide-slate-100">
+                            <!-- JS will inject rows here -->
+                        </tbody>
+                    </table>
+                </div>
 
-            <!-- ACTIONS -->
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-6">
-                <button onclick="addNewRow()" class="text-blue-600 font-extrabold text-sm flex items-center gap-2 hover:bg-blue-50 px-4 py-2 rounded-lg transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    ADD NEW QUESTION / FX UNIT
-                </button>
-                
-                <div class="flex flex-col items-center">
-                    <button id="saveBtn" onclick="processSubmission()" class="btn-submit">
-                        Submit Weekly Report
-                    </button>
-                    <p id="errorLog" class="text-red-600 text-[10px] font-bold mt-2 hidden"></p>
+                <!-- SUBMISSION CONTROLS -->
+                <div class="mt-12 flex flex-col md:flex-row justify-between items-center gap-8 bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
+                    <div class="text-center md:text-left">
+                        <p class="text-sm font-bold text-slate-600 text-marathi">कृपया सर्व माहिती तपासून मगच सबमिट करा.</p>
+                        <p class="text-[10px] text-slate-400 uppercase font-black mt-1 tracking-widest">All fields must be validated before system sync.</p>
+                    </div>
+                    <div class="w-full md:w-1/3">
+                        <button id="submitButton" onclick="handleSystemSubmission()" class="btn-anik-primary text-marathi">अहवाल सबमिट करा</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- ANALYSIS SECTION (CHARTS) -->
-        <div id="analysisSection" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade">
-            <div class="anik-card p-6">
-                <h5 class="font-bold text-gray-700 mb-4">Performance Trend</h5>
-                <canvas id="performanceChart" height="200"></canvas>
+        <!-- ANALYTICS & VISUALIZATION -->
+        <section id="analysisSection" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8 animate-slide-up" style="animation-delay: 0.3s">
+            <div class="anik-card-ui p-8">
+                <h4 class="text-lg font-black text-slate-800 mb-6 text-marathi">कामगिरीचा कल (Trend)</h4>
+                <div class="chart-wrapper">
+                    <canvas id="performanceLineChart"></canvas>
+                </div>
             </div>
-            <div class="anik-card p-6">
-                <h5 class="font-bold text-gray-700 mb-4">Unit Wise Efficiency (%)</h5>
-                <canvas id="efficiencyChart" height="200"></canvas>
+            <div class="anik-card-ui p-8">
+                <h4 class="text-lg font-black text-slate-800 mb-6 text-marathi">FX युनिट कार्यक्षमता</h4>
+                <div class="chart-wrapper">
+                    <canvas id="efficiencyBarChart"></canvas>
+                </div>
             </div>
-        </div>
+        </section>
 
     </main>
 
-    <!-- LOADING OVERLAY -->
-    <div id="loader" class="fixed inset-0 bg-white bg-opacity-90 z-[100] hidden flex flex-col items-center justify-center">
-        <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p class="mt-4 font-black text-blue-900 tracking-widest animate-pulse">प्रक्रिया सुरू आहे...</p>
-    </div>
-
+    <!-- SYSTEM SCRIPTS -->
     <script>
         /**
-         * GLOBAL STATE & CONFIGURATION
+         * GLOBAL CONSTANTS & CONFIGURATION
          */
-        let state = {
-            currentManager: "",
-            mode: "NEW_TARGET", // NEW_TARGET or UPDATE_ACHIEVEMENT
-            data: {}, // Simulation of Database
-            defaultUnits: ["Gold Loan Disb.", "Personal Loan", "Business Loan", "Recovery Collection"]
+        const SYSTEM_CONFIG = {
+            API_ENDPOINT: "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec",
+            FX_UNITS: [
+                "Gold Loan Portfolio",
+                "Personal Loan Disb.",
+                "Business Loan Recovery",
+                "Insurance Cross-sell",
+                "New File Sourcing",
+                "OD Collection (Total)"
+            ],
+            DASHBOARD_ELEMENTS: ['welcomeSection', 'kpiSection', 'formSection', 'analysisSection']
         };
 
-        // UI References
-        const loader = document.getElementById('loader');
-        const rowsContainer = document.getElementById('plannerRows');
+        /**
+         * STATE MANAGEMENT
+         */
+        let sessionState = {
+            currentManager: "",
+            history: [],
+            isUpdateMode: false,
+            currentPlan: null
+        };
 
         /**
-         * INITIALIZATION
+         * INITIALIZATION ENGINE
          */
-        function initManagerSession() {
-            const m = document.getElementById('managerSelect').value;
-            if(!m) return hideSections();
-
-            state.currentManager = m;
-            document.getElementById('displayName').innerText = m.replace('_', ' ');
-            
-            showLoader(() => {
-                document.getElementById('welcomeZone').classList.remove('hidden');
-                document.getElementById('kpiDashboard').classList.remove('hidden');
-                document.getElementById('formSection').classList.remove('hidden');
-                document.getElementById('analysisSection').classList.remove('hidden');
+        window.addEventListener('DOMContentLoaded', async () => {
+            toggleLoader(true);
+            try {
+                const response = await fetch(`${SYSTEM_CONFIG.API_ENDPOINT}?action=getManagers`);
+                const managers = await response.json();
                 
-                resetForm();
-                updateDashboard();
-                initCharts();
-            });
-        }
-
-        /**
-         * PERIOD LOGIC & DUPLICATE PREVENTION
-         * ही महत्वाची सोय आहे: जर आधी टार्गेट दिले असेल तर अचीव्हमेंट अनलॉक होते.
-         */
-        function checkExistingPlan() {
-            const from = document.getElementById('dateFrom').value;
-            const to = document.getElementById('dateTo').value;
-            if(!from || !to) return;
-
-            const planID = `${state.currentManager}_${from}_${to}`;
-            const existing = state.data[planID];
-            const badge = document.getElementById('statusBadge');
-
-            rowsContainer.innerHTML = "";
-
-            if(existing) {
-                // Scenario: Plan exists, unlock Achievement fields
-                state.mode = "UPDATE_ACHIEVEMENT";
-                badge.innerText = "Target Set - Achievement Pending";
-                badge.className = "px-4 py-2 rounded-full font-bold text-xs uppercase bg-yellow-100 text-yellow-700 block";
-                document.getElementById('saveBtn').innerText = "Update Achievement";
+                const selectElement = document.getElementById('managerSelect');
+                selectElement.innerHTML = '<option value="">-- मॅनेजर निवडा --</option>';
                 
-                existing.details.forEach(item => renderRow(item.name, item.target, item.actual, item.pd));
-            } else {
-                // Scenario: New Plan
-                state.mode = "NEW_TARGET";
-                badge.innerText = "New Weekly Plan";
-                badge.className = "px-4 py-2 rounded-full font-bold text-xs uppercase bg-blue-100 text-blue-700 block";
-                document.getElementById('saveBtn').innerText = "Submit Weekly Target";
-                
-                state.defaultUnits.forEach(unit => renderRow(unit, "", "", ""));
+                managers.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.textContent = m;
+                    selectElement.appendChild(opt);
+                });
+            } catch (error) {
+                console.error("System Error: Failed to fetch manager list", error);
+                alert("सिस्टम एरर: मॅनेजर लिस्ट लोड करता आली नाही.");
+            } finally {
+                toggleLoader(false);
             }
-            updateDashboard();
+        });
+
+        /**
+         * WORKFLOW CONTROLLER
+         */
+        async function initManagerWorkflow() {
+            const selectedManager = document.getElementById('managerSelect').value;
+            if (!selectedManager) {
+                hideDashboard();
+                return;
+            }
+
+            sessionState.currentManager = selectedManager;
+            document.getElementById('displayManagerName').textContent = selectedManager;
+            
+            toggleLoader(true);
+            try {
+                const response = await fetch(`${SYSTEM_CONFIG.API_ENDPOINT}?action=getManagerData&manager=${encodeURIComponent(selectedManager)}`);
+                const data = await response.json();
+                
+                sessionState.history = data.history || [];
+                sessionState.fxList = data.fxList || SYSTEM_CONFIG.FX_UNITS;
+
+                showDashboard();
+                clearFormFields();
+                calculateAggregates();
+                renderAnalytics();
+            } catch (error) {
+                alert("डेटा लोड करताना तांत्रिक अडचण आली.");
+            } finally {
+                toggleLoader(false);
+            }
         }
 
         /**
-         * ROW RENDERING
+         * FORM LOGIC & SYNC
          */
-        function renderRow(name, target, actual, pd) {
-            const tr = document.createElement('tr');
-            const targetLocked = state.mode === "UPDATE_ACHIEVEMENT" ? "locked-field" : "";
-            const actualLocked = state.mode === "NEW_TARGET" ? "locked-field" : "";
+        function syncFormData() {
+            const startDate = document.getElementById('inputDateFrom').value;
+            const endDate = document.getElementById('inputDateTo').value;
+            
+            if (!startDate || !endDate) return;
 
-            tr.innerHTML = `
-                <td class="p-4">
-                    <input type="text" class="row-name input-field border-none bg-transparent" value="${name}" ${state.mode === "UPDATE_ACHIEVEMENT" ? 'readonly' : ''}>
+            const existingPlan = sessionState.history.find(h => h.sDate === startDate && h.eDate === endDate);
+            const tableBody = document.getElementById('reportTableBody');
+            const badge = document.getElementById('reportStatusBadge');
+            
+            tableBody.innerHTML = "";
+            sessionState.currentPlan = existingPlan;
+
+            if (existingPlan) {
+                sessionState.isUpdateMode = true;
+                badge.textContent = "Updating Achievement";
+                badge.className = "px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase bg-amber-100 text-amber-700 block shadow-sm";
+                document.getElementById('submitButton').textContent = "अचीव्हमेंट अपडेट करा";
+                
+                existingPlan.details.forEach(item => {
+                    createTableRow(item.name, item.tDisb, item.aDisb, item.tOd || 0, item.pd);
+                });
+            } else {
+                sessionState.isUpdateMode = false;
+                badge.textContent = "Creating New Plan";
+                badge.className = "px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase bg-blue-100 text-blue-700 block shadow-sm";
+                document.getElementById('submitButton').textContent = "साप्ताहिक रिपोर्ट सबमिट करा";
+                
+                sessionState.fxList.forEach(name => {
+                    createTableRow(name, "", "", "", "");
+                });
+            }
+            calculateAggregates();
+        }
+
+        function createTableRow(name, target, actual, od, remarks) {
+            const table = document.getElementById('reportTableBody');
+            const row = document.createElement('tr');
+            row.className = "hover:bg-slate-50/50 transition duration-150";
+            
+            const targetLocked = sessionState.isUpdateMode ? 'disabled' : '';
+            const actualLocked = !sessionState.isUpdateMode ? 'disabled' : '';
+
+            row.innerHTML = `
+                <td class="p-5 font-bold text-slate-800 text-sm">
+                    ${name}
+                    <input type="hidden" class="row-name" value="${name}">
                 </td>
                 <td class="p-4">
-                    <input type="number" class="row-target input-field ${targetLocked}" value="${target}" placeholder="0" oninput="updateDashboard()" ${state.mode === "UPDATE_ACHIEVEMENT" ? 'readonly' : ''}>
+                    <input type="number" class="row-target input-pro-system py-2 text-sm" value="${target}" placeholder="0" ${targetLocked} oninput="calculateAggregates()">
                 </td>
                 <td class="p-4">
-                    <input type="number" class="row-actual input-field bg-green-50 ${actualLocked}" value="${actual}" placeholder="0" oninput="updateDashboard()" ${state.mode === "NEW_TARGET" ? 'readonly' : ''}>
+                    <input type="number" class="row-actual input-pro-system py-2 text-sm bg-emerald-50/50" value="${actual}" placeholder="0" ${actualLocked} oninput="calculateAggregates()">
+                </td>
+                <td class="p-4 text-center">
+                    <input type="number" class="row-od input-pro-system py-2 text-sm w-24 text-center mx-auto" value="${od}" placeholder="0" ${targetLocked}>
                 </td>
                 <td class="p-4">
-                    <input type="text" class="row-pd input-field" value="${pd || ''}" placeholder="Write response/remark...">
+                    <input type="text" class="row-remark input-pro-system py-2 text-sm font-normal" value="${remarks || ''}" placeholder="टीप लिहा...">
                 </td>
             `;
-            rowsContainer.appendChild(tr);
-        }
-
-        function addNewRow() {
-            renderRow("", "", "", "");
+            table.appendChild(row);
         }
 
         /**
-         * CALCULATION & DASHBOARD
+         * CALCULATION & KPI ENGINE
          */
-        function updateDashboard() {
-            let totalT = 0;
-            let totalA = 0;
-            const rows = document.querySelectorAll('#plannerRows tr');
-
-            rows.forEach(r => {
-                totalT += Number(r.querySelector('.row-target').value || 0);
-                totalA += Number(r.querySelector('.row-actual').value || 0);
+        function calculateAggregates() {
+            let totalT = 0, totalA = 0, totalOD = 0;
+            
+            document.querySelectorAll('#reportTableBody tr').forEach(row => {
+                totalT += parseFloat(row.querySelector('.row-target').value || 0);
+                totalA += parseFloat(row.querySelector('.row-actual').value || 0);
+                totalOD += parseFloat(row.querySelector('.row-od').value || 0);
             });
 
-            document.getElementById('dashTarget').innerText = `₹ ${totalT.toLocaleString()}`;
-            document.getElementById('dashActual').innerText = `₹ ${totalA.toLocaleString()}`;
+            document.getElementById('statTotalTarget').textContent = `₹ ${totalT.toLocaleString('en-IN')}`;
+            document.getElementById('statTotalAchieved').textContent = `₹ ${totalA.toLocaleString('en-IN')}`;
+            document.getElementById('statTotalOD').textContent = `₹ ${totalOD.toLocaleString('en-IN')}`;
             
-            const eff = totalT > 0 ? ((totalA / totalT) * 100).toFixed(1) : 0;
-            document.getElementById('dashEff').innerText = `${eff}%`;
+            const efficiency = totalT > 0 ? ((totalA / totalT) * 100).toFixed(1) : 0;
+            document.getElementById('statEfficiency').textContent = `${efficiency}%`;
 
-            generateAIInsight(eff, totalT);
+            updateAIInsight(efficiency);
         }
 
-        /**
-         * AI MARATHI ANALYSIS
-         */
-        function generateAIInsight(eff, totalT) {
+        function updateAIInsight(eff) {
             const aiText = document.getElementById('aiInsightText');
-            if(totalT === 0) {
-                aiText.innerText = "साप्ताहिक टार्गेट भरा, म्हणजे मी विश्लेषण करू शकेन.";
-                return;
-            }
-
-            if(eff >= 90) {
-                aiText.innerText = "उत्कृष्ट कामगिरी! तुमचे टार्गेट अचीव्हमेंट ९०% पेक्षा जास्त आहे. हेच सातत्य टिकवून ठेवा.";
-            } else if (eff >= 60) {
-                aiText.innerText = "बरी कामगिरी आहे, पण अजून सुधारणेला वाव आहे. काही युनिट्स मध्ये लक्ष देणे गरजेचे आहे.";
+            if (eff >= 95) {
+                aiText.innerHTML = '"उत्कृष्ट कामगिरी! तुमचे टार्गेट अचीव्हमेंट ९५% पेक्षा जास्त आहे. तुमचे व्यवस्थापन अतिशय प्रभावी आहे. <span class="text-emerald-600 font-black">Keep it up!</span>"';
+            } else if (eff >= 70) {
+                aiText.innerHTML = '"बरी कामगिरी आहे, परंतु काही युनिट्समध्ये ओडी (OD) वाढताना दिसत आहे. कलेक्शनवर थोडे अधिक लक्ष दिल्यास निकाल उत्तम येतील."';
+            } else if (eff > 0) {
+                aiText.innerHTML = '"सावधान! तुमचे अचीव्हमेंट टार्गेटपेक्षा खूप कमी आहे. त्वरित अ‍ॅक्शन प्लॅन तयार करून रिकव्हरीवर भर देणे आवश्यक आहे."';
             } else {
-                aiText.innerText = "सावधान! तुमची कामगिरी खालावलेली दिसत आहे. त्वरित रिकव्हरी आणि नवीन लॉगिन वर काम करा.";
+                aiText.innerHTML = '"डेटा भरल्यानंतर मी तुमच्या कामगिरीचे सविस्तर विश्लेषण करून मार्गदर्शन करेन."';
             }
         }
 
         /**
-         * DATA PROCESSING (SUBMIT)
+         * SUBMISSION HANDLER
          */
-        function processSubmission() {
-            const from = document.getElementById('dateFrom').value;
-            const to = document.getElementById('dateTo').value;
-            
-            if(!from || !to) {
-                showError("कृपया कालावधी निवडा!");
+        async function handleSystemSubmission() {
+            const startDate = document.getElementById('inputDateFrom').value;
+            const endDate = document.getElementById('inputDateTo').value;
+
+            if (!startDate || !endDate) {
+                alert("कृपया पिरियडची तारीख निवडा!");
                 return;
             }
 
-            const rows = document.querySelectorAll('#plannerRows tr');
-            const details = Array.from(rows).map(r => ({
-                name: r.querySelector('.row-name').value,
-                target: r.querySelector('.row-target').value,
-                actual: r.querySelector('.row-actual').value,
-                pd: r.querySelector('.row-pd').value
+            if (!confirm("तुम्ही दिलेली माहिती पूर्णपणे बरोबर असल्याची खात्री आहे का?")) return;
+
+            const details = Array.from(document.querySelectorAll('#reportTableBody tr')).map(row => ({
+                name: row.querySelector('.row-name').value,
+                tDisb: row.querySelector('.row-target').value,
+                aDisb: row.querySelector('.row-actual').value,
+                tOd: row.querySelector('.row-od').value,
+                pd: row.querySelector('.row-remark').value
             }));
 
-            // Save to internal state (Simulation)
-            const planID = `${state.currentManager}_${from}_${to}`;
-            state.data[planID] = { from, to, details };
+            const payload = {
+                manager: sessionState.currentManager,
+                sDate: startDate,
+                eDate: endDate,
+                fxDetails: details
+            };
 
-            showLoader(() => {
-                alert("माहिती यशस्वीरित्या सेव्ह झाली आहे!");
-                checkExistingPlan(); // Refresh logic
-            });
+            toggleLoader(true);
+            try {
+                const response = await fetch(SYSTEM_CONFIG.API_ENDPOINT, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                alert(result.message || "रिपोर्ट यशस्वीरित्या सबमिट झाला!");
+                location.reload();
+            } catch (error) {
+                alert("सबमिट करताना तांत्रिक अडचण आली. कृपया पुन्हा प्रयत्न करा.");
+            } finally {
+                toggleLoader(false);
+            }
         }
 
         /**
-         * CHARTS INITIALIZATION
+         * UI HELPERS
          */
-        function initCharts() {
-            const ctx1 = document.getElementById('performanceChart').getContext('2d');
-            new Chart(ctx1, {
+        function toggleLoader(show) {
+            document.getElementById('loader').style.display = show ? 'flex' : 'none';
+        }
+
+        function showDashboard() {
+            SYSTEM_CONFIG.DASHBOARD_ELEMENTS.forEach(id => document.getElementById(id).classList.remove('hidden'));
+        }
+
+        function hideDashboard() {
+            SYSTEM_CONFIG.DASHBOARD_ELEMENTS.forEach(id => document.getElementById(id).classList.add('hidden'));
+        }
+
+        function clearFormFields() {
+            document.getElementById('inputDateFrom').value = "";
+            document.getElementById('inputDateTo').value = "";
+            document.getElementById('reportTableBody').innerHTML = "";
+            document.getElementById('reportStatusBadge').classList.add('hidden');
+        }
+
+        /**
+         * ANALYTICS ENGINE (CHART.JS)
+         */
+        function renderAnalytics() {
+            // Simplified logic to showcase charts for last 4 entries
+            const history = sessionState.history.slice(-4);
+            const labels = history.map(h => h.sDate);
+            const targets = history.map(h => h.details.reduce((sum, d) => sum + Number(d.tDisb || 0), 0));
+            const achieved = history.map(h => h.details.reduce((sum, d) => sum + Number(d.aDisb || 0), 0));
+
+            const ctxLine = document.getElementById('performanceLineChart').getContext('2d');
+            new Chart(ctxLine, {
                 type: 'line',
                 data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                    datasets: [{
-                        label: 'Achievement Rate',
-                        data: [65, 78, 52, 90],
-                        borderColor: '#1976d2',
-                        fill: true,
-                        backgroundColor: 'rgba(25, 118, 210, 0.1)'
-                    }]
+                    labels: labels,
+                    datasets: [
+                        { label: 'Target', data: targets, borderColor: '#3b82f6', tension: 0.4, fill: false },
+                        { label: 'Achieved', data: achieved, borderColor: '#10b981', tension: 0.4, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.1)' }
+                    ]
                 },
-                options: { responsive: true }
+                options: { responsive: true, maintainAspectRatio: false }
             });
 
-            const ctx2 = document.getElementById('efficiencyChart').getContext('2d');
-            new Chart(ctx2, {
+            const ctxBar = document.getElementById('efficiencyBarChart').getContext('2d');
+            new Chart(ctxBar, {
                 type: 'bar',
                 data: {
-                    labels: ['Unit A', 'Unit B', 'Unit C', 'Unit D'],
+                    labels: sessionState.fxList.slice(0, 5),
                     datasets: [{
                         label: 'Efficiency %',
-                        data: [90, 45, 70, 85],
-                        backgroundColor: ['#1976d2', '#d32f2f', '#f9a825', '#2e7d32']
+                        data: [85, 92, 65, 78, 90],
+                        backgroundColor: '#1e40af'
                     }]
                 },
-                options: { responsive: true }
+                options: { responsive: true, maintainAspectRatio: false }
             });
         }
-
-        /**
-         * UTILS
-         */
-        function showLoader(callback) {
-            loader.classList.remove('hidden');
-            setTimeout(() => {
-                loader.classList.add('hidden');
-                if(callback) callback();
-            }, 1000);
-        }
-
-        function showError(msg) {
-            const err = document.getElementById('errorLog');
-            err.innerText = msg;
-            err.classList.remove('hidden');
-            setTimeout(() => err.classList.add('hidden'), 3000);
-        }
-
-        function resetForm() {
-            document.getElementById('dateFrom').value = "";
-            document.getElementById('dateTo').value = "";
-            rowsContainer.innerHTML = "";
-            document.getElementById('statusBadge').classList.add('hidden');
-        }
-
-        function hideSections() {
-            document.getElementById('welcomeZone').classList.add('hidden');
-            document.getElementById('kpiDashboard').classList.add('hidden');
-            document.getElementById('formSection').classList.add('hidden');
-            document.getElementById('analysisSection').classList.add('hidden');
-        }
-
     </script>
 </body>
 </html>
