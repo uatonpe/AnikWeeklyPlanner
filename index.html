@@ -2,580 +2,453 @@
 <html lang="mr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Anik Fin Pro Portal | Premium Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anik Fin Pro | Management Portal</title>
+    <!-- Tailwind for Layout, Chart.js for Analysis, Font for Branding -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #1e40af;
-            --secondary: #3b82f6;
-            --success: #059669;
-            --warning: #d97706;
-            --danger: #dc2626;
-            --bg-light: #f8fafc;
+            --anik-red: #d32f2f;
+            --anik-blue: #1976d2;
+            --anik-bg: #f4f7f9;
         }
 
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg-light);
-            color: #1e293b;
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--anik-bg);
+            color: #333;
         }
 
-        .glass-header { 
-            background: rgba(255, 255, 255, 0.95); 
-            backdrop-filter: blur(12px); 
-            border-bottom: 2px solid #e2e8f0; 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
+        .anik-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid #e1e8ed;
+            transition: all 0.3s ease;
         }
 
-        .card { 
-            background: white; 
-            border-radius: 24px; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1); 
-            border: 1px solid #f1f5f9; 
-            transition: transform 0.2s ease;
+        .anik-card:hover { transform: translateY(-5px); }
+
+        .header-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+            border-bottom: 3px solid var(--anik-blue);
         }
 
-        .input-pro { 
-            width: 100%; 
-            padding: 14px; 
-            border: 2px solid #e2e8f0; 
-            border-radius: 14px; 
-            font-size: 14px; 
+        .kpi-target { border-left: 5px solid var(--anik-blue); }
+        .kpi-achieved { border-left: 5px solid #2e7d32; }
+        .kpi-pending { border-left: 5px solid #f9a825; }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            outline: none;
+            transition: 0.3s;
             font-weight: 600;
-            outline: none; 
-            transition: all 0.3s; 
         }
 
-        .input-pro:focus { 
-            border-color: var(--secondary); 
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
-
-        .input-locked {
-            background-color: #f1f5f9 !important;
-            color: #64748b !important;
-            cursor: not-allowed;
-            border-color: #cbd5e1 !important;
-        }
-
-        .btn-main { 
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-            color: white; 
-            padding: 18px; 
-            border-radius: 16px; 
-            font-weight: 800; 
-            width: 100%; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.4);
+        .input-field:focus { border-color: var(--anik-blue); box-shadow: 0 0 10px rgba(25, 118, 210, 0.1); }
+        
+        .btn-submit {
+            background: linear-gradient(to right, var(--anik-blue), #0d47a1);
+            color: white;
+            font-weight: 800;
+            padding: 15px 30px;
+            border-radius: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(13, 71, 161, 0.3);
         }
 
-        .btn-main:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px -5px rgba(30, 64, 175, 0.5);
-        }
+        .locked-field { background-color: #f1f5f9 !important; color: #64748b; cursor: not-allowed; }
 
-        .btn-main:active { transform: translateY(0); }
+        /* Smooth Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.5s ease forwards; }
 
-        .btn-main:disabled { 
-            background: #cbd5e1; 
-            box-shadow: none; 
-            cursor: not-allowed; 
-            transform: none;
-        }
-
-        .status-badge { 
-            padding: 6px 14px; 
-            border-radius: 30px; 
-            font-size: 10px; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-        }
-
-        .loader-overlay { 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(255,255,255,0.95); 
-            z-index: 2000; 
-            display: none; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-        }
-
-        .kpi-card {
+        .ai-glow {
             position: relative;
-            overflow: hidden;
+            border: 2px solid #6200ea;
+            box-shadow: 0 0 15px rgba(98, 0, 234, 0.2);
         }
-        
-        .kpi-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-        }
-
-        .kpi-disb { border-bottom-color: #3b82f6; }
-        .kpi-od { border-bottom-color: #f59e0b; }
-        .kpi-eff { border-bottom-color: #10b981; }
-
-        @media (max-width: 640px) {
-            .table-container { display: none; }
-            .mobile-list { display: block; }
-        }
-        @media (min-width: 641px) {
-            .table-container { display: block; }
-            .mobile-list { display: none; }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="pb-20">
+<body>
 
-    <!-- Loader -->
-    <div id="loader" class="loader-overlay">
-        <div class="relative">
-            <div class="w-20 h-20 border-4 border-blue-100 rounded-full"></div>
-            <div class="w-20 h-20 border-4 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0"></div>
-        </div>
-        <p class="mt-6 font-black text-blue-900 tracking-widest animate-pulse">डेटा लोड होत आहे...</p>
-    </div>
-
-    <!-- Header -->
-    <nav class="glass-header p-4">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-8 md:h-12 object-contain">
+    <!-- Top Header Section -->
+    <header class="header-gradient px-6 py-4 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4">
-                <div class="hidden md:block text-right">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">निवडलेला मॅनेजर</p>
-                    <p id="managerDisplay" class="text-sm font-black text-blue-900">--</p>
-                </div>
-                <select id="manager" onchange="loadData()" class="bg-blue-50 border-2 border-blue-100 rounded-2xl px-4 py-2 text-sm font-black text-blue-900 focus:ring-4 focus:ring-blue-100 outline-none">
-                    <option value="">मॅनेजर निवडा</option>
+                <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" alt="Anik Logo" class="h-12 object-contain">
+                <div class="h-10 w-[2px] bg-gray-300 hidden md:block"></div>
+                <h1 class="text-xl font-extrabold text-blue-900 uppercase tracking-tighter">Weekly Planner</h1>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <label class="font-bold text-sm text-gray-600">Choose Manager:</label>
+                <select id="managerSelect" onchange="initManagerSession()" class="input-field py-2 bg-white">
+                    <option value="">-- निवडा --</option>
+                    <option value="Manager_A">Manager A (Sunil Deshmukh)</option>
+                    <option value="Manager_B">Manager B (Rahul Patil)</option>
+                    <option value="Manager_C">Manager C (Priya Sharma)</option>
                 </select>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <main id="mainContent" class="max-w-6xl mx-auto p-4 md:p-8 space-y-8 hidden">
+    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
         
-        <!-- Manager Prominent Name -->
-        <div class="text-center md:text-left">
-            <h1 id="prominentManagerName" class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">--</h1>
-            <p class="text-slate-500 font-medium mt-1">तुमच्या साप्ताहिक कामगिरीचा अहवाल येथे पहा.</p>
-        </div>
-
-        <!-- Blocker Alert -->
-        <div id="blocker" class="hidden card bg-red-50 border-red-200 p-6 flex items-center gap-6 animate-bounce">
-            <div class="bg-red-500 text-white p-4 rounded-2xl shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-            </div>
-            <div>
-                <h4 class="font-black text-red-900 uppercase text-sm tracking-wider">Achievement Pending!</h4>
-                <p class="text-red-700 text-sm">तुम्ही मागील आठवड्याचे अचीव्हमेंट (Actual) भरलेले नाही. आधी ते पूर्ण करा.</p>
-            </div>
-        </div>
-
-        <!-- Dynamic KPI Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <div class="card p-6 kpi-card kpi-disb">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Disb. Target</p>
-                <p id="kpiT" class="text-xl md:text-2xl font-black text-slate-900 mt-1">₹ 0</p>
-            </div>
-            <div class="card p-6 kpi-card kpi-disb">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Disb. Actual</p>
-                <p id="kpiA" class="text-xl md:text-2xl font-black text-emerald-600 mt-1">₹ 0</p>
-            </div>
-            <div class="card p-6 kpi-card kpi-od">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total OD Actual</p>
-                <p id="kpiOD" class="text-xl md:text-2xl font-black text-orange-600 mt-1">₹ 0</p>
-            </div>
-            <div class="card p-6 kpi-card kpi-eff text-white bg-blue-900">
-                <p class="text-[10px] font-bold text-blue-300 uppercase tracking-widest">Disb. Efficiency</p>
-                <p id="kpiE" class="text-xl md:text-2xl font-black mt-1">0%</p>
+        <!-- Welcome & AI Performance Insight -->
+        <div id="welcomeZone" class="hidden animate-fade">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2">
+                    <h2 class="text-3xl font-black text-gray-800">नमस्ते, <span id="displayName" class="text-blue-700">मॅनेजर</span>!</h2>
+                    <p class="text-gray-500 font-medium">तुमच्या साप्ताहिक रिपोर्टचे आणि टार्गेटचे खालीलप्रमाणे व्यवस्थापन करा.</p>
+                </div>
+                
+                <!-- AI INSIGHT BOX -->
+                <div class="anik-card ai-glow p-5 bg-indigo-50">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-indigo-600 text-white text-[10px] px-2 py-1 rounded-full font-bold">AI ANALYST</span>
+                        <p class="text-xs font-black text-indigo-900 uppercase">Performance Insight</p>
+                    </div>
+                    <p id="aiInsightText" class="text-sm font-semibold text-indigo-800 leading-snug italic">
+                        "डेटा लोड करा, मी तुमच्या कामगिरीचे विश्लेषण करून मार्गदर्शन करेन."
+                    </p>
+                </div>
             </div>
         </div>
 
-        <!-- Section Navigation -->
-        <div class="flex p-1.5 bg-slate-200/50 rounded-2xl w-full md:w-fit">
-            <button onclick="tab(1)" id="t1" class="flex-1 px-8 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-white shadow-sm text-blue-700">Planning & Achievement</button>
-            <button onclick="tab(2)" id="t2" class="flex-1 px-8 py-3 rounded-xl font-bold text-sm transition-all duration-300 text-slate-600">Reports & History</button>
+        <!-- KPI DASHBOARD -->
+        <div id="kpiDashboard" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade">
+            <div class="anik-card p-5 kpi-target">
+                <p class="text-[10px] font-bold text-gray-400 uppercase">Total Disb. Target</p>
+                <h4 id="dashTarget" class="text-xl font-black text-gray-800">₹ 0</h4>
+            </div>
+            <div class="anik-card p-5 kpi-achieved">
+                <p class="text-[10px] font-bold text-gray-400 uppercase">Total Achievement</p>
+                <h4 id="dashActual" class="text-xl font-black text-green-600">₹ 0</h4>
+            </div>
+            <div class="anik-card p-5 kpi-pending">
+                <p class="text-[10px] font-bold text-gray-400 uppercase">Efficiency Rate</p>
+                <h4 id="dashEff" class="text-xl font-black text-yellow-600">0%</h4>
+            </div>
+            <div class="anik-card p-5 border-l-5 border-l-red-600">
+                <p class="text-[10px] font-bold text-gray-400 uppercase">Pending Entries</p>
+                <h4 id="dashPending" class="text-xl font-black text-red-600">0</h4>
+            </div>
         </div>
 
-        <!-- FORM SECTION -->
-        <div id="sec1" class="space-y-8 animate-fadeIn">
-            <form id="pForm" class="space-y-6">
-                <div class="card p-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white shadow-xl">
+        <!-- PLANNING FORM SECTION -->
+        <div id="formSection" class="hidden anik-card p-6 md:p-8 space-y-8 animate-fade">
+            <div class="flex flex-col md:flex-row justify-between items-end gap-6 border-b pb-6">
+                <div class="grid grid-cols-2 gap-4 w-full md:w-auto">
                     <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">पिरियड सुरूवात दिनांक</label>
-                        <input type="date" id="sDate" required class="input-pro">
+                        <label class="text-xs font-black text-gray-400 uppercase mb-2 block">Date From</label>
+                        <input type="date" id="dateFrom" class="input-field" onchange="checkExistingPlan()">
                     </div>
                     <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">पिरियड शेवट दिनांक</label>
-                        <input type="date" id="eDate" required class="input-pro">
+                        <label class="text-xs font-black text-gray-400 uppercase mb-2 block">Date To</label>
+                        <input type="date" id="dateTo" class="input-field" onchange="checkExistingPlan()">
                     </div>
                 </div>
+                <div id="statusBadge" class="hidden px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest"></div>
+            </div>
 
-                <!-- Desktop Table -->
-                <div class="table-container card overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-50 border-b-2 border-slate-100">
-                            <tr>
-                                <th class="p-5 text-[10px] font-black uppercase text-slate-500">FX Unit Name</th>
-                                <th class="p-5 text-[10px] font-black uppercase text-slate-500">Target (₹)</th>
-                                <th class="p-5 text-[10px] font-black uppercase text-slate-500">Actual (₹)</th>
-                                <th class="p-5 text-[10px] font-black uppercase text-slate-500">OD (Plan|Act)</th>
-                                <th class="p-5 text-[10px] font-black uppercase text-slate-500">Action Plan / Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pcRows" class="divide-y divide-slate-100">
-                            <!-- JS Inject -->
-                        </tbody>
-                    </table>
-                </div>
+            <!-- DYNAMIC TABLE -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 text-[11px] font-black uppercase tracking-wider">
+                            <th class="p-4 border-b">FX Wise Unit / Questions</th>
+                            <th class="p-4 border-b w-44">Weekly Target (₹)</th>
+                            <th class="p-4 border-b w-44">Achieved Actual (₹)</th>
+                            <th class="p-4 border-b">Action Plan / Tarhets</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plannerRows" class="divide-y">
+                        <!-- Rows injected by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
 
-                <!-- Mobile Cards -->
-                <div id="mobRows" class="mobile-list space-y-4">
-                    <!-- JS Inject -->
+            <!-- ACTIONS -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-6">
+                <button onclick="addNewRow()" class="text-blue-600 font-extrabold text-sm flex items-center gap-2 hover:bg-blue-50 px-4 py-2 rounded-lg transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    ADD NEW QUESTION / FX UNIT
+                </button>
+                
+                <div class="flex flex-col items-center">
+                    <button id="saveBtn" onclick="processSubmission()" class="btn-submit">
+                        Submit Weekly Report
+                    </button>
+                    <p id="errorLog" class="text-red-600 text-[10px] font-bold mt-2 hidden"></p>
                 </div>
-
-                <div class="card p-6 bg-blue-50 border-blue-100">
-                    <button type="submit" id="submitBtn" class="btn-main">सबमिट प्लॅन</button>
-                    <p class="text-center text-[10px] text-slate-400 mt-4 font-bold uppercase tracking-widest">नोंदणी करण्यापूर्वी सर्व माहिती तपासून घ्या</p>
-                </div>
-            </form>
+            </div>
         </div>
 
-        <!-- HISTORY SECTION -->
-        <div id="sec2" class="hidden space-y-6">
-            <div class="card p-6 bg-white flex flex-col md:flex-row gap-4 items-end">
-                <div class="flex-1">
-                    <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">पासून</label>
-                    <input type="date" id="filterFrom" class="input-pro">
-                </div>
-                <div class="flex-1">
-                    <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">पर्यंत</label>
-                    <input type="date" id="filterTo" class="input-pro">
-                </div>
-                <button onclick="renderHistory()" class="bg-slate-900 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-black transition">फिल्टर करा</button>
+        <!-- ANALYSIS SECTION (CHARTS) -->
+        <div id="analysisSection" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade">
+            <div class="anik-card p-6">
+                <h5 class="font-bold text-gray-700 mb-4">Performance Trend</h5>
+                <canvas id="performanceChart" height="200"></canvas>
             </div>
-            
-            <div id="historyList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- History Cards -->
+            <div class="anik-card p-6">
+                <h5 class="font-bold text-gray-700 mb-4">Unit Wise Efficiency (%)</h5>
+                <canvas id="efficiencyChart" height="200"></canvas>
             </div>
         </div>
 
     </main>
 
+    <!-- LOADING OVERLAY -->
+    <div id="loader" class="fixed inset-0 bg-white bg-opacity-90 z-[100] hidden flex flex-col items-center justify-center">
+        <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-4 font-black text-blue-900 tracking-widest animate-pulse">प्रक्रिया सुरू आहे...</p>
+    </div>
+
     <script>
-        // API URL (Your Google Script Link)
-        const API = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec";
-        
-        // Global State
-        let state = { 
-            fx: [], 
-            history: [], 
-            pendingAch: false,
-            currentManager: "" 
+        /**
+         * GLOBAL STATE & CONFIGURATION
+         */
+        let state = {
+            currentManager: "",
+            mode: "NEW_TARGET", // NEW_TARGET or UPDATE_ACHIEVEMENT
+            data: {}, // Simulation of Database
+            defaultUnits: ["Gold Loan Disb.", "Personal Loan", "Business Loan", "Recovery Collection"]
         };
 
-        // Initialize
-        window.onload = () => {
-            toggleLoader(true);
-            fetch(`${API}?action=getManagers`)
-                .then(r => r.json())
-                .then(d => {
-                    const s = document.getElementById('manager');
-                    d.forEach(m => s.add(new Option(m,m)));
-                    toggleLoader(false);
-                })
-                .catch(err => alert("Error loading managers: " + err));
-        };
+        // UI References
+        const loader = document.getElementById('loader');
+        const rowsContainer = document.getElementById('plannerRows');
 
-        // Load Manager Data
-        async function loadData() {
-            const m = document.getElementById('manager').value;
-            if(!m) {
-                document.getElementById('mainContent').classList.add('hidden');
+        /**
+         * INITIALIZATION
+         */
+        function initManagerSession() {
+            const m = document.getElementById('managerSelect').value;
+            if(!m) return hideSections();
+
+            state.currentManager = m;
+            document.getElementById('displayName').innerText = m.replace('_', ' ');
+            
+            showLoader(() => {
+                document.getElementById('welcomeZone').classList.remove('hidden');
+                document.getElementById('kpiDashboard').classList.remove('hidden');
+                document.getElementById('formSection').classList.remove('hidden');
+                document.getElementById('analysisSection').classList.remove('hidden');
+                
+                resetForm();
+                updateDashboard();
+                initCharts();
+            });
+        }
+
+        /**
+         * PERIOD LOGIC & DUPLICATE PREVENTION
+         * ही महत्वाची सोय आहे: जर आधी टार्गेट दिले असेल तर अचीव्हमेंट अनलॉक होते.
+         */
+        function checkExistingPlan() {
+            const from = document.getElementById('dateFrom').value;
+            const to = document.getElementById('dateTo').value;
+            if(!from || !to) return;
+
+            const planID = `${state.currentManager}_${from}_${to}`;
+            const existing = state.data[planID];
+            const badge = document.getElementById('statusBadge');
+
+            rowsContainer.innerHTML = "";
+
+            if(existing) {
+                // Scenario: Plan exists, unlock Achievement fields
+                state.mode = "UPDATE_ACHIEVEMENT";
+                badge.innerText = "Target Set - Achievement Pending";
+                badge.className = "px-4 py-2 rounded-full font-bold text-xs uppercase bg-yellow-100 text-yellow-700 block";
+                document.getElementById('saveBtn').innerText = "Update Achievement";
+                
+                existing.details.forEach(item => renderRow(item.name, item.target, item.actual, item.pd));
+            } else {
+                // Scenario: New Plan
+                state.mode = "NEW_TARGET";
+                badge.innerText = "New Weekly Plan";
+                badge.className = "px-4 py-2 rounded-full font-bold text-xs uppercase bg-blue-100 text-blue-700 block";
+                document.getElementById('saveBtn').innerText = "Submit Weekly Target";
+                
+                state.defaultUnits.forEach(unit => renderRow(unit, "", "", ""));
+            }
+            updateDashboard();
+        }
+
+        /**
+         * ROW RENDERING
+         */
+        function renderRow(name, target, actual, pd) {
+            const tr = document.createElement('tr');
+            const targetLocked = state.mode === "UPDATE_ACHIEVEMENT" ? "locked-field" : "";
+            const actualLocked = state.mode === "NEW_TARGET" ? "locked-field" : "";
+
+            tr.innerHTML = `
+                <td class="p-4">
+                    <input type="text" class="row-name input-field border-none bg-transparent" value="${name}" ${state.mode === "UPDATE_ACHIEVEMENT" ? 'readonly' : ''}>
+                </td>
+                <td class="p-4">
+                    <input type="number" class="row-target input-field ${targetLocked}" value="${target}" placeholder="0" oninput="updateDashboard()" ${state.mode === "UPDATE_ACHIEVEMENT" ? 'readonly' : ''}>
+                </td>
+                <td class="p-4">
+                    <input type="number" class="row-actual input-field bg-green-50 ${actualLocked}" value="${actual}" placeholder="0" oninput="updateDashboard()" ${state.mode === "NEW_TARGET" ? 'readonly' : ''}>
+                </td>
+                <td class="p-4">
+                    <input type="text" class="row-pd input-field" value="${pd || ''}" placeholder="Write response/remark...">
+                </td>
+            `;
+            rowsContainer.appendChild(tr);
+        }
+
+        function addNewRow() {
+            renderRow("", "", "", "");
+        }
+
+        /**
+         * CALCULATION & DASHBOARD
+         */
+        function updateDashboard() {
+            let totalT = 0;
+            let totalA = 0;
+            const rows = document.querySelectorAll('#plannerRows tr');
+
+            rows.forEach(r => {
+                totalT += Number(r.querySelector('.row-target').value || 0);
+                totalA += Number(r.querySelector('.row-actual').value || 0);
+            });
+
+            document.getElementById('dashTarget').innerText = `₹ ${totalT.toLocaleString()}`;
+            document.getElementById('dashActual').innerText = `₹ ${totalA.toLocaleString()}`;
+            
+            const eff = totalT > 0 ? ((totalA / totalT) * 100).toFixed(1) : 0;
+            document.getElementById('dashEff').innerText = `${eff}%`;
+
+            generateAIInsight(eff, totalT);
+        }
+
+        /**
+         * AI MARATHI ANALYSIS
+         */
+        function generateAIInsight(eff, totalT) {
+            const aiText = document.getElementById('aiInsightText');
+            if(totalT === 0) {
+                aiText.innerText = "साप्ताहिक टार्गेट भरा, म्हणजे मी विश्लेषण करू शकेन.";
                 return;
             }
-            
-            state.currentManager = m;
-            document.getElementById('managerDisplay').innerText = m;
-            document.getElementById('prominentManagerName').innerText = m;
-            
-            toggleLoader(true);
-            try {
-                const r = await fetch(`${API}?action=getManagerData&manager=${encodeURIComponent(m)}`);
-                const d = await r.json();
-                state.fx = d.fxList;
-                state.history = d.history;
-                
-                checkPending();
-                renderTable();
-                document.getElementById('mainContent').classList.remove('hidden');
-            } catch (e) {
-                alert("डेटा लोड करताना त्रुटी आली.");
-            }
-            toggleLoader(false);
-        }
 
-        // Logic to check if last entry needs Actual Achievement
-        function checkPending() {
-            if(state.history.length > 0) {
-                const last = state.history[state.history.length - 1];
-                // If actual disbursement is empty for any entry, it means achievement is pending
-                let incomplete = false;
-                last.details.forEach(item => { if(!item.aDisb) incomplete = true; });
-                
-                state.pendingAch = incomplete;
-                const b = document.getElementById('blocker');
-                const btn = document.getElementById('submitBtn');
-                
-                if(incomplete) {
-                    b.classList.remove('hidden');
-                    document.getElementById('sDate').value = last.sDate;
-                    document.getElementById('eDate').value = last.eDate;
-                    document.getElementById('sDate').readOnly = true;
-                    document.getElementById('eDate').readOnly = true;
-                    btn.innerText = "अचीव्हमेंट अपडेट करा";
-                    btn.classList.replace('from-blue-600', 'from-emerald-600');
-                } else {
-                    b.classList.add('hidden');
-                    document.getElementById('sDate').value = "";
-                    document.getElementById('eDate').value = "";
-                    document.getElementById('sDate').readOnly = false;
-                    document.getElementById('eDate').readOnly = false;
-                    btn.innerText = "नवीन प्लॅन सबमिट करा";
-                    btn.classList.replace('from-emerald-600', 'from-blue-600');
-                }
+            if(eff >= 90) {
+                aiText.innerText = "उत्कृष्ट कामगिरी! तुमचे टार्गेट अचीव्हमेंट ९०% पेक्षा जास्त आहे. हेच सातत्य टिकवून ठेवा.";
+            } else if (eff >= 60) {
+                aiText.innerText = "बरी कामगिरी आहे, पण अजून सुधारणेला वाव आहे. काही युनिट्स मध्ये लक्ष देणे गरजेचे आहे.";
+            } else {
+                aiText.innerText = "सावधान! तुमची कामगिरी खालावलेली दिसत आहे. त्वरित रिकव्हरी आणि नवीन लॉगिन वर काम करा.";
             }
         }
 
-        // Render Data Rows
-        function renderTable() {
-            const pc = document.getElementById('pcRows');
-            const mb = document.getElementById('mobRows');
-            pc.innerHTML = ""; mb.innerHTML = "";
+        /**
+         * DATA PROCESSING (SUBMIT)
+         */
+        function processSubmission() {
+            const from = document.getElementById('dateFrom').value;
+            const to = document.getElementById('dateTo').value;
             
-            const lastData = state.pendingAch ? state.history[state.history.length - 1].details : null;
+            if(!from || !to) {
+                showError("कृपया कालावधी निवडा!");
+                return;
+            }
 
-            state.fx.forEach((name, i) => {
-                const prev = lastData ? lastData.find(ld => ld.name === name) : { tDisb: '', aDisb: '', tOd: '', aOd: '', pd: '' };
-                
-                const targetLocked = state.pendingAch ? "input-locked" : "";
-                const actualLocked = !state.pendingAch ? "input-locked" : "";
-
-                // Desktop Row
-                pc.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-5 font-extrabold text-blue-900">${name}</td>
-                        <td class="p-3">
-                            <input type="number" class="val-tDisb input-pro ${targetLocked}" 
-                            value="${prev.tDisb}" ${state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
-                        </td>
-                        <td class="p-3">
-                            <input type="number" class="val-aDisb input-pro bg-emerald-50 ${actualLocked}" 
-                            value="${prev.aDisb}" ${!state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
-                        </td>
-                        <td class="p-3">
-                            <div class="flex gap-1">
-                                <input type="number" class="val-tOd w-20 input-pro ${targetLocked}" placeholder="T" 
-                                value="${prev.tOd}" ${state.pendingAch ? 'readonly' : ''}>
-                                <input type="number" class="val-aOd w-20 input-pro bg-orange-50 ${actualLocked}" placeholder="A" 
-                                value="${prev.aOd}" ${!state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
-                            </div>
-                        </td>
-                        <td class="p-3">
-                            <input type="text" class="val-pd input-pro" value="${prev.pd || ''}" placeholder="रिस्पॉन्स लिहा...">
-                        </td>
-                        <input type="hidden" class="val-name" value="${name}">
-                    </tr>`;
-                
-                // Mobile Card View
-                mb.innerHTML += `
-                    <div class="card p-6 space-y-5 border-l-8 border-l-blue-600 shadow-md">
-                        <div class="flex justify-between items-center border-b pb-3">
-                            <span class="font-black text-blue-900 text-lg">${name}</span>
-                            <span class="status-badge bg-blue-100 text-blue-600">FX Unit ${i+1}</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 uppercase">Target Disbursement</label>
-                                <input type="number" class="val-tDisb input-pro mt-1 ${targetLocked}" 
-                                value="${prev.tDisb}" ${state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
-                            </div>
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 uppercase">Actual Disbursement</label>
-                                <input type="number" class="val-aDisb input-pro mt-1 bg-emerald-50 ${actualLocked}" 
-                                value="${prev.aDisb}" ${!state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 uppercase">OD (Target | Actual)</label>
-                                <div class="flex gap-1 mt-1">
-                                    <input type="number" class="val-tOd w-1/2 input-pro ${targetLocked}" 
-                                    value="${prev.tOd}" ${state.pendingAch ? 'readonly' : ''}>
-                                    <input type="number" class="val-aOd w-1/2 input-pro bg-orange-50 ${actualLocked}" 
-                                    value="${prev.aOd}" ${!state.pendingAch ? 'readonly' : ''} oninput="liveKPI()">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 uppercase">Action Plan</label>
-                                <input type="text" class="val-pd input-pro mt-1" 
-                                value="${prev.pd || ''}" placeholder="...">
-                            </div>
-                        </div>
-                    </div>`;
-            });
-            liveKPI();
-            renderHistory();
-        }
-
-        // Live Calculation for KPIs
-        function liveKPI() {
-            let totalT = 0, totalA = 0, totalOD = 0;
-            const isMob = window.innerWidth <= 640;
-            const context = isMob ? document.getElementById('mobRows') : document.getElementById('pcRows');
-            
-            context.querySelectorAll('.val-tDisb').forEach(i => totalT += Number(i.value || 0));
-            context.querySelectorAll('.val-aDisb').forEach(i => totalA += Number(i.value || 0));
-            context.querySelectorAll('.val-aOd').forEach(i => totalOD += Number(i.value || 0));
-            
-            document.getElementById('kpiT').innerText = "₹ " + totalT.toLocaleString();
-            document.getElementById('kpiA').innerText = "₹ " + totalA.toLocaleString();
-            document.getElementById('kpiOD').innerText = "₹ " + totalOD.toLocaleString();
-            
-            const eff = totalT > 0 ? ((totalA/totalT)*100).toFixed(1) : 0;
-            document.getElementById('kpiE').innerText = eff + "%";
-        }
-
-        // Form Submit
-        document.getElementById('pForm').onsubmit = async (e) => {
-            e.preventDefault();
-            
-            if(!confirm("तुम्ही दिलेली माहिती बरोबर आहे का?")) return;
-
-            toggleLoader(true);
-            const isMob = window.innerWidth <= 640;
-            const rows = isMob ? document.querySelectorAll('#mobRows > .card') : document.querySelectorAll('#pcRows tr');
-            
-            const fxDetails = Array.from(rows).map(row => ({
-                name: isMob ? row.querySelector('.font-black').innerText : row.querySelector('.val-name').value,
-                tDisb: row.querySelector('.val-tDisb').value,
-                aDisb: row.querySelector('.val-aDisb').value,
-                tOd: row.querySelector('.val-tOd').value,
-                aOd: row.querySelector('.val-aOd').value,
-                pd: row.querySelector('.val-pd').value
+            const rows = document.querySelectorAll('#plannerRows tr');
+            const details = Array.from(rows).map(r => ({
+                name: r.querySelector('.row-name').value,
+                target: r.querySelector('.row-target').value,
+                actual: r.querySelector('.row-actual').value,
+                pd: r.querySelector('.row-pd').value
             }));
 
-            const payload = {
-                manager: state.currentManager,
-                sDate: document.getElementById('sDate').value,
-                eDate: document.getElementById('eDate').value,
-                fxDetails
-            };
+            // Save to internal state (Simulation)
+            const planID = `${state.currentManager}_${from}_${to}`;
+            state.data[planID] = { from, to, details };
 
-            try {
-                const r = await fetch(API, { method: "POST", body: JSON.stringify(payload) });
-                const res = await r.json();
-                alert(res.message);
-                location.reload();
-            } catch (err) {
-                alert("सबमिट करताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.");
-                toggleLoader(false);
-            }
-        };
-
-        // Render History with Date Filtering
-        function renderHistory() {
-            const hList = document.getElementById('historyList');
-            const fromDate = document.getElementById('filterFrom').value;
-            const toDate = document.getElementById('filterTo').value;
-            
-            let filtered = state.history;
-
-            if(fromDate && toDate) {
-                filtered = state.history.filter(item => {
-                    return item.sDate >= fromDate && item.eDate <= toDate;
-                });
-            }
-
-            if(filtered.length === 0) {
-                hList.innerHTML = `<div class="col-span-full p-10 text-center font-bold text-slate-400">या तारखांमध्ये कोणताही डेटा उपलब्ध नाही.</div>`;
-                return;
-            }
-
-            hList.innerHTML = filtered.map(row => {
-                let t = 0, a = 0;
-                row.details.forEach(d => { t += Number(d.tDisb); a += Number(d.aDisb); });
-                const eff = t > 0 ? ((a/t)*100).toFixed(1) : 0;
-                
-                let badgeClass = "bg-red-100 text-red-600";
-                if(eff >= 90) badgeClass = "bg-emerald-100 text-emerald-600";
-                else if(eff >= 50) badgeClass = "bg-orange-100 text-orange-600";
-
-                return `
-                <div class="card p-6 bg-white border-l-4 border-l-blue-600 hover:shadow-xl transition-all cursor-pointer">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">कालावधी</p>
-                            <p class="text-sm font-bold text-slate-800">${row.sDate} ते ${row.eDate}</p>
-                        </div>
-                        <span class="status-badge ${badgeClass}">${eff}% Efficiency</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 border-t pt-4">
-                        <div>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase">Target Disb.</p>
-                            <p class="font-black text-slate-700">₹ ${t.toLocaleString()}</p>
-                        </div>
-                        <div>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase">Actual Disb.</p>
-                            <p class="font-black text-emerald-600">₹ ${a.toLocaleString()}</p>
-                        </div>
-                    </div>
-                </div>`;
-            }).reverse().join('');
+            showLoader(() => {
+                alert("माहिती यशस्वीरित्या सेव्ह झाली आहे!");
+                checkExistingPlan(); // Refresh logic
+            });
         }
 
-        // Tab Switching Logic
-        function tab(n) {
-            document.getElementById('sec1').classList.toggle('hidden', n !== 1);
-            document.getElementById('sec2').classList.toggle('hidden', n !== 2);
-            
-            const t1 = document.getElementById('t1');
-            const t2 = document.getElementById('t2');
+        /**
+         * CHARTS INITIALIZATION
+         */
+        function initCharts() {
+            const ctx1 = document.getElementById('performanceChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Achievement Rate',
+                        data: [65, 78, 52, 90],
+                        borderColor: '#1976d2',
+                        fill: true,
+                        backgroundColor: 'rgba(25, 118, 210, 0.1)'
+                    }]
+                },
+                options: { responsive: true }
+            });
 
-            if(n === 1) {
-                t1.className = "flex-1 px-8 py-3 rounded-xl font-bold text-sm bg-white shadow-sm text-blue-700 transition-all";
-                t2.className = "flex-1 px-8 py-3 rounded-xl font-bold text-sm text-slate-600 transition-all";
-            } else {
-                t2.className = "flex-1 px-8 py-3 rounded-xl font-bold text-sm bg-white shadow-sm text-blue-700 transition-all";
-                t1.className = "flex-1 px-8 py-3 rounded-xl font-bold text-sm text-slate-600 transition-all";
-                renderHistory();
-            }
+            const ctx2 = document.getElementById('efficiencyChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Unit A', 'Unit B', 'Unit C', 'Unit D'],
+                    datasets: [{
+                        label: 'Efficiency %',
+                        data: [90, 45, 70, 85],
+                        backgroundColor: ['#1976d2', '#d32f2f', '#f9a825', '#2e7d32']
+                    }]
+                },
+                options: { responsive: true }
+            });
         }
 
-        // UI Helpers
-        function toggleLoader(show) {
-            document.getElementById('loader').style.display = show ? 'flex' : 'none';
+        /**
+         * UTILS
+         */
+        function showLoader(callback) {
+            loader.classList.remove('hidden');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                if(callback) callback();
+            }, 1000);
+        }
+
+        function showError(msg) {
+            const err = document.getElementById('errorLog');
+            err.innerText = msg;
+            err.classList.remove('hidden');
+            setTimeout(() => err.classList.add('hidden'), 3000);
+        }
+
+        function resetForm() {
+            document.getElementById('dateFrom').value = "";
+            document.getElementById('dateTo').value = "";
+            rowsContainer.innerHTML = "";
+            document.getElementById('statusBadge').classList.add('hidden');
+        }
+
+        function hideSections() {
+            document.getElementById('welcomeZone').classList.add('hidden');
+            document.getElementById('kpiDashboard').classList.add('hidden');
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('analysisSection').classList.add('hidden');
         }
 
     </script>
