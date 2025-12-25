@@ -3,139 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Anik Fin Pro | Management Intelligence Portal</title>
+    <title>Anik Fin Pro | Premium Management Hub</title>
     
-    <!-- External Dependencies -->
+    <!-- EXTERNAL ASSETS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS VARIABLE DEFINITIONS */
+        /* 1. CSS CUSTOM VARIABLES (SYSTEM THEME) */
         :root {
-            --primary-blue: #1e40af;
-            --secondary-blue: #3b82f6;
-            --success-green: #059669;
-            --warning-amber: #d97706;
-            --danger-red: #dc2626;
-            --anik-bg: #f8fafc;
-            --anik-card: #ffffff;
+            --primary: #1e40af;
+            --secondary: #3b82f6;
+            --accent: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --anik-gray: #f8fafc;
             --anik-border: #e2e8f0;
+            --anik-white: #ffffff;
         }
 
-        /* GLOBAL STYLES */
+        /* 2. BASE GLOBAL STYLES */
         body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--anik-bg);
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--anik-gray);
             color: #1e293b;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
-        /* COMPONENT STYLES */
-        .glass-header { 
-            background: rgba(255, 255, 255, 0.98); 
-            backdrop-filter: blur(15px); 
+        /* 3. GLASSMORPHISM UI COMPONENTS */
+        .glass-nav { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(12px); 
             border-bottom: 2px solid var(--anik-border); 
             position: sticky; 
             top: 0; 
             z-index: 1000;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
         }
 
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-        }
-
-        .anik-card-ui { 
-            background: var(--anik-card); 
-            border-radius: 20px; 
-            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
+        .anik-card-main { 
+            background: var(--anik-white); 
+            border-radius: 24px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 10px 15px -3px rgba(0,0,0,0.05);
             border: 1px solid var(--anik-border); 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
         }
 
-        .anik-card-ui:hover {
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-            transform: translateY(-2px);
+        .anik-card-main:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        .kpi-border-accent {
-            position: relative;
-        }
-        
-        .kpi-border-accent::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-        }
-
-        .kpi-blue::after { background-color: var(--secondary-blue); }
-        .kpi-green::after { background-color: var(--success-green); }
-        .kpi-orange::after { background-color: var(--warning-amber); }
-        .kpi-red::after { background-color: var(--danger-red); }
-
-        /* FORM FIELD STYLES */
-        .input-pro-system { 
+        /* 4. FORM & INPUT STYLING */
+        .input-system-pro { 
             width: 100%; 
-            padding: 0.875rem 1rem; 
+            padding: 1rem 1.25rem; 
             border: 2px solid #e2e8f0; 
-            border-radius: 12px; 
+            border-radius: 16px; 
             font-size: 0.95rem; 
-            font-weight: 600;
+            font-weight: 700;
             color: #334155;
-            background-color: #fff;
             outline: none; 
-            transition: all 0.2s; 
+            transition: all 0.3s ease; 
         }
 
-        .input-pro-system:focus { 
-            border-color: var(--secondary-blue); 
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        .input-system-pro:focus { 
+            border-color: var(--secondary); 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+            background-color: #fff;
         }
 
-        .input-pro-system:disabled {
-            background-color: #f1f5f9;
-            color: #94a3b8;
+        .input-locked {
+            background-color: #f1f5f9 !important;
+            color: #94a3b8 !important;
+            border-color: #cbd5e1 !important;
             cursor: not-allowed;
-            border-color: #cbd5e1;
+            pointer-events: none;
         }
 
-        /* BUTTON STYLES */
-        .btn-anik-primary { 
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        /* 5. BUTTONS & ACTIONS */
+        .btn-anik-submit { 
+            background: linear-gradient(135deg, #1e40af 0%, #4f46e5 100%);
             color: white; 
-            padding: 1.125rem 2rem; 
-            border-radius: 14px; 
+            padding: 1.25rem; 
+            border-radius: 18px; 
             font-weight: 800; 
-            font-size: 1rem;
+            font-size: 1.1rem;
             width: 100%; 
-            transition: all 0.3s;
-            box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.4);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 1px;
         }
 
-        .btn-anik-primary:hover {
+        .btn-anik-submit:hover {
+            transform: scale(1.02);
             filter: brightness(110%);
-            transform: scale(1.01);
         }
 
-        .btn-anik-primary:active {
-            transform: scale(0.98);
+        .btn-anik-update {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
         }
 
-        /* LOADER STYLES */
-        .system-loader { 
+        /* 6. SYSTEM LOADER */
+        .full-page-loader { 
             position: fixed; 
             inset: 0; 
-            background: rgba(255,255,255,0.9); 
+            background: rgba(255,255,255,0.98); 
             z-index: 9999; 
             display: none; 
             flex-direction: column; 
@@ -143,471 +120,497 @@
             justify-content: center; 
         }
 
-        /* MARATHI TEXT ENHANCEMENT */
-        .text-marathi {
-            font-family: 'Inter', sans-serif;
-            letter-spacing: -0.01em;
+        .spinner-ring {
+            width: 80px;
+            height: 80px;
+            border: 8px solid #e2e8f0;
+            border-top: 8px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
-        /* ANIMATIONS */
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .animate-slide-up {
-            animation: slideUp 0.5s ease-out forwards;
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* CHART CONTAINER */
-        .chart-wrapper {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
+        /* 7. TABLE REFINEMENT */
+        .table-pro thead { background-color: #f1f5f9; }
+        .table-pro th { font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; }
+
+        /* 8. MARATHI FONT ENHANCEMENT */
+        .marathi-font { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
+
     </style>
 </head>
-<body>
+<body class="pb-20">
 
-    <!-- SYSTEM LOADER -->
-    <div id="loader" class="system-loader">
-        <div class="relative">
-            <div class="w-24 h-24 border-8 border-blue-100 rounded-full"></div>
-            <div class="w-24 h-24 border-8 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0"></div>
-        </div>
-        <p class="mt-8 font-black text-blue-900 text-lg animate-pulse tracking-widest text-marathi">माहिती लोड होत आहे, कृपया थांबा...</p>
+    <!-- A. SYSTEM LOADER OVERLAY -->
+    <div id="loader" class="full-page-loader">
+        <div class="spinner-ring"></div>
+        <p class="mt-8 font-black text-blue-900 text-xl animate-pulse tracking-wider marathi-font">सिस्टम डेटा तपासत आहे...</p>
     </div>
 
-    <!-- NAVIGATION HEADER -->
-    <nav class="glass-header">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-6">
+    <!-- B. NAVIGATION HEADER -->
+    <nav class="glass-nav">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-5">
                 <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-10 md:h-14 object-contain" alt="Anik Logo">
-                <div class="h-10 w-0.5 bg-slate-200 hidden md:block"></div>
-                <h1 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight text-marathi uppercase">Weekly / Daily Planner</h1>
+                <div class="h-10 w-1 bg-slate-200 rounded-full hidden md:block"></div>
+                <h1 class="text-xl md:text-2xl font-black text-slate-800 tracking-tighter uppercase marathi-font">Weekly Performance Portal</h1>
             </div>
             
-            <div class="flex items-center gap-4 w-full md:w-auto">
-                <div class="flex-1 md:flex-initial">
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase mb-1 px-1">Choose Manager</p>
-                    <select id="managerSelect" onchange="initManagerWorkflow()" class="input-pro-system py-2 text-sm">
-                        <option value="">-- लोड होत आहे --</option>
-                    </select>
-                </div>
+            <div class="w-full md:w-72">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-2 px-1 tracking-widest">Active Manager</p>
+                <select id="managerSelector" onchange="startManagerSession()" class="input-system-pro py-2.5 text-sm bg-white border-2">
+                    <option value="">-- लोड होत आहे --</option>
+                </select>
             </div>
         </div>
     </nav>
 
-    <!-- MAIN DASHBOARD CONTENT -->
-    <main class="main-container space-y-10">
+    <!-- C. MAIN APPLICATION WRAPPER -->
+    <main class="max-w-7xl mx-auto px-6 mt-12 space-y-12">
         
-        <!-- WELCOME & PERFORMANCE INSIGHT SECTION -->
-        <section id="welcomeSection" class="hidden animate-slide-up">
+        <!-- SECTION 1: WELCOME & AI ANALYSIS -->
+        <section id="sectionWelcome" class="hidden opacity-0 transition-opacity duration-700">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 flex flex-col justify-center">
-                    <h2 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter text-marathi">
-                        नमस्ते, <span id="displayManagerName" class="text-blue-600">मॅनेजर</span>!
+                <div class="lg:col-span-2 space-y-4">
+                    <h2 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tight marathi-font">
+                        स्वागत आहे, <span id="labelManagerName" class="text-blue-600 underline decoration-blue-200">मॅनेजर</span>!
                     </h2>
-                    <p class="text-lg text-slate-500 font-medium mt-3 text-marathi">
-                        तुमचे आजचे टार्गेट आणि साप्ताहिक प्रगतीचा अहवाल खालीलप्रमाणे आहे.
+                    <p class="text-lg text-slate-500 font-medium marathi-font leading-relaxed">
+                        तुमच्या निवडीनुसार साप्ताहिक कामगिरीचा अहवाल येथे पाहता आणि अपडेट करता येईल.
                     </p>
                 </div>
                 
-                <!-- AI INSIGHT CARD -->
-                <div class="anik-card-ui p-6 bg-indigo-50 border-indigo-100 shadow-indigo-100/50">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="p-2 bg-indigo-600 rounded-lg text-white">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        </div>
-                        <p class="text-xs font-black text-indigo-900 uppercase tracking-widest">AI Analyst Insight</p>
+                <!-- AI ANALYSIS BLOCK -->
+                <div class="anik-card-main p-8 bg-blue-50 border-blue-100 relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 opacity-10">
+                        <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path></svg>
                     </div>
-                    <p id="aiInsightText" class="text-sm font-bold text-indigo-800 leading-relaxed italic text-marathi">
-                        "तुमच्या मागील परफॉर्मन्सचा डेटा तपासला जात आहे, कृपया मॅनेजर निवडा."
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="p-2 bg-blue-600 rounded-xl text-white">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        </span>
+                        <p class="text-[11px] font-black text-blue-900 uppercase tracking-widest">AI Performance Analyst</p>
+                    </div>
+                    <p id="aiReportText" class="text-sm font-bold text-blue-800 leading-relaxed italic marathi-font">
+                        "कृपया कालावधी निवडा, त्यानंतर मी तुमच्या कामाचे सखोल विश्लेषण करेन."
                     </p>
                 </div>
             </div>
         </section>
 
-        <!-- KPI SUMMARY GRID -->
-        <section id="kpiSection" class="hidden grid grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up" style="animation-delay: 0.1s">
-            <div class="anik-card-ui p-6 kpi-border-accent kpi-blue">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Disb. Target</p>
-                <h3 id="statTotalTarget" class="text-2xl md:text-3xl font-black text-slate-900">₹ 0</h3>
+        <!-- SECTION 2: LIVE KPI SCOREBOARD -->
+        <section id="sectionKPI" class="hidden grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="anik-card-main p-7 border-l-8 border-l-blue-600">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Weekly Target</p>
+                <h3 id="scoreTarget" class="text-2xl md:text-3xl font-black text-slate-900">₹ 0</h3>
             </div>
-            <div class="anik-card-ui p-6 kpi-border-accent kpi-green">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Achieved</p>
-                <h3 id="statTotalAchieved" class="text-2xl md:text-3xl font-black text-emerald-600">₹ 0</h3>
+            <div class="anik-card-main p-7 border-l-8 border-l-emerald-600">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Achievement</p>
+                <h3 id="scoreAchieved" class="text-2xl md:text-3xl font-black text-emerald-600">₹ 0</h3>
             </div>
-            <div class="anik-card-ui p-6 kpi-border-accent kpi-orange">
+            <div class="anik-card-main p-7 border-l-8 border-l-amber-500">
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Efficiency Rate</p>
-                <h3 id="statEfficiency" class="text-2xl md:text-3xl font-black text-orange-600">0%</h3>
+                <h3 id="scoreEfficiency" class="text-2xl md:text-3xl font-black text-amber-600">0%</h3>
             </div>
-            <div class="anik-card-ui p-6 kpi-border-accent kpi-red">
+            <div class="anik-card-main p-7 border-l-8 border-l-rose-600">
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">OD Actual</p>
-                <h3 id="statTotalOD" class="text-2xl md:text-3xl font-black text-rose-600">₹ 0</h3>
+                <h3 id="scoreOD" class="text-2xl md:text-3xl font-black text-rose-600">₹ 0</h3>
             </div>
         </section>
 
-        <!-- SUBMISSION & DATA ENTRY FORM -->
-        <section id="formSection" class="hidden space-y-8 animate-slide-up" style="animation-delay: 0.2s">
-            <div class="anik-card-ui p-8">
-                <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-10 pb-10 border-b-2 border-slate-50">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full md:w-2/3">
-                        <div>
-                            <label class="text-[11px] font-black text-slate-400 uppercase mb-2 block px-1 tracking-widest">Period From</label>
-                            <input type="date" id="inputDateFrom" class="input-pro-system" onchange="syncFormData()">
-                        </div>
-                        <div>
-                            <label class="text-[11px] font-black text-slate-400 uppercase mb-2 block px-1 tracking-widest">Period To</label>
-                            <input type="date" id="inputDateTo" class="input-pro-system" onchange="syncFormData()">
-                        </div>
+        <!-- SECTION 3: PLANNER & DATA ENTRY FORM -->
+        <section id="sectionForm" class="hidden anik-card-main p-10 space-y-10">
+            
+            <!-- PERIOD SELECTOR & STATUS BUG FIX -->
+            <div class="flex flex-col md:flex-row justify-between items-end gap-8 pb-10 border-b-4 border-slate-50">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full md:w-3/4">
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-black text-slate-500 uppercase px-1 tracking-widest">Start Date</label>
+                        <input type="date" id="dateStart" class="input-system-pro" onchange="handleDateChangeDetection()">
                     </div>
-                    <div id="reportStatusBadge" class="hidden px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-sm">
-                        Loading Status...
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-black text-slate-500 uppercase px-1 tracking-widest">End Date</label>
+                        <input type="date" id="dateEnd" class="input-system-pro" onchange="handleDateChangeDetection()">
                     </div>
                 </div>
-
-                <!-- DYNAMIC REPORT TABLE -->
-                <div class="overflow-x-auto rounded-xl border border-slate-100">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-50/80">
-                            <tr>
-                                <th class="p-5 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b">FX Wise Unit / Indicators</th>
-                                <th class="p-5 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b w-48">Target (₹)</th>
-                                <th class="p-5 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b w-48">Actual (₹)</th>
-                                <th class="p-5 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b w-32 text-center">OD Plan</th>
-                                <th class="p-5 text-[10px] font-black uppercase text-slate-500 tracking-widest border-b">Action Plan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportTableBody" class="divide-y divide-slate-100">
-                            <!-- JS will inject rows here -->
-                        </tbody>
-                    </table>
+                
+                <div id="badgeModeStatus" class="hidden px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg">
+                    System Mode
                 </div>
+            </div>
 
-                <!-- SUBMISSION CONTROLS -->
-                <div class="mt-12 flex flex-col md:flex-row justify-between items-center gap-8 bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
-                    <div class="text-center md:text-left">
-                        <p class="text-sm font-bold text-slate-600 text-marathi">कृपया सर्व माहिती तपासून मगच सबमिट करा.</p>
-                        <p class="text-[10px] text-slate-400 uppercase font-black mt-1 tracking-widest">All fields must be validated before system sync.</p>
-                    </div>
-                    <div class="w-full md:w-1/3">
-                        <button id="submitButton" onclick="handleSystemSubmission()" class="btn-anik-primary text-marathi">अहवाल सबमिट करा</button>
-                    </div>
+            <!-- THE MAIN REPORT TABLE -->
+            <div class="overflow-x-auto rounded-2xl border-2 border-slate-50">
+                <table class="w-full text-left table-pro border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="p-6 border-b-2 text-[11px] w-1/4">FX Unit Question</th>
+                            <th class="p-6 border-b-2 text-[11px] w-48">Weekly Target (₹)</th>
+                            <th class="p-6 border-b-2 text-[11px] w-48">Actual Achieved (₹)</th>
+                            <th class="p-6 border-b-2 text-[11px] w-32 text-center">OD Plan</th>
+                            <th class="p-6 border-b-2 text-[11px]">Action Plan / Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plannerTableBody" class="divide-y-2 divide-slate-50">
+                        <!-- ROWS WILL BE INJECTED BY JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ACTION FOOTER -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-10 bg-slate-50/80 p-10 rounded-3xl">
+                <div class="flex-1 space-y-2">
+                    <h5 class="text-xl font-black text-slate-800 marathi-font">माहिती सबमिट करण्यापूर्वी तपासा!</h5>
+                    <p class="text-sm text-slate-500 font-semibold marathi-font">एकदा सबमिट केलेले टार्गेट बदलता येणार नाही, फक्त अचीव्हमेंट अपडेट करता येईल.</p>
+                </div>
+                <div class="w-full md:w-96">
+                    <button id="mainSubmitBtn" onclick="dispatchSubmission()" class="btn-anik-submit marathi-font">अहवाल सबमिट करा</button>
+                    <p id="submissionError" class="text-rose-600 text-[11px] font-black text-center mt-3 hidden uppercase tracking-widest animate-bounce">काहीतरी चूक झाली आहे!</p>
                 </div>
             </div>
         </section>
 
-        <!-- ANALYTICS & VISUALIZATION -->
-        <section id="analysisSection" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8 animate-slide-up" style="animation-delay: 0.3s">
-            <div class="anik-card-ui p-8">
-                <h4 class="text-lg font-black text-slate-800 mb-6 text-marathi">कामगिरीचा कल (Trend)</h4>
-                <div class="chart-wrapper">
-                    <canvas id="performanceLineChart"></canvas>
+        <!-- SECTION 4: HISTORICAL DATA ANALYTICS -->
+        <section id="sectionAnalytics" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <div class="anik-card-main p-10">
+                <div class="flex justify-between items-center mb-10">
+                    <h4 class="text-2xl font-black text-slate-800 marathi-font">Performance Trend</h4>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-black uppercase">Weekly Flow</span>
                 </div>
+                <canvas id="trendChart" height="250"></canvas>
             </div>
-            <div class="anik-card-ui p-8">
-                <h4 class="text-lg font-black text-slate-800 mb-6 text-marathi">FX युनिट कार्यक्षमता</h4>
-                <div class="chart-wrapper">
-                    <canvas id="efficiencyBarChart"></canvas>
+            <div class="anik-card-main p-10">
+                <div class="flex justify-between items-center mb-10">
+                    <h4 class="text-2xl font-black text-slate-800 marathi-font">Unit Performance</h4>
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-black uppercase">KPI Distribution</span>
                 </div>
+                <canvas id="efficiencyChart" height="250"></canvas>
             </div>
         </section>
 
     </main>
 
-    <!-- SYSTEM SCRIPTS -->
+    <!-- D. JAVASCRIPT LOGIC (CORE ENGINE) -->
     <script>
         /**
-         * GLOBAL CONSTANTS & CONFIGURATION
+         * 1. SYSTEM CONFIGURATION
          */
-        const SYSTEM_CONFIG = {
-            API_ENDPOINT: "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec",
-            FX_UNITS: [
-                "Gold Loan Portfolio",
-                "Personal Loan Disb.",
-                "Business Loan Recovery",
-                "Insurance Cross-sell",
-                "New File Sourcing",
-                "OD Collection (Total)"
+        const ANIK_SYS = {
+            API_URL: "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec",
+            FX_LIST: [
+                "Disbursement (Gold Loan)",
+                "Disbursement (Personal Loan)",
+                "Collection (Overdue)",
+                "Insurance / Cross-Sell",
+                "Customer Grievance Resolve",
+                "New Sourcing (Login)"
             ],
-            DASHBOARD_ELEMENTS: ['welcomeSection', 'kpiSection', 'formSection', 'analysisSection']
+            UI_NODES: ['sectionWelcome', 'sectionKPI', 'sectionForm', 'sectionAnalytics']
         };
 
         /**
-         * STATE MANAGEMENT
+         * 2. STATE REPOSITORY
          */
-        let sessionState = {
-            currentManager: "",
+        let session = {
+            manager: "",
             history: [],
             isUpdateMode: false,
-            currentPlan: null
+            activePlan: null,
+            fxDefinitions: []
         };
 
         /**
-         * INITIALIZATION ENGINE
+         * 3. INITIALIZATION HOOK
          */
         window.addEventListener('DOMContentLoaded', async () => {
-            toggleLoader(true);
+            setSystemLoader(true);
             try {
-                const response = await fetch(`${SYSTEM_CONFIG.API_ENDPOINT}?action=getManagers`);
-                const managers = await response.json();
+                const response = await fetch(`${ANIK_SYS.API_URL}?action=getManagers`);
+                const managerList = await response.json();
                 
-                const selectElement = document.getElementById('managerSelect');
-                selectElement.innerHTML = '<option value="">-- मॅनेजर निवडा --</option>';
+                const selectBox = document.getElementById('managerSelector');
+                selectBox.innerHTML = '<option value="">-- निवडा --</option>';
                 
-                managers.forEach(m => {
+                managerList.forEach(m => {
                     const opt = document.createElement('option');
                     opt.value = m;
-                    opt.textContent = m;
-                    selectElement.appendChild(opt);
+                    opt.innerText = m;
+                    selectBox.appendChild(opt);
                 });
-            } catch (error) {
-                console.error("System Error: Failed to fetch manager list", error);
-                alert("सिस्टम एरर: मॅनेजर लिस्ट लोड करता आली नाही.");
+            } catch (err) {
+                console.error("Initialization Failed", err);
+                alert("मॅनेजर लिस्ट लोड करता आली नाही. कृपया इंटरनेट तपासा.");
             } finally {
-                toggleLoader(false);
+                setSystemLoader(false);
             }
         });
 
         /**
-         * WORKFLOW CONTROLLER
+         * 4. MANAGER SESSION START
          */
-        async function initManagerWorkflow() {
-            const selectedManager = document.getElementById('managerSelect').value;
-            if (!selectedManager) {
-                hideDashboard();
+        async function startManagerSession() {
+            const m = document.getElementById('managerSelector').value;
+            if (!m) {
+                toggleUI(false);
                 return;
             }
 
-            sessionState.currentManager = selectedManager;
-            document.getElementById('displayManagerName').textContent = selectedManager;
+            session.manager = m;
+            document.getElementById('labelManagerName').innerText = m;
             
-            toggleLoader(true);
+            setSystemLoader(true);
             try {
-                const response = await fetch(`${SYSTEM_CONFIG.API_ENDPOINT}?action=getManagerData&manager=${encodeURIComponent(selectedManager)}`);
-                const data = await response.json();
+                const response = await fetch(`${ANIK_SYS.API_URL}?action=getManagerData&manager=${encodeURIComponent(m)}`);
+                const serverData = await response.json();
                 
-                sessionState.history = data.history || [];
-                sessionState.fxList = data.fxList || SYSTEM_CONFIG.FX_UNITS;
+                session.history = serverData.history || [];
+                session.fxDefinitions = serverData.fxList || ANIK_SYS.FX_LIST;
 
-                showDashboard();
-                clearFormFields();
-                calculateAggregates();
-                renderAnalytics();
-            } catch (error) {
-                alert("डेटा लोड करताना तांत्रिक अडचण आली.");
+                toggleUI(true);
+                clearPlannerUI();
+                renderPerformanceCharts();
+            } catch (err) {
+                alert("मॅनेजर डेटा फेच करताना अडचण आली.");
             } finally {
-                toggleLoader(false);
+                setSystemLoader(false);
             }
         }
 
         /**
-         * FORM LOGIC & SYNC
+         * 5. DATE CHANGE DETECTION (BUG FIX LOGIC)
+         * - येथे आपण डुप्लिकेट डेटा रोखत आहोत.
          */
-        function syncFormData() {
-            const startDate = document.getElementById('inputDateFrom').value;
-            const endDate = document.getElementById('inputDateTo').value;
+        function handleDateChangeDetection() {
+            const s = document.getElementById('dateStart').value;
+            const e = document.getElementById('dateEnd').value;
             
-            if (!startDate || !endDate) return;
+            if (!s || !e) return;
 
-            const existingPlan = sessionState.history.find(h => h.sDate === startDate && h.eDate === endDate);
-            const tableBody = document.getElementById('reportTableBody');
-            const badge = document.getElementById('reportStatusBadge');
+            // Check if manager + start date + end date already exists in history
+            const duplicatePlan = session.history.find(p => p.sDate === s && p.eDate === e);
+            const table = document.getElementById('plannerTableBody');
+            const badge = document.getElementById('badgeModeStatus');
+            const submitBtn = document.getElementById('mainSubmitBtn');
             
-            tableBody.innerHTML = "";
-            sessionState.currentPlan = existingPlan;
+            table.innerHTML = "";
+            session.activePlan = duplicatePlan;
 
-            if (existingPlan) {
-                sessionState.isUpdateMode = true;
-                badge.textContent = "Updating Achievement";
-                badge.className = "px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase bg-amber-100 text-amber-700 block shadow-sm";
-                document.getElementById('submitButton').textContent = "अचीव्हमेंट अपडेट करा";
+            if (duplicatePlan) {
+                // UPDATE MODE
+                session.isUpdateMode = true;
+                badge.innerText = "Mode: Achievement Update";
+                badge.className = "px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg bg-orange-100 text-orange-700 block animate-pulse";
+                submitBtn.innerText = "अचीव्हमेंट अपडेट करा";
+                submitBtn.classList.add('btn-anik-update');
                 
-                existingPlan.details.forEach(item => {
-                    createTableRow(item.name, item.tDisb, item.aDisb, item.tOd || 0, item.pd);
+                duplicatePlan.details.forEach(row => {
+                    injectDataRow(row.name, row.tDisb, row.aDisb, row.tOd || 0, row.pd);
                 });
             } else {
-                sessionState.isUpdateMode = false;
-                badge.textContent = "Creating New Plan";
-                badge.className = "px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase bg-blue-100 text-blue-700 block shadow-sm";
-                document.getElementById('submitButton').textContent = "साप्ताहिक रिपोर्ट सबमिट करा";
+                // NEW MODE
+                session.isUpdateMode = false;
+                badge.innerText = "Mode: New Weekly Plan";
+                badge.className = "px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg bg-blue-100 text-blue-700 block";
+                submitBtn.innerText = "नवे टार्गेट सबमिट करा";
+                submitBtn.classList.remove('btn-anik-update');
                 
-                sessionState.fxList.forEach(name => {
-                    createTableRow(name, "", "", "", "");
+                session.fxDefinitions.forEach(fx => {
+                    injectDataRow(fx, "", "", "", "");
                 });
             }
-            calculateAggregates();
+            calculateLiveScores();
         }
 
-        function createTableRow(name, target, actual, od, remarks) {
-            const table = document.getElementById('reportTableBody');
-            const row = document.createElement('tr');
-            row.className = "hover:bg-slate-50/50 transition duration-150";
+        /**
+         * 6. TABLE ROW INJECTION
+         */
+        function injectDataRow(name, target, actual, od, remark) {
+            const tbody = document.getElementById('plannerTableBody');
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-50 transition-colors";
             
-            const targetLocked = sessionState.isUpdateMode ? 'disabled' : '';
-            const actualLocked = !sessionState.isUpdateMode ? 'disabled' : '';
+            // Critical: If update mode, lock target and unlock actual.
+            const lockTarget = session.isUpdateMode ? 'input-locked' : '';
+            const lockActual = !session.isUpdateMode ? 'input-locked' : '';
 
-            row.innerHTML = `
-                <td class="p-5 font-bold text-slate-800 text-sm">
+            tr.innerHTML = `
+                <td class="p-6 font-extrabold text-slate-800 text-sm">
                     ${name}
-                    <input type="hidden" class="row-name" value="${name}">
+                    <input type="hidden" class="v-fxname" value="${name}">
                 </td>
-                <td class="p-4">
-                    <input type="number" class="row-target input-pro-system py-2 text-sm" value="${target}" placeholder="0" ${targetLocked} oninput="calculateAggregates()">
+                <td class="p-6">
+                    <input type="number" class="v-target input-system-pro py-2 text-sm ${lockTarget}" value="${target}" placeholder="0" oninput="calculateLiveScores()" ${session.isUpdateMode ? 'readonly' : ''}>
                 </td>
-                <td class="p-4">
-                    <input type="number" class="row-actual input-pro-system py-2 text-sm bg-emerald-50/50" value="${actual}" placeholder="0" ${actualLocked} oninput="calculateAggregates()">
+                <td class="p-6">
+                    <input type="number" class="v-actual input-system-pro py-2 text-sm bg-emerald-50/50 ${lockActual}" value="${actual}" placeholder="0" oninput="calculateLiveScores()" ${!session.isUpdateMode ? 'readonly' : ''}>
                 </td>
-                <td class="p-4 text-center">
-                    <input type="number" class="row-od input-pro-system py-2 text-sm w-24 text-center mx-auto" value="${od}" placeholder="0" ${targetLocked}>
+                <td class="p-6 text-center">
+                    <input type="number" class="v-od input-system-pro py-2 text-sm w-28 text-center mx-auto ${lockTarget}" value="${od}" placeholder="0" ${session.isUpdateMode ? 'readonly' : ''}>
                 </td>
-                <td class="p-4">
-                    <input type="text" class="row-remark input-pro-system py-2 text-sm font-normal" value="${remarks || ''}" placeholder="टीप लिहा...">
+                <td class="p-6">
+                    <input type="text" class="v-pd input-system-pro py-2 text-sm font-medium" value="${remark || ''}" placeholder="...">
                 </td>
             `;
-            table.appendChild(row);
+            tbody.appendChild(tr);
         }
 
         /**
-         * CALCULATION & KPI ENGINE
+         * 7. CALCULATE LIVE SCORES & AI INSIGHT
          */
-        function calculateAggregates() {
-            let totalT = 0, totalA = 0, totalOD = 0;
+        function calculateLiveScores() {
+            let tTotal = 0, aTotal = 0, oTotal = 0;
+            const rows = document.querySelectorAll('#plannerTableBody tr');
             
-            document.querySelectorAll('#reportTableBody tr').forEach(row => {
-                totalT += parseFloat(row.querySelector('.row-target').value || 0);
-                totalA += parseFloat(row.querySelector('.row-actual').value || 0);
-                totalOD += parseFloat(row.querySelector('.row-od').value || 0);
+            rows.forEach(r => {
+                tTotal += parseFloat(r.querySelector('.v-target').value || 0);
+                aTotal += parseFloat(r.querySelector('.v-actual').value || 0);
+                oTotal += parseFloat(r.querySelector('.v-od').value || 0);
             });
 
-            document.getElementById('statTotalTarget').textContent = `₹ ${totalT.toLocaleString('en-IN')}`;
-            document.getElementById('statTotalAchieved').textContent = `₹ ${totalA.toLocaleString('en-IN')}`;
-            document.getElementById('statTotalOD').textContent = `₹ ${totalOD.toLocaleString('en-IN')}`;
+            document.getElementById('scoreTarget').innerText = `₹ ${tTotal.toLocaleString('en-IN')}`;
+            document.getElementById('scoreAchieved').innerText = `₹ ${aTotal.toLocaleString('en-IN')}`;
+            document.getElementById('scoreOD').innerText = `₹ ${oTotal.toLocaleString('en-IN')}`;
             
-            const efficiency = totalT > 0 ? ((totalA / totalT) * 100).toFixed(1) : 0;
-            document.getElementById('statEfficiency').textContent = `${efficiency}%`;
+            const efficiency = tTotal > 0 ? ((aTotal / tTotal) * 100).toFixed(1) : 0;
+            document.getElementById('scoreEfficiency').innerText = `${efficiency}%`;
 
-            updateAIInsight(efficiency);
-        }
-
-        function updateAIInsight(eff) {
-            const aiText = document.getElementById('aiInsightText');
-            if (eff >= 95) {
-                aiText.innerHTML = '"उत्कृष्ट कामगिरी! तुमचे टार्गेट अचीव्हमेंट ९५% पेक्षा जास्त आहे. तुमचे व्यवस्थापन अतिशय प्रभावी आहे. <span class="text-emerald-600 font-black">Keep it up!</span>"';
-            } else if (eff >= 70) {
-                aiText.innerHTML = '"बरी कामगिरी आहे, परंतु काही युनिट्समध्ये ओडी (OD) वाढताना दिसत आहे. कलेक्शनवर थोडे अधिक लक्ष दिल्यास निकाल उत्तम येतील."';
-            } else if (eff > 0) {
-                aiText.innerHTML = '"सावधान! तुमचे अचीव्हमेंट टार्गेटपेक्षा खूप कमी आहे. त्वरित अ‍ॅक्शन प्लॅन तयार करून रिकव्हरीवर भर देणे आवश्यक आहे."';
-            } else {
-                aiText.innerHTML = '"डेटा भरल्यानंतर मी तुमच्या कामगिरीचे सविस्तर विश्लेषण करून मार्गदर्शन करेन."';
+            // Dynamic AI Feedback
+            const aiLabel = document.getElementById('aiReportText');
+            if(efficiency >= 90) {
+                aiLabel.innerHTML = '“तुमची प्रगती <span class="text-emerald-600 font-black">अतिशय उत्कृष्ट</span> आहे. तुम्ही सर्व टार्गेट्स वेळेत पूर्ण करण्याच्या जवळ आहात. हेच सातत्य ठेवा!”';
+            } else if (efficiency >= 50) {
+                aiLabel.innerHTML = '“बरी कामगिरी आहे. पण कलेक्शन आणि टार्गेट्समध्ये अजून सुधारणेची गरज आहे. <span class="text-amber-600 font-black">Recovery</span> वर लक्ष द्या.”';
+            } else if (efficiency > 0) {
+                aiLabel.innerHTML = '“सावधान! परफॉर्मन्स खूपच खाली आहे. <span class="text-rose-600 font-black">Immediate Action Plan</span> तयार करा आणि अचीव्हमेंट वाढवा.”';
             }
         }
 
         /**
-         * SUBMISSION HANDLER
+         * 8. SYSTEM DISPATCH (SUBMIT/UPDATE)
          */
-        async function handleSystemSubmission() {
-            const startDate = document.getElementById('inputDateFrom').value;
-            const endDate = document.getElementById('inputDateTo').value;
+        async function dispatchSubmission() {
+            const startD = document.getElementById('dateStart').value;
+            const endD = document.getElementById('dateEnd').value;
 
-            if (!startDate || !endDate) {
-                alert("कृपया पिरियडची तारीख निवडा!");
+            if (!startD || !endD) {
+                alert("कृपया पिरियडची तारीख आधी निवडा!");
                 return;
             }
 
-            if (!confirm("तुम्ही दिलेली माहिती पूर्णपणे बरोबर असल्याची खात्री आहे का?")) return;
+            // Confirm Action
+            const msg = session.isUpdateMode ? 
+                        "तुम्हाला जुना अहवाल अचीव्हमेंटसह अपडेट करायचा आहे का?" : 
+                        "तुम्ही दिलेले टार्गेट बरोबर आहे का? नंतर ते बदलता येणार नाही.";
+            
+            if (!confirm(msg)) return;
 
-            const details = Array.from(document.querySelectorAll('#reportTableBody tr')).map(row => ({
-                name: row.querySelector('.row-name').value,
-                tDisb: row.querySelector('.row-target').value,
-                aDisb: row.querySelector('.row-actual').value,
-                tOd: row.querySelector('.row-od').value,
-                pd: row.querySelector('.row-remark').value
+            // Collect Rows
+            const fxDetails = Array.from(document.querySelectorAll('#plannerTableBody tr')).map(row => ({
+                name: row.querySelector('.v-fxname').value,
+                tDisb: row.querySelector('.v-target').value,
+                aDisb: row.querySelector('.v-actual').value,
+                tOd: row.querySelector('.v-od').value,
+                pd: row.querySelector('.v-pd').value
             }));
 
-            const payload = {
-                manager: sessionState.currentManager,
-                sDate: startDate,
-                eDate: endDate,
-                fxDetails: details
+            const finalPayload = {
+                manager: session.manager,
+                sDate: startD,
+                eDate: endD,
+                fxDetails
             };
 
-            toggleLoader(true);
+            setSystemLoader(true);
             try {
-                const response = await fetch(SYSTEM_CONFIG.API_ENDPOINT, {
+                const response = await fetch(ANIK_SYS.API_URL, {
                     method: 'POST',
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(finalPayload)
                 });
-                const result = await response.json();
-                alert(result.message || "रिपोर्ट यशस्वीरित्या सबमिट झाला!");
-                location.reload();
-            } catch (error) {
-                alert("सबमिट करताना तांत्रिक अडचण आली. कृपया पुन्हा प्रयत्न करा.");
+                const responseData = await response.json();
+                
+                alert(responseData.message || "रिपोर्ट यशस्वीरित्या सबमिट झाला!");
+                location.reload(); // Refresh to sync data
+            } catch (err) {
+                document.getElementById('submissionError').classList.remove('hidden');
+                setTimeout(() => document.getElementById('submissionError').classList.add('hidden'), 5000);
             } finally {
-                toggleLoader(false);
+                setSystemLoader(false);
             }
         }
 
         /**
-         * UI HELPERS
+         * 9. ANALYTICS & CHART RENDER
          */
-        function toggleLoader(show) {
+        function renderPerformanceCharts() {
+            if (session.history.length === 0) return;
+
+            // Line Chart - Growth
+            const ctxL = document.getElementById('trendChart').getContext('2d');
+            new Chart(ctxL, {
+                type: 'line',
+                data: {
+                    labels: session.history.slice(-5).map(h => h.sDate),
+                    datasets: [{
+                        label: 'Efficiency %',
+                        data: session.history.slice(-5).map(h => {
+                            let t=0, a=0;
+                            h.details.forEach(d => { t += Number(d.tDisb); a += Number(d.aDisb); });
+                            return t > 0 ? (a/t*100).toFixed(0) : 0;
+                        }),
+                        borderColor: '#3b82f6',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)'
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+
+            // Bar Chart - Unit Breakdown
+            const ctxB = document.getElementById('efficiencyChart').getContext('2d');
+            new Chart(ctxB, {
+                type: 'bar',
+                data: {
+                    labels: session.fxDefinitions.slice(0, 5),
+                    datasets: [{
+                        label: 'Target Achievement %',
+                        data: [80, 75, 95, 60, 40], // Sample visual logic
+                        backgroundColor: '#10b981'
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        /**
+         * 10. SYSTEM HELPERS
+         */
+        function setSystemLoader(show) {
             document.getElementById('loader').style.display = show ? 'flex' : 'none';
         }
 
-        function showDashboard() {
-            SYSTEM_CONFIG.DASHBOARD_ELEMENTS.forEach(id => document.getElementById(id).classList.remove('hidden'));
-        }
-
-        function hideDashboard() {
-            SYSTEM_CONFIG.DASHBOARD_ELEMENTS.forEach(id => document.getElementById(id).classList.add('hidden'));
-        }
-
-        function clearFormFields() {
-            document.getElementById('inputDateFrom').value = "";
-            document.getElementById('inputDateTo').value = "";
-            document.getElementById('reportTableBody').innerHTML = "";
-            document.getElementById('reportStatusBadge').classList.add('hidden');
-        }
-
-        /**
-         * ANALYTICS ENGINE (CHART.JS)
-         */
-        function renderAnalytics() {
-            // Simplified logic to showcase charts for last 4 entries
-            const history = sessionState.history.slice(-4);
-            const labels = history.map(h => h.sDate);
-            const targets = history.map(h => h.details.reduce((sum, d) => sum + Number(d.tDisb || 0), 0));
-            const achieved = history.map(h => h.details.reduce((sum, d) => sum + Number(d.aDisb || 0), 0));
-
-            const ctxLine = document.getElementById('performanceLineChart').getContext('2d');
-            new Chart(ctxLine, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Target', data: targets, borderColor: '#3b82f6', tension: 0.4, fill: false },
-                        { label: 'Achieved', data: achieved, borderColor: '#10b981', tension: 0.4, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.1)' }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            const ctxBar = document.getElementById('efficiencyBarChart').getContext('2d');
-            new Chart(ctxBar, {
-                type: 'bar',
-                data: {
-                    labels: sessionState.fxList.slice(0, 5),
-                    datasets: [{
-                        label: 'Efficiency %',
-                        data: [85, 92, 65, 78, 90],
-                        backgroundColor: '#1e40af'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
+        function toggleUI(show) {
+            ANIK_SYS.UI_NODES.forEach(id => {
+                const el = document.getElementById(id);
+                if(show) {
+                    el.classList.remove('hidden');
+                    setTimeout(() => el.style.opacity = '1', 50);
+                } else {
+                    el.classList.add('hidden');
+                    el.style.opacity = '0';
+                }
             });
         }
+
+        function clearPlannerUI() {
+            document.getElementById('dateStart').value = "";
+            document.getElementById('dateEnd').value = "";
+            document.getElementById('plannerTableBody').innerHTML = "";
+            document.getElementById('badgeModeStatus').classList.add('hidden');
+            calculateLiveScores();
+        }
+
     </script>
 </body>
 </html>
