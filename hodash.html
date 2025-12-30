@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <title>Enterprise HO Dashboard | LIVE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 24px; }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+    <header class="max-w-[1600px] mx-auto flex flex-col lg:flex-row justify-between items-center mb-12">
+        <div>
+            <h1 class="text-4xl font-black tracking-tighter uppercase">ANIK <span class="text-blue-500">EXECUTIVE</span> PANEL</h1>
+            <p class="text-slate-400 font-bold uppercase text-[10px] tracking-[0.4em] mt-2">LIVE INTELLIGENCE FROM MASTER_DATA</p>
+        </div>
+        <button onclick="loadGlobalData()" class="bg-blue-600 px-8 py-3 rounded-xl font-bold uppercase text-xs">डेटा रिफ्रेश करा</button>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Stats -->
+        <div class="glass-card border-l-4 border-blue-500">
+            <p class="text-slate-400 text-[10px] font-black uppercase mb-2">Total Combined Target</p>
+            <h3 id="statT" class="text-3xl font-black">₹ 0</h3>
+        </div>
+        <div class="glass-card border-l-4 border-emerald-500">
+            <p class="text-slate-400 text-[10px] font-black uppercase mb-2">Net Achievement</p>
+            <h3 id="statA" class="text-3xl font-black text-emerald-400">₹ 0</h3>
+        </div>
+        <div class="glass-card border-l-4 border-amber-500">
+            <p class="text-slate-400 text-[10px] font-black uppercase mb-2">Efficiency Index</p>
+            <h3 id="statE" class="text-3xl font-black text-amber-400">0%</h3>
+        </div>
+
+        <!-- Chart -->
+        <div class="md:col-span-3 glass-card h-[500px]">
+            <canvas id="hoChart"></canvas>
+        </div>
+    </main>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec"; 
+        let chart;
+
+        async function loadGlobalData() {
+            // येथे आपण सर्व मॅनेजर्सचा डेटा लूपमध्ये किंवा मास्टर शीटमधून घेऊ शकतो
+            // उदाहरणासाठी आपण एका मॅनेजरचा डेटा दाखवत आहोत
+            const mgrResp = await fetch(`${SCRIPT_URL}?action=getManagers`);
+            const managers = await mgrResp.json();
+            
+            let totalT = 0, totalA = 0;
+            let chartLabels = [], targetData = [], actualData = [];
+
+            for(let mgr of managers) {
+                const resp = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
+                const data = await resp.json();
+                
+                let mgrT = 0, mgrA = 0;
+                data.history.forEach(h => {
+                    h.details.forEach(d => {
+                        mgrT += Number(d.tDisb);
+                        mgrA += Number(d.aDisb);
+                    });
+                });
+
+                totalT += mgrT; totalA += mgrA;
+                chartLabels.push(mgr);
+                targetData.push(mgrT);
+                actualData.push(mgrA);
+            }
+
+            document.getElementById('statT').innerText = "₹ " + totalT.toLocaleString();
+            document.getElementById('statA').innerText = "₹ " + totalA.toLocaleString();
+            document.getElementById('statE').innerText = ((totalA/totalT)*100).toFixed(1) + "%";
+
+            updateChart(chartLabels, targetData, actualData);
+        }
+
+        function updateChart(labels, tData, aData) {
+            const ctx = document.getElementById('hoChart').getContext('2d');
+            if(chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Target', data: tData, backgroundColor: '#1e40af' },
+                        { label: 'Actual', data: aData, backgroundColor: '#10b981' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, color: '#94a3b8' }
+            });
+        }
+
+        window.onload = loadGlobalData;
+    </script>
+</body>
+</html>
