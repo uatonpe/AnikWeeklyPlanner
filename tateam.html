@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <title>TA System Synchronization | Anik Financial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --anik-emerald: #10b981; --anik-slate: #0f172a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fafafa; }
+        .system-card { background: white; border-radius: 30px; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .input-actual { background: #f0fdf4; border: 2px solid #d1fae5; padding: 12px; border-radius: 12px; font-weight: 800; color: #065f46; outline: none; width: 100%; transition: 0.3s; }
+        .input-actual:focus { border-color: #10b981; background: #fff; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); }
+        .target-display { background: #f8fafc; padding: 12px; border-radius: 12px; font-weight: 800; color: #1e40af; border: 1px solid #e2e8f0; }
+        @keyframes slide { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .animate-slide { animation: slide 0.5s ease-out forwards; }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <nav class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 pb-8 border-b-2">
+        <div class="flex items-center gap-4">
+            <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-10">
+            <h1 class="text-2xl font-black text-emerald-800 uppercase tracking-tighter">TA Achievement Hub</h1>
+        </div>
+        <div class="flex items-center gap-4 mt-6 md:mt-0">
+            <span class="bg-emerald-100 text-emerald-700 px-5 py-2 rounded-full font-black text-[10px] tracking-[0.2em] uppercase">Data Synchronization Mode</span>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto">
+        <!-- Control Panel -->
+        <div class="system-card p-10 mb-12 bg-slate-900 text-white flex flex-col md:flex-row items-end gap-8">
+            <div class="flex-1">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">अ‍ॅक्टिव्ह प्लॅन निवडा (Active Target Weeks)</label>
+                <select id="planRef" class="w-full p-4 rounded-2xl bg-slate-800 border-none text-white font-bold outline-none ring-2 ring-slate-700 focus:ring-emerald-500 transition-all">
+                    <option value="">-- उपलब्ध टार्गेट्स शोधा --</option>
+                    <option>साप्ताहिक प्लॅन: 2025-06-01 (Manager: Rahul)</option>
+                </select>
+            </div>
+            <button onclick="TA_Engine.loadWorksheet()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 px-12 py-4 rounded-2xl font-black uppercase tracking-widest transition-all">वर्कशीट लोड करा</button>
+        </div>
+
+        <!-- Sync Table -->
+        <div id="syncWorksheet" class="hidden animate-slide">
+            <div class="system-card overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 border-b border-slate-100">
+                        <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            <th class="p-8">Associate & KPI Question</th>
+                            <th class="p-8 text-center w-48">Target (Fixed)</th>
+                            <th class="p-8 text-center w-48">System Actual</th>
+                            <th class="p-8 text-center w-40">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taWorksheetBody" class="divide-y divide-slate-50">
+                        <!-- Content via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-12 p-10 bg-emerald-50 rounded-[40px] border-2 border-emerald-100 flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="max-w-xl">
+                    <h4 class="text-2xl font-black text-emerald-900 mb-2 uppercase italic">Sync Confirmation</h4>
+                    <p class="text-emerald-700 font-bold text-sm">TA टिमने भरलेली अचीव्हमेंट माहिती फायनल मानली जाईल. डेटा सिंक करण्यापूर्वी सर्व आकडे सिस्टीममधील आकड्यांशी जुळत असल्याची खात्री करा.</p>
+                </div>
+                <button onclick="TA_Engine.syncFinal()" class="bg-emerald-600 text-white px-16 py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-emerald-200 hover:scale-105 transition-all">
+                    सिस्टम डेटा सिंक करा
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /**
+         * CONFIGURATION ZONE (येथे प्रश्न बदला)
+         */
+        const TA_CONFIG = {
+            QUESTIONS: [
+                "New Loan Disbursement (Target ₹)",
+                "New Loan Apprisal (Target ₹)",
+                "OD Recovery (Target ₹)",
+                "Regular Collection (Target ₹)",
+                "Past Due (Target ₹)",
+                "Auto Pay Rocket Pay",
+                "New Group Meeting"
+            ],
+            STAFF: ["Amol Vidhate", "Suresh Kadam"]
+        };
+
+        const TA_Engine = {
+            loadWorksheet() {
+                if(!document.getElementById('planRef').value) return;
+
+                const body = document.getElementById('taWorksheetBody');
+                body.innerHTML = "";
+                document.getElementById('syncWorksheet').classList.remove('hidden');
+
+                TA_CONFIG.STAFF.forEach(staff => {
+                    // Staff Section Header
+                    const header = document.createElement('tr');
+                    header.className = "bg-slate-50/50";
+                    header.innerHTML = `<td colspan="4" class="p-4 font-black text-slate-400 text-[10px] uppercase tracking-[0.3em] pl-8">${staff} - Performance Tracking</td>`;
+                    body.appendChild(header);
+
+                    TA_CONFIG.QUESTIONS.forEach(q => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-emerald-50/10 transition-colors";
+                        tr.innerHTML = `
+                            <td class="p-8">
+                                <p class="font-bold text-slate-800 text-sm">${q}</p>
+                            </td>
+                            <td class="p-8">
+                                <div class="target-display">₹ 5,00,000</div>
+                            </td>
+                            <td class="p-8">
+                                <input type="number" class="input-actual text-center" oninput="TA_Engine.liveCalc(this, 500000)" placeholder="0">
+                            </td>
+                            <td class="p-8 text-center">
+                                <span class="eff-badge font-black text-slate-300 text-xs italic">0%</span>
+                            </td>
+                        `;
+                        body.appendChild(tr);
+                    });
+                });
+            },
+
+            liveCalc(el, target) {
+                const badge = el.parentElement.nextElementSibling.querySelector('.eff-badge');
+                const val = parseFloat(el.value) || 0;
+                const perc = ((val / target) * 100).toFixed(1);
+                
+                badge.innerText = perc + "%";
+                badge.className = "eff-badge font-black text-xs italic " + (perc >= 90 ? 'text-emerald-500' : perc >= 50 ? 'text-amber-500' : 'text-rose-500');
+            },
+
+            syncFinal() {
+                alert("साप्ताहिक अचीव्हमेंट डेटा यशस्वीरित्या सिंक झाला!");
+                window.location.reload();
+            }
+        };
+    </script>
+</body>
+</html>
