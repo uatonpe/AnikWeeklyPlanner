@@ -2,227 +2,144 @@
 <html lang="mr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manager Strategic Planner | Anik Financial</title>
+    <title>Anik Manager Planner | LIVE</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        /* DESIGN SYSTEM */
-        :root {
-            --anik-blue: #1e40af; --anik-light: #3b82f6; --anik-bg: #f8fafc;
-            --anik-card: #ffffff; --anik-border: #e2e8f0; --anik-text: #0f172a;
-            --system-radius: 24px;
-        }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--anik-bg); color: var(--anik-text); overflow-x: hidden; }
-        
-        /* PREMIUM UI ELEMENTS */
-        .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); border-bottom: 1px solid var(--anik-border); position: sticky; top: 0; z-index: 1000; }
-        .planner-card { background: var(--anik-card); border-radius: var(--system-radius); border: 1px solid var(--anik-border); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .planner-card:hover { transform: translateY(-4px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); }
-        
-        /* INPUT STYLING */
-        .system-input { width: 100%; padding: 14px 18px; border-radius: 16px; border: 2px solid #e2e8f0; font-weight: 700; outline: none; transition: all 0.3s ease; background: #fcfcfc; }
-        .system-input:focus { border-color: var(--anik-blue); background: #fff; box-shadow: 0 0 0 5px rgba(30, 64, 175, 0.1); }
-        
-        /* TABLE STYLING */
-        .kpi-row { border-left: 6px solid transparent; transition: all 0.3s; }
-        .kpi-row:hover { border-left-color: var(--anik-blue); background: #f8faff; }
-        
-        /* ANIMATIONS */
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .reveal { animation: fadeInUp 0.6s ease forwards; }
-        .marathi-font { letter-spacing: -0.01em; line-height: 1.6; }
-        
-        .btn-primary { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 18px 40px; border-radius: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
-        .btn-primary:hover { transform: scale(1.03); box-shadow: 0 15px 30px rgba(30, 64, 175, 0.3); }
+        :root { --anik-blue: #1e40af; --anik-bg: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--anik-bg); color: #0f172a; }
+        .system-card { background: white; border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); transition: 0.3s; }
+        .system-input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 600; outline: none; transition: 0.3s; }
+        .system-input:focus { border-color: var(--anik-blue); box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1); }
+        .staff-section { border-left: 8px solid var(--anik-blue); margin-bottom: 40px; }
     </style>
 </head>
-<body class="pb-24">
-
-    <!-- NAVIGATION -->
-    <header class="glass-header">
-        <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-6">
-                <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-10 md:h-12 object-contain">
-                <div class="h-10 w-px bg-slate-200 hidden md:block"></div>
-                <div>
-                    <h1 class="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Strategic Planner</h1>
-                    <p class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest mt-1">Planner Ver 2025.4.0</p>
-                </div>
-            </div>
-            
-            <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
-                <select id="managerSelector" class="system-input py-3 text-sm bg-blue-50 border-blue-100" onchange="PlannerEngine.init()">
-                    <option value="">-- मॅनेजर निवडा --</option>
-                    <option>Manager 1</option>
-                    <option>Manager 2</option>
-                </select>
-                <div class="flex gap-2">
-                    <input type="date" id="weekStart" class="system-input py-3 text-xs w-36">
-                    <input type="date" id="weekEnd" class="system-input py-3 text-xs w-36">
-                </div>
-            </div>
+<body class="p-6 md:p-12">
+    <nav class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 border-b pb-8">
+        <div class="flex items-center gap-4">
+            <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-10">
+            <h1 class="text-2xl font-black uppercase text-slate-800 tracking-tighter">Strategic Planner (LIVE)</h1>
         </div>
-    </header>
-
-    <!-- MAIN APP CANVAS -->
-    <main class="max-w-7xl mx-auto px-6 mt-12">
-        <section class="mb-12 reveal">
-            <h2 class="text-4xl font-black text-slate-900 marathi-font leading-tight">नमस्ते, मॅनेजर! 👋</h2>
-            <p class="mt-3 text-slate-500 font-semibold text-lg marathi-font">तुमच्या टिमचे या आठवड्याचे टार्गेट्स खालीलप्रमाणे सेट करा.</p>
-        </section>
-
-        <!-- Dynamic Staff Container -->
-        <div id="staffContainer" class="space-y-12">
-            <!-- Loading State Placeholder -->
-            <div class="bg-white p-20 rounded-[40px] text-center border-4 border-dashed border-slate-100">
-                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                </div>
-                <p class="text-slate-400 font-bold marathi-font text-xl">काम सुरू करण्यासाठी वरील ड्रॉपडाऊनमधून मॅनेजर निवडा.</p>
-            </div>
+        <div class="flex flex-wrap gap-4 mt-6 md:mt-0">
+            <select id="mgrSelect" class="system-input bg-blue-50 w-64" onchange="loadManagerStaff()">
+                <option value="">-- मॅनेजर निवडा --</option>
+            </select>
+            <input type="date" id="sDate" class="system-input w-44">
+            <input type="date" id="eDate" class="system-input w-44">
         </div>
+    </nav>
 
-        <!-- Submission UI -->
-        <div id="submitSection" class="hidden mt-16 reveal">
-            <div class="bg-slate-900 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
-                <div class="absolute -top-24 -right-24 w-80 h-80 bg-blue-600 rounded-full blur-[100px] opacity-20 transition-all group-hover:opacity-40"></div>
-                
-                <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-12">
-                    <div class="max-w-xl">
-                        <h3 class="text-3xl font-black text-white marathi-font mb-4">प्लॅन लॉक करण्यास तयार आहात?</h3>
-                        <p class="text-slate-400 font-bold marathi-font text-lg">तुम्ही भरलेली माहिती साप्ताहिक टार्गेट म्हणून सिस्टीममध्ये रेकॉर्ड केली जाईल. ही माहिती नंतर TA टिमला अपडेटसाठी उपलब्ध होईल.</p>
-                    </div>
-                    <button onclick="PlannerEngine.submitToCloud()" class="btn-primary w-full md:w-auto shadow-blue-900/40">
-                        साप्ताहिक टार्गेट लॉक करा
-                    </button>
-                </div>
-            </div>
+    <main id="plannerBox" class="max-w-7xl mx-auto space-y-8">
+        <!-- Live Staff Cards will appear here -->
+        <div class="p-20 text-center text-slate-400 font-bold border-4 border-dashed rounded-[40px]">
+            काम सुरू करण्यासाठी मॅनेजर आणि तारीख निवडा...
         </div>
     </main>
 
+    <footer class="max-w-7xl mx-auto mt-12 flex justify-end">
+        <button onclick="submitPlan()" id="submitBtn" class="hidden bg-blue-700 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
+            साप्ताहिक टार्गेट लॉक करा
+        </button>
+    </footer>
+
     <script>
-        /**
-         * 1. CONFIGURATION ZONE (येथे प्रश्न बदला)
-         * तुम्ही खालील लिस्टमध्ये हवे तितके प्रश्न वाढवू शकता किंवा बदलू शकता.
-         */
-        const SYSTEM_CONFIG = {
-            KPI_QUESTIONS: [
-                "New Loan Disbursement (Target ₹)",
-                "New Loan Apprisal (Target ₹)",
-                "OD Recovery (Target ₹)",
-                "Regular Collection (Target ₹)",
-                "Past Due (Target ₹)",
-                "Auto Pay Rocket Pay",
-                "New Group Meeting"
-            ],
-            // हे स्टाफ नेम्स सर्व्हरवरून (API) येऊ शकतात
-            STAFF_LIST: ["Amol Vidhate", "Suresh Kadam", "Priyanka Mohite", "Rahul Jadhav"]
-        };
+        // --- CONFIGURATION ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec"; 
+        const KPI_QUESTIONS = [
+            "New Loan Disbursement (Target ₹)",
+            "New Loan Apprisal (Target ₹)",
+            "OD Recovery (Target ₹)",
+            "Regular Collection (Target ₹)",
+            "Past Due (Target ₹)",
+            "Auto Pay Rocket Pay",
+            "New Group Meeting"
+        ];
 
-        /**
-         * 2. RENDER ENGINE
-         */
-        const PlannerEngine = {
-            init() {
-                const mgr = document.getElementById('managerSelector').value;
-                if(!mgr) return;
+        let currentStaffList = [];
 
-                const container = document.getElementById('staffContainer');
-                const submitSection = document.getElementById('submitSection');
+        // १. लोड मॅनेजर्स
+        async function init() {
+            const resp = await fetch(`${SCRIPT_URL}?action=getManagers`);
+            const managers = await resp.json();
+            const sel = document.getElementById('mgrSelect');
+            managers.forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
+        }
+
+        // २. मॅनेजरचे स्टाफ लोड करा
+        async function loadManagerStaff() {
+            const mgr = document.getElementById('mgrSelect').value;
+            if(!mgr) return;
+
+            document.getElementById('plannerBox').innerHTML = "<p class='text-center p-10 font-bold'>स्टाफ लिस्ट लोड होत आहे...</p>";
+            
+            const resp = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
+            const data = await resp.json();
+            currentStaffList = data.fxList;
+
+            renderUI();
+        }
+
+        function renderUI() {
+            const container = document.getElementById('plannerBox');
+            container.innerHTML = "";
+            document.getElementById('submitBtn').classList.remove('hidden');
+
+            currentStaffList.forEach(staff => {
+                const section = document.createElement('div');
+                section.className = "system-card p-8 staff-section";
                 
-                container.innerHTML = "";
-                submitSection.classList.remove('hidden');
+                let rows = KPI_QUESTIONS.map(q => `
+                    <tr class="border-b border-slate-50">
+                        <td class="py-4 font-bold text-slate-700 text-sm">${q}</td>
+                        <td class="py-4 px-4"><input type="number" data-staff="${staff}" data-q="${q}" class="target-val system-input" placeholder="0"></td>
+                        <td class="py-4"><input type="text" data-staff="${staff}" data-q="${q}" class="target-note system-input" placeholder="नोंद..."></td>
+                    </tr>
+                `).join('');
 
-                SYSTEM_CONFIG.STAFF_LIST.forEach((staff, sIdx) => {
-                    const card = document.createElement('div');
-                    card.className = "planner-card p-8 md:p-12 reveal";
-                    card.style.animationDelay = `${sIdx * 0.15}s`;
+                section.innerHTML = `
+                    <h3 class="text-xl font-black text-blue-800 mb-6 flex items-center gap-3">
+                        <span class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">${staff.charAt(0)}</span> ${staff}
+                    </h3>
+                    <table class="w-full">
+                        <thead><tr class="text-[10px] font-black text-slate-400 uppercase"><th>KPI Question</th><th class="px-4">Target Amount</th><th>Strategy</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                `;
+                container.appendChild(section);
+            });
+        }
 
-                    let kpiHtml = SYSTEM_CONFIG.KPI_QUESTIONS.map((q, qIdx) => `
-                        <tr class="kpi-row group">
-                            <td class="py-6 px-4">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-xs font-black text-slate-400 border border-slate-100">${qIdx + 1}</span>
-                                    <p class="font-bold text-slate-700 marathi-font">${q}</p>
-                                </div>
-                            </td>
-                            <td class="py-6 px-4">
-                                <div class="relative group-hover:scale-105 transition-transform">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-300">₹</span>
-                                    <input type="number" 
-                                           data-staff="${staff}" 
-                                           data-q="${q}" 
-                                           class="target-val system-input pl-10 bg-slate-50/50 border-slate-100 focus:bg-white" 
-                                           placeholder="0">
-                                </div>
-                            </td>
-                            <td class="py-6 px-4">
-                                <input type="text" 
-                                       data-staff="${staff}" 
-                                       data-q="${q}" 
-                                       class="target-note system-input bg-slate-50/50 border-slate-100 focus:bg-white text-sm" 
-                                       placeholder="नोंद किंवा अ‍ॅक्शन प्लॅन...">
-                            </td>
-                        </tr>
-                    `).join('');
+        // ३. डेटा शीटमध्ये पाठवा (doPost)
+        async function submitPlan() {
+            const mgr = document.getElementById('mgrSelect').value;
+            const sDate = document.getElementById('sDate').value;
+            const eDate = document.getElementById('eDate').value;
 
-                    card.innerHTML = `
-                        <div class="flex items-center justify-between mb-10 pb-6 border-b-2 border-slate-50">
-                            <div class="flex items-center gap-5">
-                                <div class="w-16 h-16 rounded-[24px] bg-blue-600 text-white flex items-center justify-center font-black text-2xl shadow-lg shadow-blue-200">
-                                    ${staff.charAt(0)}
-                                </div>
-                                <div>
-                                    <h3 class="text-2xl font-black text-slate-900">${staff}</h3>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Associate</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            if(!sDate || !eDate) return alert("तारीख भरा!");
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left min-w-[800px]">
-                                <thead>
-                                    <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                        <th class="pb-6 px-4">कामगिरीचा प्रकार (KPI Question)</th>
-                                        <th class="pb-6 px-4 w-1/4">टार्गेट रक्कम / संख्या</th>
-                                        <th class="pb-6 px-4 w-1/3">अ‍ॅक्शन प्लॅन (Strategy)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${kpiHtml}</tbody>
-                            </table>
-                        </div>
-                    `;
-                    container.appendChild(card);
+            const fxDetails = [];
+            document.querySelectorAll('.target-val').forEach((el, i) => {
+                const note = document.querySelectorAll('.target-note')[i].value;
+                fxDetails.push({
+                    name: el.dataset.staff + " || " + el.dataset.q,
+                    tDisb: el.value || 0,
+                    aDisb: 0, // Initial actual is 0
+                    pd: note
                 });
-            },
+            });
 
-            async submitToCloud() {
-                const sDate = document.getElementById('weekStart').value;
-                const eDate = document.getElementById('weekEnd').value;
-                if(!sDate || !eDate) return alert("कृपया प्लॅनचा कालावधी (Dates) निवडा!");
+            const payload = { manager: mgr, sDate: sDate, eDate: eDate, fxDetails: fxDetails };
 
-                if(!confirm("तुम्ही टार्गेट लॉक करण्यास तयार आहात का? एकदा लॉक झाल्यावर बदल करता येणार नाही.")) return;
+            const resp = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            const result = await resp.json();
+            alert(result.message);
+            location.reload();
+        }
 
-                const data = [];
-                document.querySelectorAll('.target-val').forEach((input, i) => {
-                    const note = document.querySelectorAll('.target-note')[i].value;
-                    data.push({
-                        staff: input.dataset.staff,
-                        question: input.dataset.q,
-                        target: input.value || 0,
-                        remark: note
-                    });
-                });
-
-                console.log("Final Data for Server:", data);
-                alert("साप्ताहिक टार्गेट यशस्वीरित्या सिस्टीममध्ये लॉक झाले!");
-                window.location.reload();
-            }
-        };
+        window.onload = init;
     </script>
 </body>
 </html>
