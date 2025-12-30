@@ -2,143 +2,419 @@
 <html lang="mr">
 <head>
     <meta charset="UTF-8">
-    <title>Anik Manager Planner | LIVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anik Manager Strategic Planner | Enterprise Edition</title>
+    
+    <!-- External Resources -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        :root { --anik-blue: #1e40af; --anik-bg: #f8fafc; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--anik-bg); color: #0f172a; }
-        .system-card { background: white; border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); transition: 0.3s; }
-        .system-input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 2px solid #e2e8f0; font-weight: 600; outline: none; transition: 0.3s; }
-        .system-input:focus { border-color: var(--anik-blue); box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1); }
-        .staff-section { border-left: 8px solid var(--anik-blue); margin-bottom: 40px; }
+        :root {
+            --anik-primary: #1e40af;
+            --anik-secondary: #1e3a8a;
+            --anik-accent: #3b82f6;
+            --anik-bg: #f8fafc;
+            --anik-card: #ffffff;
+            --anik-border: #e2e8f0;
+            --anik-text: #0f172a;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--anik-bg);
+            color: var(--anik-text);
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Glassmorphism & Effects */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .system-card {
+            background: var(--anik-card);
+            border-radius: 24px;
+            border: 1px solid var(--anik-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .system-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .input-focus-effect {
+            transition: all 0.3s ease;
+        }
+
+        .input-focus-effect:focus {
+            border-color: var(--anik-primary);
+            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+            background: white;
+        }
+
+        .gradient-btn {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            transition: all 0.3s ease;
+        }
+
+        .gradient-btn:hover {
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
+
+        .gradient-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade { animation: fadeIn 0.6s ease-out forwards; }
+
+        .shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 768px) {
+            .mobile-grid { grid-template-columns: 1fr; }
+            .mobile-padding { padding: 1rem; }
+            .kpi-row { flex-direction: column; gap: 0.5rem; }
+        }
+
+        /* Locking Overlay */
+        #lockOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
     </style>
 </head>
-<body class="p-6 md:p-12">
-    <nav class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 border-b pb-8">
-        <div class="flex items-center gap-4">
-            <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-10">
-            <h1 class="text-2xl font-black uppercase text-slate-800 tracking-tighter">Strategic Planner (LIVE)</h1>
-        </div>
-        <div class="flex flex-wrap gap-4 mt-6 md:mt-0">
-            <select id="mgrSelect" class="system-input bg-blue-50 w-64" onchange="loadManagerStaff()">
-                <option value="">-- मॅनेजर निवडा --</option>
-            </select>
-            <input type="date" id="sDate" class="system-input w-44">
-            <input type="date" id="eDate" class="system-input w-44">
+<body class="bg-slate-50">
+
+    <!-- Loading Overlay -->
+    <div id="lockOverlay">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-800"></div>
+        <p class="mt-4 font-bold text-blue-900">तुमचा प्लॅन सुरक्षित केला जात आहे...</p>
+    </div>
+
+    <!-- Top Navigation -->
+    <nav class="glass-header mb-8 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-800 p-2 rounded-xl">
+                    <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-8 brightness-0 invert" alt="Anik Logo">
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight text-slate-800">Strategic Planner <span class="text-blue-600">2025</span></h1>
+                    <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Enterprise Performance Management</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                <div class="relative flex-1 md:flex-none">
+                    <i class="fa-solid fa-user-tie absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <select id="mgrSelect" class="w-full md:w-64 pl-12 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-600 outline-none font-bold text-slate-700 bg-white transition-all appearance-none cursor-pointer" onchange="handleManagerChange()">
+                        <option value="">मॅनेजर निवडा</option>
+                    </select>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <main id="plannerBox" class="max-w-7xl mx-auto space-y-8">
-        <!-- Live Staff Cards will appear here -->
-        <div class="p-20 text-center text-slate-400 font-bold border-4 border-dashed rounded-[40px]">
-            काम सुरू करण्यासाठी मॅनेजर आणि तारीख निवडा...
+    <!-- Welcome Section -->
+    <header class="max-w-7xl mx-auto px-6 mb-10">
+        <div id="welcomeBox" class="bg-gradient-to-r from-blue-900 to-blue-700 rounded-[32px] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden hidden">
+            <div class="relative z-10">
+                <h2 class="text-3xl md:text-5xl font-black mb-4">सप्रेम नमस्कार, <span id="mgrDisplayName">मॅनेजर</span>! 👋</h2>
+                <p class="text-blue-100 text-lg md:text-xl max-w-2xl font-medium opacity-90">तुमच्या टीमचे या आठवड्याचे धोरणात्मक नियोजन (Strategic Planning) करण्यासाठी खालील माहिती अचूक भरा.</p>
+                
+                <div class="mt-8 flex flex-wrap gap-6">
+                    <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+                        <p class="text-xs font-bold uppercase opacity-60 mb-1">नियोजन कालावधी (Start Date)</p>
+                        <input type="date" id="sDate" class="bg-transparent font-bold text-white outline-none cursor-pointer">
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+                        <p class="text-xs font-bold uppercase opacity-60 mb-1">नियोजन समाप्ती (End Date)</p>
+                        <input type="date" id="eDate" class="bg-transparent font-bold text-white outline-none cursor-pointer">
+                    </div>
+                </div>
+            </div>
+            <!-- Decorative Circles -->
+            <div class="absolute -right-20 -top-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-400/20 rounded-full blur-2xl"></div>
         </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-6 pb-24">
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-20 bg-white rounded-[40px] border-4 border-dashed border-slate-200">
+            <div class="mb-6 inline-flex items-center justify-center w-24 h-24 bg-blue-50 rounded-full">
+                <i class="fa-solid fa-chart-line text-4xl text-blue-300"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-400">सुरू करण्यासाठी प्रथम मॅनेजर निवडा...</h3>
+            <p class="text-slate-400 mt-2">तुमच्या टीमची माहिती येथे आपोआप लोड होईल.</p>
+        </div>
+
+        <!-- Dynamic Staff Cards Container -->
+        <div id="plannerBox" class="grid grid-cols-1 gap-10"></div>
+
+        <!-- Submit Section -->
+        <div id="actionFooter" class="hidden mt-16 flex flex-col items-center">
+            <div class="max-w-md text-center mb-8">
+                <i class="fa-solid fa-shield-check text-green-500 text-3xl mb-4"></i>
+                <h4 class="text-xl font-extrabold text-slate-800">सबमिट करण्यापूर्वी खात्री करा</h4>
+                <p class="text-slate-500 font-medium">एकदा प्लॅन 'लॉक' झाला की त्यामध्ये बदल करता येणार नाही.</p>
+            </div>
+            
+            <button onclick="confirmAndSubmit()" id="submitBtn" class="gradient-btn group px-16 py-6 rounded-2xl text-white font-black text-xl uppercase tracking-widest shadow-2xl hover:shadow-blue-200 flex items-center gap-4">
+                <span>साप्ताहिक टार्गेट लॉक करा</span>
+                <i class="fa-solid fa-lock transition-transform group-hover:rotate-12"></i>
+            </button>
+        </div>
+
     </main>
 
-    <footer class="max-w-7xl mx-auto mt-12 flex justify-end">
-        <button onclick="submitPlan()" id="submitBtn" class="hidden bg-blue-700 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
-            साप्ताहिक टार्गेट लॉक करा
-        </button>
-    </footer>
-
+    <!-- JS Logic -->
     <script>
-        // --- CONFIGURATION ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec"; 
+        
         const KPI_QUESTIONS = [
-            "New Loan Disbursement (Target ₹)",
-            "New Loan Apprisal (Target ₹)",
-            "OD Recovery (Target ₹)",
-            "Regular Collection (Target ₹)",
-            "Past Due (Target ₹)",
-            "Auto Pay Rocket Pay",
-            "New Group Meeting"
+            { q: "New Loan Disbursement (Target ₹)", icon: "fa-hand-holding-dollar", color: "blue" },
+            { q: "New Loan Apprisal (Target ₹)", icon: "fa-magnifying-glass-chart", color: "indigo" },
+            { q: "OD Recovery (Target ₹)", icon: "fa-rotate-left", color: "red" },
+            { q: "Regular Collection (Target ₹)", icon: "fa-money-bill-trend-up", color: "green" },
+            { q: "Past Due (Target ₹)", icon: "fa-calendar-exclamation", color: "orange" },
+            { q: "Auto Pay Rocket Pay", icon: "fa-bolt", color: "purple" },
+            { q: "New Group Meeting", icon: "fa-users-rectangle", color: "cyan" }
         ];
 
         let currentStaffList = [];
+        let isLocked = false;
 
-        // १. लोड मॅनेजर्स
+        // Initialization
         async function init() {
-            const resp = await fetch(`${SCRIPT_URL}?action=getManagers`);
-            const managers = await resp.json();
-            const sel = document.getElementById('mgrSelect');
-            managers.forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
+            try {
+                const resp = await fetch(`${SCRIPT_URL}?action=getManagers`);
+                const managers = await resp.json();
+                const sel = document.getElementById('mgrSelect');
+                managers.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.textContent = m;
+                    sel.appendChild(opt);
+                });
+            } catch (e) {
+                console.error("Error loading managers:", e);
+                alert("मॅनेजर लिस्ट लोड करताना त्रुटी आली.");
+            }
         }
 
-        // २. मॅनेजरचे स्टाफ लोड करा
-        async function loadManagerStaff() {
+        // Handle Manager Change
+        async function handleManagerChange() {
             const mgr = document.getElementById('mgrSelect').value;
-            if(!mgr) return;
+            if(!mgr) {
+                document.getElementById('welcomeBox').classList.add('hidden');
+                document.getElementById('emptyState').classList.remove('hidden');
+                document.getElementById('plannerBox').innerHTML = "";
+                document.getElementById('actionFooter').classList.add('hidden');
+                return;
+            }
 
-            document.getElementById('plannerBox').innerHTML = "<p class='text-center p-10 font-bold'>स्टाफ लिस्ट लोड होत आहे...</p>";
-            
-            const resp = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
-            const data = await resp.json();
-            currentStaffList = data.fxList;
+            // UI Feedback
+            document.getElementById('emptyState').innerHTML = `
+                <div class="flex flex-col items-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-600 mb-4"></div>
+                    <p class="font-bold text-blue-800">${mgr} यांचा डेटा लोड होत आहे...</p>
+                </div>
+            `;
 
-            renderUI();
+            try {
+                const resp = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
+                const data = await resp.json();
+                currentStaffList = data.fxList;
+
+                // Update UI
+                document.getElementById('mgrDisplayName').textContent = mgr;
+                document.getElementById('welcomeBox').classList.remove('hidden');
+                document.getElementById('emptyState').classList.add('hidden');
+                document.getElementById('actionFooter').classList.remove('hidden');
+                
+                renderStaffCards();
+            } catch (e) {
+                alert("डेटा लोड करता आला नाही.");
+            }
         }
 
-        function renderUI() {
+        // Render Cards
+        function renderStaffCards() {
             const container = document.getElementById('plannerBox');
             container.innerHTML = "";
-            document.getElementById('submitBtn').classList.remove('hidden');
 
-            currentStaffList.forEach(staff => {
-                const section = document.createElement('div');
-                section.className = "system-card p-8 staff-section";
-                
-                let rows = KPI_QUESTIONS.map(q => `
-                    <tr class="border-b border-slate-50">
-                        <td class="py-4 font-bold text-slate-700 text-sm">${q}</td>
-                        <td class="py-4 px-4"><input type="number" data-staff="${staff}" data-q="${q}" class="target-val system-input" placeholder="0"></td>
-                        <td class="py-4"><input type="text" data-staff="${staff}" data-q="${q}" class="target-note system-input" placeholder="नोंद..."></td>
-                    </tr>
+            currentStaffList.forEach((staff, index) => {
+                const card = document.createElement('div');
+                card.className = "system-card animate-fade";
+                card.style.animationDelay = `${index * 0.1}s`;
+
+                let kpiHtml = KPI_QUESTIONS.map(kpi => `
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center p-6 border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                        <div class="lg:col-span-4 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-${kpi.color}-100 flex items-center justify-center text-${kpi.color}-600">
+                                <i class="fa-solid ${kpi.icon}"></i>
+                            </div>
+                            <span class="font-bold text-slate-700">${kpi.q}</span>
+                        </div>
+                        <div class="lg:col-span-3">
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">₹</span>
+                                <input type="number" 
+                                    data-staff="${staff}" 
+                                    data-q="${kpi.q}" 
+                                    class="target-val w-full pl-10 pr-4 py-3 rounded-xl border-2 border-slate-100 input-focus-effect font-bold" 
+                                    placeholder="Target Amount">
+                            </div>
+                        </div>
+                        <div class="lg:col-span-5">
+                            <input type="text" 
+                                data-staff="${staff}" 
+                                data-q="${kpi.q}" 
+                                class="target-note w-full px-4 py-3 rounded-xl border-2 border-slate-100 input-focus-effect font-medium" 
+                                placeholder="तुमची रणनीती (Strategy) लिहा...">
+                        </div>
+                    </div>
                 `).join('');
 
-                section.innerHTML = `
-                    <h3 class="text-xl font-black text-blue-800 mb-6 flex items-center gap-3">
-                        <span class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">${staff.charAt(0)}</span> ${staff}
-                    </h3>
-                    <table class="w-full">
-                        <thead><tr class="text-[10px] font-black text-slate-400 uppercase"><th>KPI Question</th><th class="px-4">Target Amount</th><th>Strategy</th></tr></thead>
-                        <tbody>${rows}</tbody>
-                    </table>
+                card.innerHTML = `
+                    <div class="p-6 border-b bg-slate-50/50 rounded-t-[24px] flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-blue-800 text-white rounded-2xl flex items-center justify-center font-black text-xl shadow-lg">
+                                ${staff.charAt(0)}
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-extrabold text-slate-800">${staff}</h3>
+                                <p class="text-xs font-bold text-blue-600 uppercase tracking-widest">Field Executive</p>
+                            </div>
+                        </div>
+                        <div class="hidden md:block">
+                            <span class="bg-green-100 text-green-700 px-4 py-2 rounded-full text-xs font-black uppercase">Active Task</span>
+                        </div>
+                    </div>
+                    <div class="kpi-container">
+                        ${kpiHtml}
+                    </div>
                 `;
-                container.appendChild(section);
+                container.appendChild(card);
             });
         }
 
-        // ३. डेटा शीटमध्ये पाठवा (doPost)
-        async function submitPlan() {
-            const mgr = document.getElementById('mgrSelect').value;
+        // Confirm and Submit
+        function confirmAndSubmit() {
             const sDate = document.getElementById('sDate').value;
             const eDate = document.getElementById('eDate').value;
 
-            if(!sDate || !eDate) return alert("तारीख भरा!");
+            if(!sDate || !eDate) {
+                alert("कृपया आधी नियोजन तारीख निवडा!");
+                return;
+            }
+
+            if(confirm("तुम्ही प्लॅन लॉक करण्यास तयार आहात का? यानंतर बदल करता येणार नाही.")) {
+                submitPlan();
+            }
+        }
+
+        // Final Submission
+        async function submitPlan() {
+            if(isLocked) return;
+            
+            const mgr = document.getElementById('mgrSelect').value;
+            const sDate = document.getElementById('sDate').value;
+            const eDate = document.getElementById('eDate').value;
+            const overlay = document.getElementById('lockOverlay');
+            const submitBtn = document.getElementById('submitBtn');
+
+            overlay.style.display = 'flex';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "प्रोसेस होत आहे...";
 
             const fxDetails = [];
-            document.querySelectorAll('.target-val').forEach((el, i) => {
-                const note = document.querySelectorAll('.target-note')[i].value;
+            const valInputs = document.querySelectorAll('.target-val');
+            const noteInputs = document.querySelectorAll('.target-note');
+
+            valInputs.forEach((el, i) => {
                 fxDetails.push({
                     name: el.dataset.staff + " || " + el.dataset.q,
                     tDisb: el.value || 0,
-                    aDisb: 0, // Initial actual is 0
-                    pd: note
+                    aDisb: 0,
+                    pd: noteInputs[i].value || "No Strategy Provided"
                 });
             });
 
-            const payload = { manager: mgr, sDate: sDate, eDate: eDate, fxDetails: fxDetails };
+            const payload = {
+                manager: mgr,
+                sDate: sDate,
+                eDate: eDate,
+                fxDetails: fxDetails
+            };
 
-            const resp = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-            const result = await resp.json();
-            alert(result.message);
-            location.reload();
+            try {
+                const resp = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await resp.json();
+                
+                if(result.status === 'success') {
+                    isLocked = true;
+                    alert("अभिनंदन! तुमचा प्लॅन यशस्वीरीत्या लॉक करण्यात आला आहे.");
+                    location.reload();
+                } else {
+                    throw new Error("Submission failed");
+                }
+            } catch (e) {
+                alert("सबमिट करताना एरर आली. कृपया पुन्हा प्रयत्न करा.");
+                overlay.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span>साप्ताहिक टार्गेट लॉक करा</span><i class="fa-solid fa-lock"></i>`;
+            }
         }
 
+        // Start the app
         window.onload = init;
     </script>
 </body>
