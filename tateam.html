@@ -3,410 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TA Executive Sync | Anik Financial</title>
-    
-    <!-- External Assets -->
+    <title>TA System | Live Enterprise Portal</title>
+
+    <!-- External Frameworks -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@lucide/icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.js"></script>
 
     <style>
         :root {
             --primary: #059669;
-            --primary-dark: #064e3b;
-            --bg-main: #f8fafc;
+            --primary-light: #ecfdf5;
+            --accent: #10b981;
+            --slate-custom: #0f172a;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-main);
+            background: #f1f5f9;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 30px 30px;
             color: #1e293b;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
-            min-height: 100vh;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
-        .input-focus-effect:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        .input-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
+        .input-card:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
         }
 
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Animations */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
         }
 
-        .table-row-hover:hover {
-            background-color: rgba(240, 253, 244, 0.5);
-        }
-
-        .loader {
-            border-top-color: var(--primary);
-            animation: spinner 0.6s linear infinite;
-        }
-
-        @keyframes spinner {
-            to { transform: rotate(360deg); }
-        }
-
-        .step-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            font-size: 12px;
+        /* Target States */
+        .status-pill {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
             font-weight: 800;
-            background: #10b981;
-            color: white;
-            margin-right: 10px;
+            text-transform: uppercase;
         }
+
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-success { background: #dcfce7; color: #166534; }
     </style>
 </head>
-<body class="antialiased">
 
-    <!-- Top Navigation -->
-    <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-lg border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+<body class="min-h-screen pb-20">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <div class="bg-emerald-600 p-2 rounded-xl">
-                    <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-8 brightness-0 invert" alt="Anik Logo">
+                <div class="bg-emerald-600 p-2.5 rounded-2xl shadow-lg shadow-emerald-200">
+                    <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-6 brightness-0 invert" alt="Anik Logo">
                 </div>
-                <div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
-                <div>
-                    <h1 class="text-xl font-extrabold text-slate-800 tracking-tight leading-none">TA SYNC</h1>
-                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest leading-none">Live Enterprise Portal</span>
+                <div class="hidden md:block">
+                    <h1 class="text-xl font-extrabold text-slate-800 tracking-tight leading-none uppercase">TA System</h1>
+                    <span class="text-[10px] font-bold text-emerald-600 tracking-[0.2em] uppercase">Enterprise Live Entry</span>
                 </div>
             </div>
-            
-            <div class="hidden md:flex items-center gap-6">
-                <div class="text-right">
-                    <p id="currentDate" class="text-xs font-bold text-slate-500"></p>
-                    <p class="text-xs font-medium text-slate-400">सिस्टममध्ये आपले स्वागत आहे</p>
+
+            <div class="flex items-center gap-6">
+                <div class="hidden lg:flex flex-col text-right">
+                    <span id="liveClock" class="text-sm font-black text-slate-700">00:00:00 PM</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" id="liveDate">Loading Date...</span>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
-                    <i data-lucide="user" class="w-5 h-5 text-slate-600"></i>
+                <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center border-2 border-white shadow-sm">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i>
                 </div>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <main class="max-w-7xl mx-auto px-6 py-10">
+    <main class="max-w-7xl mx-auto px-4 pt-10">
         
-        <!-- Selection Area -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-            <div class="lg:col-span-2 glass-card p-8">
-                <div class="flex items-center mb-6">
-                    <span class="step-badge">1</span>
-                    <h3 class="text-sm font-black uppercase text-slate-500 tracking-wider">डेटा निवड क्षेत्र (Selection Zone)</h3>
+        <!-- Selection Hub -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+            
+            <div class="lg:col-span-8 glass-panel rounded-[32px] p-8 animate__animated animate__fadeIn">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                    <h2 class="text-lg font-black text-slate-800 uppercase tracking-tight">डेटा निवड क्षेत्र (Selection Zone)</h2>
                 </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-600 ml-1 italic">मॅनेजर निवडा</label>
-                        <div class="relative">
-                            <select id="mgrSelect" onchange="handleManagerChange()" class="w-full appearance-none bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold text-slate-700 input-focus-effect cursor-pointer transition-all">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Manager Selection -->
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">मॅनेजर निवडा</label>
+                        <div class="relative group">
+                            <select id="mgrSelect" onchange="loadManagerData()" class="w-full appearance-none bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 font-bold text-slate-700 focus:border-emerald-500 focus:bg-white outline-none transition-all cursor-pointer">
                                 <option value="">-- निवडा --</option>
                             </select>
-                            <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                            <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-focus-within:text-emerald-500 transition-colors">
                                 <i data-lucide="chevron-down" class="w-5 h-5"></i>
                             </div>
                         </div>
                     </div>
 
-                    <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-600 ml-1 italic">उपलब्ध आठवडा (Weekly Plan)</label>
-                        <div class="relative">
-                            <select id="planSelect" onchange="loadActualsTable()" class="w-full appearance-none bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold text-slate-700 input-focus-effect cursor-pointer transition-all">
+                    <!-- Plan Selection -->
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">उपलब्ध आठवडा (Weekly Plans)</label>
+                        <div class="relative group">
+                            <select id="planSelect" onchange="renderMainTable()" class="w-full appearance-none bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 font-bold text-slate-700 focus:border-emerald-500 focus:bg-white outline-none transition-all cursor-pointer">
                                 <option value="">-- आधी मॅनेजर निवडा --</option>
                             </select>
-                            <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                <i data-lucide="calendar" class="w-5 h-5"></i>
+                            <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-focus-within:text-emerald-500 transition-colors">
+                                <i data-lucide="calendar-range" class="w-5 h-5"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Stats Card -->
-            <div class="glass-card bg-emerald-900 text-white p-8 relative overflow-hidden">
-                <div class="relative z-10">
-                    <h3 class="text-emerald-300 text-xs font-black uppercase tracking-widest mb-4">Summary Overview</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <p class="text-emerald-100/60 text-[10px] uppercase font-bold">Total Target</p>
-                            <p id="totalTarget" class="text-3xl font-black">₹ 0.00</p>
-                        </div>
-                        <div>
-                            <p class="text-emerald-100/60 text-[10px] uppercase font-bold">Current Actual Entered</p>
-                            <p id="totalActual" class="text-3xl font-black text-emerald-400">₹ 0.00</p>
-                        </div>
+            <!-- Stats Overview Card -->
+            <div class="lg:col-span-4 glass-panel rounded-[32px] p-8 bg-slate-900 text-white animate__animated animate__fadeInRight">
+                <h3 class="text-xs font-black text-emerald-400 uppercase tracking-[0.2em] mb-6">Summary Metrics</h3>
+                <div class="space-y-6">
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Target Disbursement</p>
+                        <p id="statTarget" class="text-3xl font-black">₹ 0.00</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                        <p class="text-[10px] font-bold text-emerald-400 uppercase mb-1">Actual Entered</p>
+                        <p id="statActual" class="text-3xl font-black text-emerald-500">₹ 0.00</p>
                     </div>
                 </div>
-                <!-- Background Decoration -->
-                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-800 rounded-full opacity-50"></div>
-                <div class="absolute -right-5 -bottom-5 w-20 h-20 bg-emerald-700 rounded-full opacity-30"></div>
+                <div class="mt-6 pt-6 border-t border-white/10">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-slate-400">Sync Status</span>
+                        <span class="flex items-center gap-1.5 text-[10px] font-black uppercase text-emerald-400">
+                            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> Server Ready
+                        </span>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Main Data Entry Table -->
-        <div id="syncTableContainer" class="hidden animate-fade-in">
-            <div class="glass-card overflow-hidden shadow-2xl border-emerald-100">
-                <div class="bg-white border-b border-slate-100 p-6 flex justify-between items-center">
-                    <div class="flex items-center">
-                        <span class="step-badge">2</span>
-                        <h3 class="font-black text-slate-800 uppercase tracking-tight">स्टाफ अ‍ॅक्चुअल एंट्री (Staff Performance Entry)</h3>
+        <!-- Dynamic Data Entry Table -->
+        <div id="tableWrapper" class="hidden animate__animated animate__fadeInUp">
+            <div class="glass-panel rounded-[32px] overflow-hidden">
+                
+                <!-- Table Header Toolstrip -->
+                <div class="bg-white p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 id="tableHeading" class="text-xl font-black text-slate-800 tracking-tight">--</h2>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">स्टाफ अ‍ॅक्चुअल डेटा एंट्री</p>
                     </div>
-                    <div class="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-[10px] font-black uppercase tracking-widest">
-                        Live Sync Active
+                    <div class="flex gap-2">
+                        <div class="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-[11px] font-black uppercase">Auto-Calculate Active</div>
                     </div>
                 </div>
-                
+
+                <!-- Main Table -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50/50">
-                                <th class="p-6 text-[11px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-100">स्टाफ नाव आणि कार्य</th>
-                                <th class="p-6 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-100">टार्गेट (Target)</th>
-                                <th class="p-6 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-100">सिस्टम अ‍ॅक्चुअल (Actual)</th>
-                                <th class="p-6 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-100">प्रगती (Gap)</th>
+                            <tr class="bg-slate-50/80">
+                                <th class="p-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.15em]">स्टाफ नाव</th>
+                                <th class="p-6 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.15em]">आठवडा टार्गेट</th>
+                                <th class="p-6 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.15em]">सिस्टम अ‍ॅक्चुअल (Input)</th>
+                                <th class="p-6 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.15em]">प्रगती (Gap)</th>
                             </tr>
                         </thead>
                         <tbody id="taBody" class="divide-y divide-slate-50">
-                            <!-- JS Inject -->
+                            <!-- JS Injection -->
                         </tbody>
                     </table>
                 </div>
 
-                <!-- Footer Action -->
-                <div id="actionBox" class="p-8 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div class="flex items-center gap-3 text-slate-500">
-                        <i data-lucide="info" class="w-5 h-5 text-emerald-600"></i>
-                        <p class="text-xs font-medium italic text-balance">कृपया सर्व आकडे तपासून 'सिस्टम डेटा सिंक करा' बटणावर क्लिक करा.</p>
+                <!-- Footer Action Area -->
+                <div class="p-10 bg-slate-50/50 border-t border-slate-100">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                        <div class="max-w-md">
+                            <h4 class="font-black text-slate-700 uppercase text-sm mb-1">सिंक करण्यापूर्वी तपासा!</h4>
+                            <p class="text-xs font-medium text-slate-400">कृपया सर्व स्टाफचा अ‍ॅक्चुअल डेटा भरला आहे याची खात्री करा. एकदा सिंक केल्यावर डेटा सर्व्हरवर अपडेट होईल.</p>
+                        </div>
+                        <button onclick="syncToServer()" id="submitBtn" class="group w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-12 py-5 rounded-[20px] font-black uppercase tracking-widest shadow-2xl shadow-emerald-200 flex items-center justify-center gap-4 transition-all hover:scale-[1.03] active:scale-95">
+                            <i data-lucide="cloud-lightning" class="w-6 h-6 animate-pulse"></i>
+                            सिस्टम डेटा सिंक करा
+                        </button>
                     </div>
-                    <button id="submitBtn" onclick="updateData()" class="group relative w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-[0.2em] transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-emerald-200 flex items-center justify-center gap-3">
-                        <i data-lucide="refresh-cw" class="w-5 h-5 group-hover:rotate-180 transition-transform duration-500"></i>
-                        सिस्टम डेटा सिंक करा
-                    </button>
                 </div>
+
             </div>
         </div>
 
         <!-- Initial Placeholder -->
-        <div id="placeholderUI" class="glass-card py-24 flex flex-col items-center justify-center text-slate-400">
-            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6">
-                <i data-lucide="database" class="w-10 h-10 opacity-20"></i>
+        <div id="placeholder" class="py-20 flex flex-col items-center justify-center opacity-40">
+            <div class="w-24 h-24 bg-slate-200 rounded-full flex items-center justify-center mb-6">
+                <i data-lucide="database-backup" class="w-10 h-10 text-slate-500"></i>
             </div>
-            <p class="font-bold text-sm tracking-widest uppercase">डेटा लोड करण्यासाठी वरून मॅनेजर निवडा</p>
+            <p class="text-sm font-black uppercase tracking-[0.3em] text-slate-500">Wait for selection...</p>
         </div>
 
     </main>
 
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] hidden flex flex-col items-center justify-center">
-        <div class="loader w-16 h-16 border-4 border-slate-200 border-solid rounded-full mb-4"></div>
-        <p class="text-emerald-800 font-black tracking-widest animate-pulse">डेटा सिंक होत आहे...</p>
+    <!-- Global Loading Overlay -->
+    <div id="globalLoader" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] hidden flex-col items-center justify-center">
+        <div class="relative w-20 h-20">
+            <div class="absolute inset-0 border-4 border-emerald-500/20 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <p class="mt-6 text-white font-black tracking-[0.2em] uppercase animate-pulse">Processing Data...</p>
     </div>
 
+    <!-- Script Logic -->
     <script>
+        // --- CONFIGURATION ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec"; 
-        let historyData = [];
-        let currentPlanIndex = null;
+        let currentHistory = [];
+        let activeIdx = null;
 
-        // Initialize Icons & UI
+        // --- INITIALIZATION ---
         async function init() {
             lucide.createIcons();
-            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('mr-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            updateClock();
+            setInterval(updateClock, 1000);
             
-            showLoading(true);
+            toggleLoader(true);
             try {
                 const resp = await fetch(`${SCRIPT_URL}?action=getManagers`);
                 const managers = await resp.json();
                 const sel = document.getElementById('mgrSelect');
+                
                 managers.forEach(m => {
                     const opt = document.createElement('option');
                     opt.value = m;
                     opt.textContent = m;
                     sel.appendChild(opt);
                 });
-            } catch (e) {
-                toast("Error loading managers", "error");
+                
+                toast("System Initialized", "success");
+            } catch (err) {
+                console.error("Init Error:", err);
+                Swal.fire("Connection Error", "सर्व्हरशी संपर्क होऊ शकला नाही.", "error");
             } finally {
-                showLoading(false);
+                toggleLoader(false);
             }
         }
 
-        async function handleManagerChange() {
+        // --- CORE FUNCTIONS ---
+        async function loadManagerData() {
             const mgr = document.getElementById('mgrSelect').value;
-            if(!mgr) {
-                resetUI();
-                return;
-            }
+            if(!mgr) { resetUI(); return; }
 
-            showLoading(true);
+            toggleLoader(true);
             try {
                 const resp = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
                 const data = await resp.json();
-                historyData = data.history;
+                currentHistory = data.history;
 
                 const planSel = document.getElementById('planSelect');
-                planSel.innerHTML = '<option value="">-- आठवडा निवडा --</option>';
+                planSel.innerHTML = '<option value="">-- प्लॅन निवडा --</option>';
                 
-                historyData.forEach((h, i) => {
-                    // Logic to format date nicely
-                    const dateStr = `आठवडा: ${h.sDate} ते ${h.eDate}`;
-                    planSel.innerHTML += `<option value="${i}">${dateStr}</option>`;
+                currentHistory.forEach((h, i) => {
+                    // Clarifying Dates for User
+                    const dateDisplay = `📅 Week: ${h.sDate} to ${h.eDate}`;
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = dateDisplay;
+                    planSel.appendChild(opt);
                 });
-                
-                toast("मॅनेजर डेटा अपडेट झाला");
-            } catch (e) {
-                toast("डेटा प्राप्त करताना त्रुटी आली", "error");
+
+                toast("मॅनेजर डेटा लोड झाला");
+            } catch (err) {
+                toast("Error fetching data", "error");
             } finally {
-                showLoading(false);
+                toggleLoader(false);
             }
         }
 
-        function loadActualsTable() {
+        function renderMainTable() {
             const idx = document.getElementById('planSelect').value;
             if(idx === "") {
-                document.getElementById('syncTableContainer').classList.add('hidden');
-                document.getElementById('placeholderUI').classList.remove('hidden');
+                document.getElementById('tableWrapper').classList.add('hidden');
+                document.getElementById('placeholder').classList.remove('hidden');
                 return;
             }
 
-            currentPlanIndex = idx;
-            const plan = historyData[idx];
+            activeIdx = idx;
+            const plan = currentHistory[idx];
             const body = document.getElementById('taBody');
+            
+            // UI Updates
+            document.getElementById('tableHeading').innerText = `आठवडा: ${plan.sDate} - ${plan.eDate}`;
+            document.getElementById('tableWrapper').classList.remove('hidden');
+            document.getElementById('placeholder').classList.add('hidden');
+            
             body.innerHTML = "";
-
-            document.getElementById('syncTableContainer').classList.remove('hidden');
-            document.getElementById('placeholderUI').classList.add('hidden');
-
             let totalT = 0;
-            let totalA = 0;
 
             plan.details.forEach((item, i) => {
                 totalT += parseFloat(item.tDisb || 0);
-                totalA += parseFloat(item.aDisb || 0);
                 
                 const row = document.createElement('tr');
-                row.className = 'table-row-hover transition-colors';
+                row.className = "group hover:bg-emerald-50/50 transition-all";
                 row.innerHTML = `
                     <td class="p-6">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs uppercase">
-                                ${item.name.substring(0,2)}
+                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-black text-slate-400 text-xs">
+                                ${i + 1}
                             </div>
                             <div>
-                                <p class="font-extrabold text-slate-700">${item.name}</p>
-                                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Business Executive / Staff</p>
+                                <p class="font-extrabold text-slate-700 tracking-tight">${item.name}</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Field Executive</p>
                             </div>
                         </div>
                     </td>
                     <td class="p-6 text-center">
-                        <div class="inline-block bg-blue-50 px-4 py-2 rounded-xl">
-                            <span class="text-blue-700 font-black tracking-tight">₹ ${formatCurrency(item.tDisb)}</span>
+                        <div class="inline-block px-4 py-2 bg-slate-100 rounded-xl">
+                            <span class="text-sm font-black text-slate-600">₹ ${formatINR(item.tDisb)}</span>
                         </div>
                     </td>
                     <td class="p-6">
-                        <div class="relative max-w-[180px] mx-auto">
+                        <div class="relative max-w-[180px] mx-auto group">
                             <input type="number" 
-                                class="act-val w-full bg-white border-2 border-emerald-100 rounded-xl p-3 text-center font-black text-emerald-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none" 
-                                value="${item.aDisb || ''}" 
+                                class="act-input w-full bg-white border-2 border-slate-200 rounded-2xl p-4 text-center font-black text-slate-700 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                                value="${item.aDisb || ''}"
                                 placeholder="0.00"
-                                oninput="calculateRealtimeTotals()"
-                                data-index="${i}">
+                                data-index="${i}"
+                                oninput="calculateRealtime()">
                         </div>
                     </td>
                     <td class="p-6 text-center">
-                        <span class="gap-indicator text-[10px] font-bold text-slate-400">--</span>
+                        <div class="gap-status text-[11px] font-black uppercase tracking-widest text-slate-300">
+                            - 0.00
+                        </div>
                     </td>
                 `;
                 body.appendChild(row);
             });
 
-            document.getElementById('totalTarget').innerText = `₹ ${formatCurrency(totalT)}`;
-            calculateRealtimeTotals();
-            lucide.createIcons();
+            document.getElementById('statTarget').innerText = `₹ ${formatINR(totalT)}`;
+            calculateRealtime();
         }
 
-        function calculateRealtimeTotals() {
-            let runningActual = 0;
-            let runningTarget = 0;
-            const inputs = document.querySelectorAll('.act-val');
-            const plan = historyData[currentPlanIndex];
+        function calculateRealtime() {
+            const inputs = document.querySelectorAll('.act-input');
+            let totalActual = 0;
+            const plan = currentHistory[activeIdx];
 
-            inputs.forEach((input, i) => {
-                const val = parseFloat(input.value) || 0;
-                const target = parseFloat(plan.details[i].tDisb) || 0;
-                runningActual += val;
-                runningTarget += target;
+            inputs.forEach((inp, idx) => {
+                const val = parseFloat(inp.value) || 0;
+                const target = parseFloat(plan.details[idx].tDisb) || 0;
+                totalActual += val;
 
-                // Update individual gap indicators
-                const row = input.closest('tr');
-                const gapSpan = row.querySelector('.gap-indicator');
+                // Gap Calculation
+                const gapCell = inp.closest('tr').querySelector('.gap-status');
                 const diff = val - target;
-                
-                if (val > 0) {
-                    if (diff >= 0) {
-                        gapSpan.innerHTML = `<span class="text-emerald-600">+₹${formatCurrency(diff)}</span>`;
-                    } else {
-                        gapSpan.innerHTML = `<span class="text-red-400">-₹${formatCurrency(Math.abs(diff))}</span>`;
-                    }
+
+                if (val === 0) {
+                    gapCell.innerText = "N/A";
+                    gapCell.className = "gap-status text-[11px] font-black text-slate-300";
+                } else if (diff >= 0) {
+                    gapCell.innerText = `✅ +${formatINR(diff)}`;
+                    gapCell.className = "gap-status text-[11px] font-black text-emerald-600";
+                } else {
+                    gapCell.innerText = `📉 -${formatINR(Math.abs(diff))}`;
+                    gapCell.className = "gap-status text-[11px] font-black text-red-500";
                 }
             });
 
-            document.getElementById('totalActual').innerText = `₹ ${formatCurrency(runningActual)}`;
-            
-            // Visual feedback on total
-            const actualText = document.getElementById('totalActual');
-            if(runningActual >= runningTarget && runningTarget > 0) {
-                actualText.classList.replace('text-emerald-400', 'text-yellow-400');
-            } else {
-                actualText.classList.add('text-emerald-400');
-            }
+            document.getElementById('statActual').innerText = `₹ ${formatINR(totalActual)}`;
         }
 
-        async function updateData() {
-            const idx = currentPlanIndex;
-            if (idx === null) return;
-
-            const plan = historyData[idx];
-            const inputs = document.querySelectorAll('.act-val');
+        async function syncToServer() {
+            const inputs = document.querySelectorAll('.act-input');
+            const plan = currentHistory[activeIdx];
             
-            const updatedDetails = plan.details.map((item, i) => {
-                return {
-                    ...item,
-                    aDisb: inputs[i].value || 0
-                };
-            });
+            // Check if all fields are filled
+            let allFilled = true;
+            inputs.forEach(i => { if(i.value === "") allFilled = false; });
+            
+            if(!allFilled) {
+                const confirm = await Swal.fire({
+                    title: 'काही रकाने रिकामे आहेत!',
+                    text: "तुम्हाला शून्य (0) अ‍ॅक्चुअल डेटासह सिंक करायचे आहे का?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'हो, चालू ठेवा',
+                    cancelButtonText: 'तपासा'
+                });
+                if(!confirm.isConfirmed) return;
+            }
+
+            toggleLoader(true);
+            
+            const updatedDetails = plan.details.map((item, i) => ({
+                ...item,
+                aDisb: inputs[i].value || 0
+            }));
 
             const payload = { 
                 manager: document.getElementById('mgrSelect').value, 
@@ -415,53 +430,45 @@
                 fxDetails: updatedDetails 
             };
 
-            const confirm = await Swal.fire({
-                title: 'खात्री आहे का?',
-                text: "तुम्ही भरलेला डेटा सिस्टीममध्ये अपडेट केला जाईल.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#059669',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'हो, अपडेट करा!',
-                cancelButtonText: 'रद्द करा'
-            });
+            try {
+                // Use fetch for POST
+                await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', // Common with GAS
+                    body: JSON.stringify(payload) 
+                });
 
-            if (confirm.isConfirmed) {
-                showLoading(true);
-                try {
-                    const resp = await fetch(SCRIPT_URL, { 
-                        method: 'POST', 
-                        mode: 'no-cors', // Common for Google Apps Script
-                        body: JSON.stringify(payload) 
-                    });
-                    
-                    Swal.fire({
-                        title: 'यशस्वी!',
-                        text: 'डेटा यशस्वीरित्या सिंक झाला आहे.',
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        location.reload();
-                    });
-                } catch (e) {
-                    toast("डेटा सिंक अयशस्वी", "error");
-                } finally {
-                    showLoading(false);
-                }
+                Swal.fire({
+                    icon: 'success',
+                    title: 'यशस्वी सिंक!',
+                    text: 'तुमचा डेटा सर्व्हरवर सुरक्षितपणे सेव्ह झाला आहे.',
+                    confirmButtonColor: '#059669'
+                }).then(() => location.reload());
+
+            } catch (err) {
+                console.error("Sync Error:", err);
+                Swal.fire("Error", "सिंक करताना अडचण आली. कृपया पुन्हा प्रयत्न करा.", "error");
+            } finally {
+                toggleLoader(false);
             }
         }
 
-        // --- Helpers ---
+        // --- HELPERS ---
+        function toggleLoader(show) {
+            document.getElementById('globalLoader').classList.toggle('hidden', !show);
+        }
 
-        function formatCurrency(num) {
+        function formatINR(num) {
             return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num);
         }
 
-        function showLoading(status) {
-            const loader = document.getElementById('loadingOverlay');
-            if(status) loader.classList.remove('hidden');
-            else loader.classList.add('hidden');
+        function updateClock() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('mr-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            
+            document.getElementById('liveClock').innerText = timeStr;
+            document.getElementById('liveDate').innerText = dateStr;
         }
 
         function toast(msg, icon = "success") {
@@ -477,10 +484,10 @@
 
         function resetUI() {
             document.getElementById('planSelect').innerHTML = '<option value="">-- आधी मॅनेजर निवडा --</option>';
-            document.getElementById('syncTableContainer').classList.add('hidden');
-            document.getElementById('placeholderUI').classList.remove('hidden');
-            document.getElementById('totalTarget').innerText = "₹ 0.00";
-            document.getElementById('totalActual').innerText = "₹ 0.00";
+            document.getElementById('tableWrapper').classList.add('hidden');
+            document.getElementById('placeholder').classList.remove('hidden');
+            document.getElementById('statTarget').innerText = "₹ 0.00";
+            document.getElementById('statActual').innerText = "₹ 0.00";
         }
 
         window.onload = init;
