@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="mr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Anik Financial Services Pvt Ltd | Strategic Management Ver 2025</title>
+    <title>Anik Financial Services Pvt Ltd | Strategic Management Enterprise Ver 2025</title>
     
     <!-- 
       SYSTEM ASSETS & UI FRAMEWORK
@@ -12,6 +11,7 @@
       Tailwind CSS: Modern Styling
       Chart.js: Advanced Visualization
       Plus Jakarta Sans: Premium Typography
+      Lucide Icons: Modern iconography
     -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -19,7 +19,8 @@
     
     <style>
         /* 
-          1. SYSTEM DESIGN SYSTEM (TOKENS)
+          1. DESIGN SYSTEM TOKENS
+          Standardized colors and spacing for a professional look.
         */
         :root {
             --anik-primary: #1e40af;
@@ -73,6 +74,11 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
+        .system-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
         /* 
           4. TAB ARCHITECTURE 
         */
@@ -83,7 +89,7 @@
             font-size: 0.8rem;
             color: var(--anik-text-muted);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-bottom: 3px solid transparent;
+            border-bottom: 4px solid transparent;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -109,16 +115,17 @@
             border-radius: 16px; border: 2px solid var(--anik-border);
             font-weight: 700; transition: all 0.3s ease;
             outline: none; font-size: 0.95rem;
+            background: #fff;
         }
 
         .pro-input:focus { border-color: var(--anik-secondary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
 
         .input-locked {
-            background-color: #f1f5f9 !important;
-            color: #64748b !important;
+            background-color: #f8fafc !important;
+            color: #94a3b8 !important;
             cursor: not-allowed !important;
             border-style: dashed !important;
-            opacity: 0.8;
+            opacity: 0.7;
         }
 
         .input-success { border-color: var(--anik-success) !important; background-color: #f0fdf4; }
@@ -135,8 +142,8 @@
         }
 
         .btn-primary-pro { background: linear-gradient(135deg, var(--anik-primary) 0%, var(--anik-accent) 100%); color: white; }
-        .btn-primary-pro:hover { transform: scale(1.02); filter: brightness(110%); }
-        .btn-primary-pro:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+        .btn-primary-pro:hover { transform: scale(1.02); box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.4); }
+        .btn-primary-pro:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; }
 
         .btn-success-pro { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; }
         
@@ -171,306 +178,399 @@
 
         #systemToast {
             position: fixed; bottom: 30px; right: 30px;
-            padding: 1rem 2rem; border-radius: 12px;
+            padding: 1.25rem 2.5rem; border-radius: 16px;
             background: #1e293b; color: white;
             font-weight: 700; z-index: 10000;
-            display: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+            display: none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            border-left: 5px solid var(--anik-secondary);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Specific Table Styling for Staff Grouping */
+        .staff-header-row {
+            background-color: #f1f5f9;
+            border-left: 6px solid var(--anik-primary);
+        }
+        .question-row {
+            border-left: 6px solid #e2e8f0;
         }
     </style>
 </head>
 <body class="pb-20">
 
-    <!-- SYSTEM OVERLAYS -->
+    <!-- [1] SYSTEM OVERLAYS (LOADERS & TOASTS) -->
     <div id="mainLoader" class="loader-overlay">
         <div class="spinner-ring"></div>
-        <p class="mt-8 font-black text-slate-800 text-xl tracking-tighter marathi-font">डेटा लोड होत आहे...</p>
+        <p class="mt-8 font-black text-slate-800 text-xl tracking-tighter marathi-font italic">Anik Financial Systems - प्रोसेसिंग सुरू आहे...</p>
     </div>
 
-    <div id="systemToast" class="marathi-font">संदेश...</div>
+    <div id="systemToast" class="marathi-font">संदेश अपडेट होत आहे...</div>
 
-    <!-- NAVIGATION ARCHITECTURE -->
+    <!-- [2] NAVIGATION ARCHITECTURE -->
     <nav class="system-navigation shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-8">
             <div class="flex items-center gap-6">
                 <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-10 md:h-12 object-contain" alt="Anik Logo">
-                <div class="h-8 w-px bg-slate-200 hidden md:block"></div>
+                <div class="h-10 w-px bg-slate-200 hidden md:block"></div>
                 <div>
-                    <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase">Anik Financial Services</h1>
-                    <p class="text-[9px] font-bold text-blue-600 uppercase tracking-widest leading-none">Planner Ver 2025</p>
+                    <h1 class="text-2xl font-black text-slate-900 tracking-tighter uppercase leading-tight">Strategic Hub</h1>
+                    <p class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest leading-none">Planner Ver 2025.2.0</p>
                 </div>
             </div>
             
-            <div class="w-full md:w-96">
+            <div class="w-full md:w-[450px]">
                 <div class="system-input-group">
-                    <label class="system-label">निवडलेले रीजनल मॅनेजर</label>
-                    <select id="masterManagerSelect" onchange="SystemController.handleManagerChange()" class="pro-input bg-white cursor-pointer border-blue-100">
-                        <option value="">-- मॅनेजर निवडा --</option>
-                    </select>
+                    <label class="system-label">रिजनल मॅनेजर निवडा (Select Manager)</label>
+                    <div class="relative">
+                        <select id="masterManagerSelect" onchange="SystemController.handleManagerChange()" class="pro-input bg-white cursor-pointer border-blue-200 shadow-sm appearance-none pr-10">
+                            <option value="">-- मॅनेजर निवडा --</option>
+                        </select>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-6 flex items-center justify-start border-t border-slate-50 overflow-x-auto no-scrollbar">
-            <button onclick="ViewController.switchTab('PLANNER')" id="tab-PLANNER" class="tab-trigger active marathi-font whitespace-nowrap">१. साप्ताहिक प्लॅनर (TARGET)</button>
-            <button onclick="ViewController.switchTab('ACHIEVEMENT')" id="tab-ACHIEVEMENT" class="tab-trigger marathi-font whitespace-nowrap">२. अचीव्हमेंट ट्रॅकर (ACTUAL)</button>
-            <button onclick="ViewController.switchTab('ANALYTICS')" id="tab-ANALYTICS" class="tab-trigger marathi-font whitespace-nowrap">३. कार्यक्षमता विश्लेषण (INSIGHTS)</button>
+        <div class="max-w-7xl mx-auto px-6 flex items-center justify-start border-t border-slate-50 overflow-x-auto no-scrollbar scroll-smooth">
+            <button onclick="ViewController.switchTab('PLANNER')" id="tab-PLANNER" class="tab-trigger active marathi-font whitespace-nowrap">१. साप्ताहिक प्लॅनर (SET TARGETS)</button>
+            <button onclick="ViewController.switchTab('ACHIEVEMENT')" id="tab-ACHIEVEMENT" class="tab-trigger marathi-font whitespace-nowrap">२. अचीव्हमेंट ट्रॅकर (ACTUALS)</button>
+            <button onclick="ViewController.switchTab('ANALYTICS')" id="tab-ANALYTICS" class="tab-trigger marathi-font whitespace-nowrap">३. कार्यक्षमता विश्लेषण (PERFORMANCE)</button>
         </div>
     </nav>
 
-    <!-- MAIN APPLICATION CANVAS -->
+    <!-- [3] MAIN APPLICATION CANVAS -->
     <main class="max-w-7xl mx-auto px-6 mt-10">
         
         <!-- MODULE: WELCOME INSIGHTS (AI DASHBOARD) -->
-        <section id="insightSection" class="hidden mb-10 fade-up">
+        <section id="insightSection" class="hidden mb-12 fade-up">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 flex flex-col justify-center bg-white p-10 rounded-[32px] border border-slate-100 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
-                    <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900 marathi-font leading-tight relative z-10">
-                        नमस्ते, <span id="displayManagerName" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">मॅनेजर</span>!
+                <div class="lg:col-span-2 flex flex-col justify-center bg-white p-12 rounded-[40px] border border-slate-100 shadow-xl relative overflow-hidden group">
+                    <div class="absolute -top-10 -right-10 w-64 h-64 bg-blue-50 rounded-full opacity-50 group-hover:scale-110 transition-transform duration-700"></div>
+                    <h2 class="text-4xl md:text-6xl font-black text-slate-900 marathi-font leading-tight relative z-10">
+                        नमस्ते, <span id="displayManagerName" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-800">मॅनेजर</span>!
                     </h2>
-                    <p class="mt-4 text-slate-500 font-medium text-lg marathi-font relative z-10">
-                        तुमचा डॅशबोर्ड सक्रिय आहे. खालील टॅब वापरून तुमचे साप्ताहिक टार्गेट आणि अचीव्हमेंट नियंत्रित करा.
+                    <p class="mt-6 text-slate-500 font-semibold text-xl marathi-font relative z-10 max-w-xl">
+                        तुमच्या टिमची या आठवड्याची उद्दिष्ट्ये निर्धारित करा आणि प्रगतीचा मागोवा घ्या.
                     </p>
                 </div>
 
-                <div class="system-card p-8 bg-indigo-600 border-none relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <svg class="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <div class="system-card p-10 bg-indigo-700 border-none relative overflow-hidden group shadow-2xl">
+                    <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-25 transition-opacity duration-500">
+                        <svg class="w-40 h-40 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     </div>
-                    <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-4">AI Performance Snapshot</p>
-                    <p id="aiInsightText" class="text-white font-bold marathi-font text-lg leading-relaxed relative z-10">
-                        "तुमच्या कार्यक्षमतेचे विश्लेषण करण्यासाठी टॅब निवडा."
-                    </p>
+                    <p class="text-[11px] font-black text-indigo-200 uppercase tracking-[0.2em] mb-6">Manager Performance Insight</p>
+                    <div class="relative z-10">
+                        <p id="aiInsightText" class="text-white font-bold marathi-font text-2xl leading-relaxed">
+                            "तुमच्या कार्यक्षमतेचे विश्लेषण करण्यासाठी विभाग निवडा."
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- MODULE 1: WEEKLY PLANNER (STRICT TARGETING) -->
-        <section id="view-PLANNER" class="hidden space-y-8 fade-up">
-            <div class="system-card p-8 md:p-12">
-                <div class="flex flex-col md:flex-row justify-between items-end gap-10 mb-12 pb-10 border-b-2 border-slate-50">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full md:w-2/3">
+        <!-- MODULE 1: WEEKLY PLANNER (STRICT TARGETING BY STAFF) -->
+        <section id="view-PLANNER" class="hidden space-y-10 fade-up">
+            <div class="system-card p-8 md:p-14">
+                <div class="flex flex-col md:flex-row justify-between items-end gap-12 mb-14 pb-12 border-b-2 border-slate-50">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 w-full md:w-3/4">
                         <div class="system-input-group">
-                            <label class="system-label">प्लॅनर सुरू होण्याची तारीख (Start)</label>
-                            <input type="date" id="planDateFrom" class="pro-input" onchange="PlannerModule.validateExistingPlan()">
+                            <label class="system-label">प्लॅनर सुरू तारीख (From)</label>
+                            <input type="date" id="planDateFrom" class="pro-input shadow-sm border-slate-100" onchange="PlannerModule.validateExistingPlan()">
                         </div>
                         <div class="system-input-group">
-                            <label class="system-label">प्लॅनर संपण्याची तारीख (End)</label>
-                            <input type="date" id="planDateTo" class="pro-input" onchange="PlannerModule.validateExistingPlan()">
+                            <label class="system-label">प्लॅनर समाप्ती तारीख (To)</label>
+                            <input type="date" id="planDateTo" class="pro-input shadow-sm border-slate-100" onchange="PlannerModule.validateExistingPlan()">
                         </div>
                     </div>
                     
                     <div id="plannerStatusIndicator" class="hidden">
-                        <div class="flex items-center gap-3 px-6 py-3 bg-rose-50 text-rose-600 rounded-2xl border border-rose-100">
-                            <span class="w-3 h-3 bg-rose-500 rounded-full animate-pulse"></span>
-                            <p class="font-black text-xs uppercase tracking-wider">या तारखेचा प्लॅन आधीच लॉक आहे</p>
+                        <div class="flex items-center gap-4 px-8 py-4 bg-rose-50 text-rose-700 rounded-3xl border border-rose-100 shadow-sm">
+                            <span class="relative flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-600"></span>
+                            </span>
+                            <p class="font-black text-xs uppercase tracking-[0.1em]">हा कालावधी आधीच लॉक आहे</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-[24px] border border-slate-100 shadow-inner bg-slate-50/20">
-                    <table class="w-full text-left min-w-[800px]">
-                        <thead class="bg-slate-50/80">
-                            <tr>
-                                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Business Unit / Question</th>
-                                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Weekly Target (₹)</th>
-                                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">OD Target (₹)</th>
-                                <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Strategy / Action Plan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="plannerTableBody" class="divide-y divide-slate-50 bg-white">
-                            <!-- Injected Dynamically -->
-                        </tbody>
-                    </table>
+                <div class="overflow-hidden rounded-[32px] border border-slate-200 shadow-2xl bg-white">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left min-w-[950px] border-collapse">
+                            <thead class="bg-slate-900">
+                                <tr>
+                                    <th class="p-8 text-[11px] font-black text-slate-100 uppercase tracking-widest border-b border-slate-800">Staff & KPI Question</th>
+                                    <th class="p-8 text-[11px] font-black text-slate-100 uppercase tracking-widest border-b border-slate-800">Weekly Target (₹)</th>
+                                    <th class="p-8 text-[11px] font-black text-slate-100 uppercase tracking-widest border-b border-slate-800">OD Target (₹)</th>
+                                    <th class="p-8 text-[11px] font-black text-slate-100 uppercase tracking-widest border-b border-slate-800">Action Plan / Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="plannerTableBody" class="divide-y divide-slate-100">
+                                <!-- Nested Loop Injection Happens Here -->
+                                 <tr>
+                                     <td colspan="4" class="p-20 text-center text-slate-400 font-bold italic">
+                                         कृपया आधी मॅनेजर आणि तारीख निवडा...
+                                     </td>
+                                 </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div id="plannerActionFooter" class="mt-12 flex flex-col md:flex-row items-center justify-between gap-8 p-10 bg-blue-50/50 rounded-[32px] border border-blue-100">
-                    <div class="max-w-xl">
-                        <h4 class="text-xl font-black text-blue-900 marathi-font mb-2">महत्वाची सूचना:</h4>
-                        <p class="text-sm text-blue-700 font-bold marathi-font">
-                            टार्गेट एकदा सबमिट केल्यानंतर बदलता येत नाही. खात्री करूनच 'लॉक' बटण दाबा.
+                <div id="plannerActionFooter" class="mt-14 flex flex-col md:flex-row items-center justify-between gap-10 p-12 bg-blue-50/70 rounded-[40px] border-2 border-blue-100 shadow-inner">
+                    <div class="max-w-2xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-blue-600 p-2 rounded-lg text-white">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <h4 class="text-2xl font-black text-blue-900 marathi-font uppercase tracking-tight">महत्त्वाची पडताळणी:</h4>
+                        </div>
+                        <p class="text-lg text-blue-700 font-bold marathi-font leading-relaxed">
+                            तुम्ही भरलेली माहिती ही त्या स्टाफचे त्या आठवड्याचे अधिकृत टार्गेट मानले जाईल. एकदा लॉक केल्यावर यामध्ये बदल करता येणार नाही.
                         </p>
                     </div>
-                    <button id="submitPlanBtn" onclick="PlannerModule.dispatchSubmission()" class="btn-core btn-primary-pro w-full md:w-80 marathi-font shadow-xl">
-                        टार्गेट लॉक करा (Lock Target)
+                    <button id="submitPlanBtn" onclick="PlannerModule.dispatchSubmission()" class="btn-core btn-primary-pro w-full md:w-[350px] marathi-font text-lg shadow-2xl py-6">
+                        साप्ताहिक टार्गेट लॉक करा
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- MODULE 2: ACHIEVEMENT TRACKER (IMMUTABLE ACTUALS) -->
-        <section id="view-ACHIEVEMENT" class="hidden space-y-8 fade-up">
-            <div class="system-card p-8 md:p-12 border-t-8 border-t-emerald-500">
-                <div class="flex flex-col md:flex-row justify-between items-end gap-10 mb-12 pb-10 border-b-2 border-slate-50">
-                    <div class="w-full md:w-1/2 system-input-group">
-                        <label class="system-label">उपलब्ध साप्ताहिक प्लॅन निवडा</label>
-                        <select id="achievementPlanDropdown" class="pro-input bg-emerald-50/30 border-emerald-100" onchange="AchievementModule.loadPlanData()">
-                            <option value="">-- प्लॅन निवडा --</option>
-                        </select>
+        <!-- MODULE 2: ACHIEVEMENT TRACKER (STAFF PERFORMANCE INPUT) -->
+        <section id="view-ACHIEVEMENT" class="hidden space-y-10 fade-up">
+            <div class="system-card p-8 md:p-14 border-t-[12px] border-t-emerald-600 shadow-2xl">
+                <div class="flex flex-col md:flex-row justify-between items-end gap-12 mb-14 pb-12 border-b-2 border-slate-100">
+                    <div class="w-full md:w-3/5 system-input-group">
+                        <label class="system-label">उपलब्ध साप्ताहिक प्लॅन निवडा (Select Active Week)</label>
+                        <div class="relative">
+                            <select id="achievementPlanDropdown" class="pro-input bg-emerald-50/40 border-emerald-100 shadow-sm appearance-none pr-12" onchange="AchievementModule.loadPlanData()">
+                                <option value="">-- प्लॅन निवडा --</option>
+                            </select>
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="flex gap-10 bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                        <div class="text-center">
-                            <p class="system-label">Total Goal</p>
-                            <p id="kpiGoal" class="text-3xl font-black text-slate-800">₹ 0</p>
+                    <div class="flex flex-wrap gap-8 bg-slate-50 p-8 rounded-[32px] border border-slate-200 shadow-sm">
+                        <div class="text-center px-4">
+                            <p class="system-label mb-1">Total Group Goal</p>
+                            <p id="kpiGoal" class="text-4xl font-black text-slate-900 tabular-nums">₹ 0</p>
                         </div>
-                        <div class="w-px h-12 bg-slate-200"></div>
-                        <div class="text-center">
-                            <p class="system-label">Current Actual</p>
-                            <p id="kpiActual" class="text-3xl font-black text-emerald-600">₹ 0</p>
+                        <div class="w-px h-16 bg-slate-200 hidden md:block"></div>
+                        <div class="text-center px-4">
+                            <p class="system-label mb-1 text-emerald-600">Real-time Actual</p>
+                            <p id="kpiActual" class="text-4xl font-black text-emerald-600 tabular-nums">₹ 0</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-[24px] border border-emerald-50 shadow-sm">
-                    <table class="w-full text-left min-w-[800px]">
-                        <thead class="bg-emerald-50/50">
-                            <tr>
-                                <th class="p-6 text-[10px] font-black text-emerald-900 uppercase tracking-widest">Business Unit</th>
-                                <th class="p-6 text-[10px] font-black text-emerald-900 uppercase tracking-widest">Target Set (₹)</th>
-                                <th class="p-6 text-[10px] font-black text-emerald-900 uppercase tracking-widest">Achievement (₹)</th>
-                                <th class="p-6 text-[10px] font-black text-emerald-900 uppercase tracking-widest">Status / Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody id="achievementTableBody" class="divide-y divide-slate-100 bg-white">
-                            <!-- Injected Dynamically -->
-                        </tbody>
-                    </table>
+                <div class="overflow-hidden rounded-[32px] border border-emerald-100 shadow-xl bg-white">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left min-w-[950px] border-collapse">
+                            <thead class="bg-emerald-600">
+                                <tr>
+                                    <th class="p-8 text-[11px] font-black text-white uppercase tracking-widest">Staff & Target Type</th>
+                                    <th class="p-8 text-[11px] font-black text-white uppercase tracking-widest">Target Set (₹)</th>
+                                    <th class="p-8 text-[11px] font-black text-white uppercase tracking-widest">Achievement (₹)</th>
+                                    <th class="p-8 text-[11px] font-black text-white uppercase tracking-widest">Closing Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="achievementTableBody" class="divide-y divide-slate-100">
+                                <!-- Achievement Rows -->
+                                <tr>
+                                    <td colspan="4" class="p-20 text-center text-slate-400 font-bold italic">
+                                        अचीव्हमेंट भरण्यासाठी वरील ड्रॉपडाऊनमधून तारीख निवडा...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div id="achievementActionFooter" class="mt-12 flex flex-col md:flex-row items-center justify-between gap-8 p-10 bg-emerald-50 rounded-[32px] border border-emerald-100">
-                    <div class="max-w-xl">
-                        <h4 class="text-xl font-black text-emerald-900 marathi-font mb-2">अचीव्हमेंट फायनल करा!</h4>
-                        <p class="text-sm text-emerald-700 font-bold marathi-font">
-                            जर तुम्ही अचीव्हमेंट एकदा सबमिट केली तर ती भविष्यात बदलता येणार नाही.
+                <div id="achievementActionFooter" class="mt-14 flex flex-col md:flex-row items-center justify-between gap-10 p-12 bg-emerald-50 rounded-[40px] border-2 border-emerald-100 shadow-inner">
+                    <div class="max-w-2xl">
+                        <div class="flex items-center gap-3 mb-4 text-emerald-800">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <h4 class="text-2xl font-black marathi-font uppercase tracking-tight">अचीव्हमेंट फायनल करा</h4>
+                        </div>
+                        <p class="text-lg text-emerald-700 font-bold marathi-font leading-relaxed">
+                            साप्ताहिक कामकाज पूर्ण झाले असल्यास, शेवटची अचीव्हमेंट भरून सबमिट करा. ही माहिती सिस्टिममध्ये कायमस्वरूपी रेकॉर्ड केली जाईल.
                         </p>
                     </div>
-                    <button id="submitAchBtn" onclick="AchievementModule.dispatchUpdate()" class="btn-core btn-success-pro w-full md:w-80 marathi-font shadow-lg">
+                    <button id="submitAchBtn" onclick="AchievementModule.dispatchUpdate()" class="btn-core btn-success-pro w-full md:w-[350px] marathi-font text-lg shadow-2xl py-6">
                         अचीव्हमेंट अपडेट करा
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- MODULE 3: ADVANCED ANALYTICS (CUSTOM TRACKING) -->
-        <section id="view-ANALYTICS" class="hidden space-y-10 fade-up">
+        <!-- MODULE 3: ADVANCED ANALYTICS (DEEP DRILL DOWN) -->
+        <section id="view-ANALYTICS" class="hidden space-y-12 fade-up">
             
-            <!-- Filters & Summary -->
-            <div class="system-card p-10 bg-slate-900 text-white border-none">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-10">
+            <!-- Filters & Global Stats -->
+            <div class="system-card p-12 bg-slate-900 text-white border-none shadow-2xl relative overflow-hidden">
+                <div class="absolute -bottom-20 -right-20 w-96 h-96 bg-blue-600 rounded-full blur-[100px] opacity-20 pointer-events-none"></div>
+                
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-12 relative z-10">
                     <div>
-                        <h4 class="text-3xl font-black marathi-font tracking-tighter">कार्यक्षमता विश्लेषण केंद्र</h4>
-                        <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mt-2">Performance Intelligence Hub</p>
+                        <h4 class="text-4xl font-black marathi-font tracking-tighter leading-tight">कार्यक्षमता विश्लेषण केंद्र</h4>
+                        <div class="flex items-center gap-3 mt-4">
+                            <span class="w-12 h-1.5 bg-blue-500 rounded-full"></span>
+                            <p class="text-slate-400 text-xs font-black uppercase tracking-[0.3em]">Performance Intelligence Hub</p>
+                        </div>
                     </div>
                     
-                    <div class="flex flex-wrap items-center gap-6">
+                    <div class="flex flex-wrap items-center gap-8 bg-slate-800/50 p-6 rounded-3xl border border-slate-700">
                         <div class="system-input-group">
                             <label class="system-label text-slate-500">From Date</label>
-                            <input type="date" id="filterStart" class="pro-input bg-slate-800 border-slate-700 text-white" onchange="AnalyticsModule.refresh()">
+                            <input type="date" id="filterStart" class="pro-input bg-slate-800 border-slate-700 text-white shadow-inner" onchange="AnalyticsModule.refresh()">
                         </div>
                         <div class="system-input-group">
                             <label class="system-label text-slate-500">To Date</label>
-                            <input type="date" id="filterEnd" class="pro-input bg-slate-800 border-slate-700 text-white" onchange="AnalyticsModule.refresh()">
+                            <input type="date" id="filterEnd" class="pro-input bg-slate-800 border-slate-700 text-white shadow-inner" onchange="AnalyticsModule.refresh()">
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12 border-t border-slate-800 pt-10">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-500 uppercase mb-2">Total Combined Target</p>
-                        <p id="statTotalTarget" class="text-3xl font-black text-blue-400">₹ 0</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-12 mt-16 border-t border-slate-800 pt-16 relative z-10">
+                    <div class="group">
+                        <p class="text-[11px] font-black text-slate-500 uppercase mb-4 tracking-widest">Combined Target</p>
+                        <p id="statTotalTarget" class="text-4xl font-black text-blue-400 tabular-nums">₹ 0</p>
+                        <div class="mt-4 h-1 w-10 bg-blue-400 group-hover:w-full transition-all duration-500"></div>
                     </div>
-                    <div>
-                        <p class="text-[10px] font-black text-slate-500 uppercase mb-2">Total Achievement</p>
-                        <p id="statTotalAch" class="text-3xl font-black text-emerald-400">₹ 0</p>
+                    <div class="group">
+                        <p class="text-[11px] font-black text-slate-500 uppercase mb-4 tracking-widest">Net Achievement</p>
+                        <p id="statTotalAch" class="text-4xl font-black text-emerald-400 tabular-nums">₹ 0</p>
+                        <div class="mt-4 h-1 w-10 bg-emerald-400 group-hover:w-full transition-all duration-500"></div>
                     </div>
-                    <div>
-                        <p class="text-[10px] font-black text-slate-500 uppercase mb-2">Avg. Efficiency</p>
-                        <p id="statAvgEff" class="text-3xl font-black text-amber-400">0%</p>
+                    <div class="group">
+                        <p class="text-[11px] font-black text-slate-500 uppercase mb-4 tracking-widest">Efficiency Index</p>
+                        <p id="statAvgEff" class="text-4xl font-black text-amber-400 tabular-nums">0%</p>
+                        <div class="mt-4 h-1 w-10 bg-amber-400 group-hover:w-full transition-all duration-500"></div>
                     </div>
-                    <div>
-                        <p class="text-[10px] font-black text-slate-500 uppercase mb-2">Reports in Period</p>
-                        <p id="statReportCount" class="text-3xl font-black text-indigo-400">0</p>
+                    <div class="group">
+                        <p class="text-[11px] font-black text-slate-500 uppercase mb-4 tracking-widest">Reported Cycles</p>
+                        <p id="statReportCount" class="text-4xl font-black text-indigo-400 tabular-nums">0</p>
+                        <div class="mt-4 h-1 w-10 bg-indigo-400 group-hover:w-full transition-all duration-500"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Visual Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                <div class="system-card p-10">
-                    <h4 class="text-2xl font-black marathi-font mb-6">कार्यक्षमता कल (Trend)</h4>
-                    <div class="h-[400px]"><canvas id="chartTrendCanvas"></canvas></div>
+            <!-- Charts Visualization Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="system-card p-12 bg-white shadow-xl">
+                    <div class="flex items-center justify-between mb-10">
+                        <h4 class="text-2xl font-black marathi-font text-slate-800">साप्ताहिक प्रगती कल (Trend)</h4>
+                        <div class="p-3 bg-blue-50 rounded-2xl text-blue-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="h-[450px]"><canvas id="chartTrendCanvas"></canvas></div>
                 </div>
 
-                <div class="system-card p-10">
-                    <h4 class="text-2xl font-black marathi-font mb-6">विभागवार कामगिरी (KPI Snapshot)</h4>
-                    <div class="h-[400px]"><canvas id="chartUnitCanvas"></canvas></div>
+                <div class="system-card p-12 bg-white shadow-xl">
+                    <div class="flex items-center justify-between mb-10">
+                        <h4 class="text-2xl font-black marathi-font text-slate-800">स्टाफ कामगिरी विश्लेषण</h4>
+                        <div class="p-3 bg-emerald-50 rounded-2xl text-emerald-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="h-[450px]"><canvas id="chartUnitCanvas"></canvas></div>
                 </div>
             </div>
 
-            <!-- KPI PERFORMANCE MATRIX -->
-            <div class="system-card p-10">
-                <h4 class="text-2xl font-black marathi-font mb-8">कामगिरी सारांश (At a Glance Performance)</h4>
-                <div class="overflow-x-auto rounded-3xl border border-slate-100">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-50">
-                            <tr>
-                                <th class="p-6 text-[10px] font-bold text-slate-400 uppercase">Manager / Unit</th>
-                                <th class="p-6 text-[10px] font-bold text-slate-400 uppercase">Net Target (₹)</th>
-                                <th class="p-6 text-[10px] font-bold text-slate-400 uppercase">Net Actual (₹)</th>
-                                <th class="p-6 text-[10px] font-bold text-slate-400 uppercase">Performance %</th>
-                            </tr>
-                        </thead>
-                        <tbody id="performanceMatrixBody" class="divide-y divide-slate-50">
-                            <!-- Injected Dynamically -->
-                        </tbody>
-                    </table>
+            <!-- STAFF KPI MATRIX (DETAIL VIEW) -->
+            <div class="system-card p-12 bg-white shadow-2xl overflow-hidden">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+                    <div>
+                        <h4 class="text-3xl font-black marathi-font text-slate-900 leading-tight">डिटेल कामगिरी मॅट्रिक्स</h4>
+                        <p class="text-slate-500 font-bold text-sm uppercase mt-2 tracking-widest italic">In-depth Staff Metrics</p>
+                    </div>
+                    <button onclick="AnalyticsModule.refresh()" class="flex items-center gap-2 px-6 py-3 bg-slate-100 rounded-2xl font-black text-xs uppercase hover:bg-slate-200 transition-all active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Refresh Data
+                    </button>
+                </div>
+                
+                <div class="overflow-hidden rounded-[32px] border border-slate-100 shadow-inner">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="p-8 text-[11px] font-black text-slate-500 uppercase tracking-widest">Staff Member / Employee</th>
+                                    <th class="p-8 text-[11px] font-black text-slate-500 uppercase tracking-widest text-center">Net Target (₹)</th>
+                                    <th class="p-8 text-[11px] font-black text-slate-500 uppercase tracking-widest text-center">Net Achievement (₹)</th>
+                                    <th class="p-8 text-[11px] font-black text-slate-500 uppercase tracking-widest text-center">Rating / Eff %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="performanceMatrixBody" class="divide-y divide-slate-50">
+                                <!-- Dynamic Logic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- SYSTEM CORE LOGIC ENGINE -->
+    <!-- [4] SYSTEM CORE LOGIC ENGINE (JAVASCRIPT) -->
     <script>
         /**
-         * 1. SYSTEM CONFIGURATION & KPI QUESTIONS
-         * Add or remove questions here; the UI adapts automatically.
+         * 1. SYSTEM CONFIGURATION & DEFINED KPIs
+         * These are the business-wide questions that apply to EACH staff member.
          */
         const GLOBAL_CONFIG = {
+            // Updated API Endpoints (Link to Google Apps Script)
             API_URL: "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec",
-            DEFAULT_KPI_QUESTIONS: [
+            
+            // These are the questions/KPIs for each staff member
+            STAFF_KPI_LIST: [
                 "Gold Loan Disbursement (Target ₹)",
                 "Personal Loan Portfolio Recovery (Target ₹)",
-                "Business Loan Login/Disb (Target ₹)",
+                "Business Loan Login/Disbursement (Target ₹)",
                 "Insurance & Cross Sell Premium (Target ₹)",
                 "OD Portfolio Recovery (Target ₹)",
                 "New Customer Acquisition Count",
-                "Feedback & Service Quality Score"
-            ]
+                "Self Service / Admin Tasks Completion"
+            ],
+            
+            // Placeholder for staff names loaded from the server per manager
+            DYNAMIC_STAFF_LIST: [] 
         };
 
         const SYSTEM_STATE = {
             currentManager: "",
-            historyData: [],
+            historyData: [], // All plan history for the selected manager
             currentTab: "PLANNER",
             charts: { trend: null, unit: null }
         };
 
         /**
-         * 2. SYSTEM CONTROLLER (CENTRAL HUB)
+         * 2. SYSTEM CONTROLLER (CENTRAL COMMUNICATIONS HUB)
          */
         const SystemController = {
+            
             async init() {
+                console.log("System Initializing...");
                 this.toggleLoader(true);
                 try {
                     const response = await fetch(`${GLOBAL_CONFIG.API_URL}?action=getManagers`);
+                    if (!response.ok) throw new Error("Server Error");
                     const managers = await response.json();
                     this.populateManagerSelect(managers);
-                    this.showToast("सिस्टम तयार आहे.");
+                    this.showToast("सिस्टम कनेक्शन यशस्वी. कृपया मॅनेजर निवडा.");
                 } catch (error) {
-                    console.error("Init Error:", error);
-                    this.showToast("कनेक्शन एरर.", "error");
+                    console.error("Initialization Error:", error);
+                    this.showToast("इंटरनेट कनेक्शन किंवा सर्व्हर एरर.", "error");
                 } finally {
                     this.toggleLoader(false);
                 }
@@ -489,20 +589,28 @@
 
                 this.toggleLoader(true);
                 try {
+                    // Fetch all data for this specific manager
                     const response = await fetch(`${GLOBAL_CONFIG.API_URL}?action=getManagerData&manager=${encodeURIComponent(manager)}`);
                     const payload = await response.json();
                     
+                    // History of previous weekly locks
                     SYSTEM_STATE.historyData = payload.history || [];
                     
-                    // Prioritize KPIs from server if available
+                    // The staff list belonging to this manager (from Google Sheet)
+                    // If sheet sends ["Suraj", "Laxman"], we update our dynamic list
                     if (payload.fxList && payload.fxList.length > 0) {
-                        GLOBAL_CONFIG.DEFAULT_KPI_QUESTIONS = payload.fxList;
+                        GLOBAL_CONFIG.DYNAMIC_STAFF_LIST = payload.fxList;
+                    } else {
+                        // Fallback if sheet is empty or only has one row
+                        GLOBAL_CONFIG.DYNAMIC_STAFF_LIST = ["No Staff Assigned"];
                     }
 
+                    // Refresh current view based on active tab
                     ViewController.switchTab(SYSTEM_STATE.currentTab);
-                    this.updateSummaryKPIs();
+                    this.updateAIPredictions();
                 } catch (error) {
-                    this.showToast("डेटा लोड अयशस्वी.", "error");
+                    console.error("Manager Data Fetch Error:", error);
+                    this.showToast("डेटा लोड करता आला नाही.", "error");
                 } finally {
                     this.toggleLoader(false);
                 }
@@ -519,21 +627,23 @@
                 });
             },
 
-            updateSummaryKPIs() {
+            updateAIPredictions() {
+                const aiBox = document.getElementById('aiInsightText');
                 if (SYSTEM_STATE.historyData.length === 0) {
-                    document.getElementById('aiInsightText').innerText = "तुमचा पहिला साप्ताहिक प्लॅन तयार करण्यासाठी प्लॅनर टॅबवर जा.";
+                    aiBox.innerText = "तुमचा पहिला साप्ताहिक प्लॅन तयार करण्यासाठी 'साप्ताहिक प्लॅनर' टॅबवर जा आणि टिमचे टार्गेट्स सेट करा.";
                     return;
                 }
                 
+                // Get latest performance
                 const lastPlan = SYSTEM_STATE.historyData[SYSTEM_STATE.historyData.length - 1];
                 let t = 0, a = 0;
-                lastPlan.details.forEach(d => { t += Number(d.tDisb); a += Number(d.aDisb); });
+                lastPlan.details.forEach(d => { t += Number(d.tDisb || 0); a += Number(d.aDisb || 0); });
                 const eff = t > 0 ? ((a/t)*100).toFixed(0) : 0;
                 
-                const aiBox = document.getElementById('aiInsightText');
-                if (eff >= 90) aiBox.innerText = `तुमची कार्यक्षमता ${eff}% आहे. खूपच छान! गोल्ड लोन टार्गेटवर लक्ष ठेवा.`;
-                else if (eff >= 50) aiBox.innerText = `तुमची कार्यक्षमता ${eff}% आहे. अधिक जोमाने प्रयत्न करणे गरजेचे आहे.`;
-                else aiBox.innerText = "मागील आठवड्याची कामगिरी समाधानकारक नाही. तातडीने अ‍ॅक्शन प्लॅन तयार करा.";
+                if (eff >= 95) aiBox.innerText = `अप्रतिम! तुमची मागील आठवड्याची कार्यक्षमता ${eff}% आहे. हेच सातत्य टिकवून ठेवा.`;
+                else if (eff >= 75) aiBox.innerText = `चांगली कामगिरी! ${eff}% कार्यक्षमता आहे. काही स्टाफ मेंबर्सना अधिक गाईडन्सची गरज आहे.`;
+                else if (eff > 0) aiBox.innerText = `कार्यक्षमता ${eff}% आहे. तुम्हाला टार्गेट पूर्ण करण्यासाठी अ‍ॅक्शन प्लॅन सुधारण्याची गरज आहे.`;
+                else aiBox.innerText = "मागील आठवड्याची अचीव्हमेंट अजून पूर्णपणे भरली गेलेली दिसत नाही.";
             },
 
             toggleLoader(show) {
@@ -543,9 +653,9 @@
             showToast(msg, type = "info") {
                 const t = document.getElementById('systemToast');
                 t.innerText = msg;
-                t.style.backgroundColor = type === "error" ? "#ef4444" : "#1e293b";
+                t.style.borderLeftColor = type === "error" ? "#ef4444" : "#3b82f6";
                 t.style.display = 'block';
-                setTimeout(() => t.style.display = 'none', 4000);
+                setTimeout(() => t.style.display = 'none', 5000);
             },
 
             resetApp() {
@@ -553,42 +663,60 @@
                 ['PLANNER', 'ACHIEVEMENT', 'ANALYTICS'].forEach(tab => {
                     document.getElementById(`view-${tab}`).classList.add('hidden');
                 });
+            },
+
+            formatCurrency(val) {
+                return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
             }
         };
 
         /**
-         * 3. VIEW CONTROLLER (TAB MANAGEMENT)
+         * 3. VIEW CONTROLLER (TAB ENGINE)
          */
         const ViewController = {
             switchTab(tabId) {
                 if (!SYSTEM_STATE.currentManager) {
-                    SystemController.showToast("कृपया आधी मॅनेजर निवडा.", "error");
+                    SystemController.showToast("कृपया आधी मॅनेजरची निवड करा.", "error");
                     return;
                 }
 
                 SYSTEM_STATE.currentTab = tabId;
                 
+                // UI Cleanup
                 document.querySelectorAll('.tab-trigger').forEach(btn => btn.classList.remove('active'));
                 document.getElementById(`tab-${tabId}`).classList.add('active');
 
+                // Section Hide/Show
                 document.querySelectorAll('main > section').forEach(sec => {
                     if (sec.id !== 'insightSection') sec.classList.add('hidden');
                 });
                 
-                document.getElementById(`view-${tabId}`).classList.remove('hidden');
+                const targetSec = document.getElementById(`view-${tabId}`);
+                targetSec.classList.remove('hidden');
 
+                // Tab Specific Init
                 if (tabId === 'PLANNER') PlannerModule.init();
                 if (tabId === 'ACHIEVEMENT') AchievementModule.init();
                 if (tabId === 'ANALYTICS') AnalyticsModule.init();
+
+                // Auto Scroll Top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         };
 
         /**
-         * 4. PLANNER MODULE (STRICT VALIDATION)
+         * 4. PLANNER MODULE (THE NESTED LOOP LOGIC: STAFF -> KPI)
          */
         const PlannerModule = {
+            
             init() {
-                this.renderRows(false);
+                // Clear any leftover date inputs if switching managers
+                document.getElementById('planDateFrom').value = "";
+                document.getElementById('planDateTo').value = "";
+                document.getElementById('plannerStatusIndicator').classList.add('hidden');
+                document.getElementById('submitPlanBtn').disabled = false;
+                
+                this.renderNestedRows(false);
             },
 
             validateExistingPlan() {
@@ -596,7 +724,7 @@
                 const eDate = document.getElementById('planDateTo').value;
                 if (!sDate || !eDate) return;
 
-                // Check for exact match or overlap
+                // Check if this date range is already locked in history
                 const existing = SYSTEM_STATE.historyData.find(h => {
                     return (sDate >= h.sDate && sDate <= h.eDate) || (eDate >= h.sDate && eDate <= h.eDate);
                 });
@@ -606,45 +734,81 @@
 
                 if (existing) {
                     btn.disabled = true;
-                    btn.innerText = "Target Period Blocked";
+                    btn.innerText = "Data Period Locked";
                     badge.classList.remove('hidden');
-                    this.renderRows(true, existing.details);
+                    this.renderNestedRows(true, existing.details);
                 } else {
                     btn.disabled = false;
-                    btn.innerText = "टार्गेट लॉक करा (Lock Target)";
+                    btn.innerText = "साप्ताहिक टार्गेट लॉक करा";
                     badge.classList.add('hidden');
-                    this.renderRows(false);
+                    this.renderNestedRows(false);
                 }
             },
 
-            renderRows(isLocked, existingDetails = []) {
+            /**
+             * CORE RENDERER: Nested Loop to show Staff wise Questions
+             */
+            renderNestedRows(isLocked, existingDetails = []) {
                 const body = document.getElementById('plannerTableBody');
                 body.innerHTML = "";
 
-                GLOBAL_CONFIG.DEFAULT_KPI_QUESTIONS.forEach((q, idx) => {
-                    const rowData = existingDetails[idx] || { tDisb: "", tOd: "", pd: "" };
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 transition-colors";
+                if (GLOBAL_CONFIG.DYNAMIC_STAFF_LIST.length === 0) {
+                    body.innerHTML = '<tr><td colspan="4" class="p-10 text-center font-bold text-rose-500">या मॅनेजरसाठी स्टाफ सापडला नाही.</td></tr>';
+                    return;
+                }
+
+                // OUTER LOOP: Each Staff Member (from Google Sheet)
+                GLOBAL_CONFIG.DYNAMIC_STAFF_LIST.forEach((staffName) => {
                     
-                    tr.innerHTML = `
-                        <td class="p-6">
-                            <p class="font-bold text-slate-800 text-sm">${q}</p>
-                            <input type="hidden" class="v-fx-name" value="${q}">
-                        </td>
-                        <td class="p-6">
-                            <input type="number" class="v-plan-target pro-input ${isLocked ? 'input-locked' : ''}" 
-                                   value="${rowData.tDisb}" placeholder="0" ${isLocked ? 'readonly' : ''}>
-                        </td>
-                        <td class="p-6">
-                            <input type="number" class="v-plan-od pro-input ${isLocked ? 'input-locked' : ''}" 
-                                   value="${rowData.tOd}" placeholder="0" ${isLocked ? 'readonly' : ''}>
-                        </td>
-                        <td class="p-6">
-                            <input type="text" class="v-plan-note pro-input ${isLocked ? 'input-locked' : ''}" 
-                                   value="${rowData.pd}" placeholder="Strategy note..." ${isLocked ? 'readonly' : ''}>
+                    // Group Header Row
+                    const headerRow = document.createElement('tr');
+                    headerRow.className = "staff-header-row shadow-sm";
+                    headerRow.innerHTML = `
+                        <td colspan="4" class="p-5 font-black text-slate-900 bg-slate-100/80 border-y border-slate-200">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs uppercase">
+                                    ${staffName.charAt(0)}
+                                </div>
+                                <span class="tracking-widest uppercase text-sm">Employee Name: ${staffName}</span>
+                            </div>
                         </td>
                     `;
-                    body.appendChild(tr);
+                    body.appendChild(headerRow);
+
+                    // INNER LOOP: Each KPI Question for this staff
+                    GLOBAL_CONFIG.STAFF_KPI_LIST.forEach((kpiQuestion) => {
+                        const uniqueKey = `${staffName} || ${kpiQuestion}`;
+                        const match = existingDetails.find(d => d.name === uniqueKey);
+                        const rowData = match || { tDisb: "", tOd: "", pd: "" };
+
+                        const qRow = document.createElement('tr');
+                        qRow.className = "question-row hover:bg-slate-50 transition-all group";
+                        qRow.innerHTML = `
+                            <td class="p-6 pl-12 border-b border-slate-50">
+                                <p class="font-bold text-slate-700 text-sm group-hover:text-blue-600 transition-colors">${kpiQuestion}</p>
+                                <input type="hidden" class="v-fx-name" value="${uniqueKey}">
+                            </td>
+                            <td class="p-6 border-b border-slate-50">
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">₹</span>
+                                    <input type="number" class="v-plan-target pro-input pl-8 ${isLocked ? 'input-locked' : ''}" 
+                                           value="${rowData.tDisb}" placeholder="0" ${isLocked ? 'readonly' : ''}>
+                                </div>
+                            </td>
+                            <td class="p-6 border-b border-slate-50">
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">₹</span>
+                                    <input type="number" class="v-plan-od pro-input pl-8 ${isLocked ? 'input-locked' : ''}" 
+                                           value="${rowData.tOd}" placeholder="0" ${isLocked ? 'readonly' : ''}>
+                                </div>
+                            </td>
+                            <td class="p-6 border-b border-slate-50">
+                                <input type="text" class="v-plan-note pro-input ${isLocked ? 'input-locked' : ''}" 
+                                       value="${rowData.pd}" placeholder="Strategy details..." ${isLocked ? 'readonly' : ''}>
+                            </td>
+                        `;
+                        body.appendChild(qRow);
+                    });
                 });
             },
 
@@ -653,19 +817,19 @@
                 const eDate = document.getElementById('planDateTo').value;
 
                 if (!sDate || !eDate) {
-                    SystemController.showToast("तारीख निवडा.", "error");
+                    SystemController.showToast("कृपया सुरू आणि संपण्याची तारीख निवडा.", "error");
                     return;
                 }
 
-                if (!confirm("एकदा लॉक केलेले टार्गेट पुन्हा बदलता येणार नाही. सुरू ठेवायचे?")) return;
+                if (!confirm("एकदा लॉक केलेले टार्गेट पुन्हा बदलता येणार नाही. सर्व स्टाफचे टार्गेट बरोबर आहेत याची खात्री करा. पुढे जायचे?")) return;
 
-                const rows = document.querySelectorAll('#plannerTableBody tr');
+                const rows = document.querySelectorAll('#plannerTableBody tr.question-row');
                 const details = Array.from(rows).map(row => ({
                     name: row.querySelector('.v-fx-name').value,
                     tDisb: row.querySelector('.v-plan-target').value || 0,
                     tOd: row.querySelector('.v-plan-od').value || 0,
                     pd: row.querySelector('.v-plan-note').value,
-                    aDisb: "0" 
+                    aDisb: "0" // Initial actual is always 0
                 }));
 
                 SystemController.toggleLoader(true);
@@ -676,11 +840,18 @@
                         fxDetails: details
                     };
 
-                    await fetch(GLOBAL_CONFIG.API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                    SystemController.showToast("टार्गेट लॉक झाले.");
+                    const resp = await fetch(GLOBAL_CONFIG.API_URL, { 
+                        method: 'POST', 
+                        body: JSON.stringify(payload) 
+                    });
+                    
+                    if (!resp.ok) throw new Error();
+
+                    SystemController.showToast("अभिनंदन! साप्ताहिक टार्गेट यशस्वीरित्या लॉक झाले.");
+                    // Refresh system to show the new lock
                     SystemController.handleManagerChange();
                 } catch (e) {
-                    SystemController.showToast("सबमिशन त्रुटी.", "error");
+                    SystemController.showToast("सबमिशन करताना एरर आली. कृपया पुन्हा प्रयत्न करा.", "error");
                 } finally {
                     SystemController.toggleLoader(false);
                 }
@@ -688,19 +859,28 @@
         };
 
         /**
-         * 5. ACHIEVEMENT MODULE (IMMUTABILITY)
+         * 5. ACHIEVEMENT MODULE (TRACKING PROGRESS PER STAFF MEMBER)
          */
         const AchievementModule = {
+            
             init() {
                 const drop = document.getElementById('achievementPlanDropdown');
                 drop.innerHTML = '<option value="">-- उपलब्ध प्लॅन निवडा --</option>';
                 
-                SYSTEM_STATE.historyData.slice().reverse().forEach((h, idx) => {
+                // Show latest plans at the top
+                const reversedHistory = [...SYSTEM_STATE.historyData].reverse();
+                
+                reversedHistory.forEach((h) => {
+                    const originalIdx = SYSTEM_STATE.historyData.indexOf(h);
                     const opt = document.createElement('option');
-                    opt.value = SYSTEM_STATE.historyData.indexOf(h);
-                    opt.innerText = `${h.sDate} ते ${h.eDate} (Week Plan)`;
+                    opt.value = originalIdx;
+                    opt.innerText = `साप्ताहिक प्लॅन: ${h.sDate} ते ${h.eDate} (Current Targets Locked)`;
                     drop.appendChild(opt);
                 });
+
+                document.getElementById('kpiGoal').innerText = "₹ 0";
+                document.getElementById('kpiActual').innerText = "₹ 0";
+                document.getElementById('achievementTableBody').innerHTML = '<tr><td colspan="4" class="p-20 text-center text-slate-400 font-bold italic">अचीव्हमेंट भरण्यासाठी वरील ड्रॉपडाऊनमधून तारीख निवडा...</td></tr>';
             },
 
             loadPlanData() {
@@ -717,44 +897,53 @@
                 const plan = SYSTEM_STATE.historyData[idx];
                 let totalT = 0;
                 
-                // Achievement Lock Condition: If any achievement value > 0, we consider it locked for now
-                // (You can also add a specific "isFinalized" flag in your Google Sheet JSON)
-                const isAlreadyFinalized = plan.details.some(d => Number(d.aDisb) > 0);
+                // If every row has an achievement > 0, we can assume it was finalized 
+                // However, for business use, we allow updates until a "Final Submit" button is pressed.
+                const isFinalized = plan.details.every(d => Number(d.aDisb) > 0 && d.aDisb !== "0");
+
+                let currentStaff = "";
 
                 plan.details.forEach(item => {
                     totalT += Number(item.tDisb);
+                    
+                    // Logic to detect staff change for headers in achievement view
+                    const parts = item.name.split(" || ");
+                    const staffName = parts[0];
+                    const kpiLabel = parts[1] || item.name;
+
+                    if (staffName !== currentStaff) {
+                        currentStaff = staffName;
+                        const headerTr = document.createElement('tr');
+                        headerTr.className = "bg-emerald-50 shadow-inner";
+                        headerTr.innerHTML = `<td colspan="4" class="p-4 font-black text-emerald-900 uppercase text-xs tracking-widest pl-8 border-y border-emerald-100">${staffName} - Performance Tracking</td>`;
+                        body.appendChild(headerTr);
+                    }
+
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-emerald-50/20 transition-colors";
+                    tr.className = "hover:bg-emerald-50/20 transition-all";
                     tr.innerHTML = `
-                        <td class="p-6">
-                            <p class="font-bold text-slate-800 text-sm">${item.name}</p>
+                        <td class="p-6 pl-12 border-b border-slate-50">
+                            <p class="font-bold text-slate-800 text-sm">${kpiLabel}</p>
                         </td>
-                        <td class="p-6">
-                            <p class="font-black text-blue-700">₹ ${Number(item.tDisb).toLocaleString()}</p>
+                        <td class="p-6 border-b border-slate-50">
+                            <p class="font-black text-blue-800 tabular-nums">${SystemController.formatCurrency(item.tDisb)}</p>
                         </td>
-                        <td class="p-6">
-                            <input type="number" class="v-ach-val pro-input ${isAlreadyFinalized ? 'input-locked' : 'input-success'}" 
-                                   value="${item.aDisb}" ${isAlreadyFinalized ? 'readonly' : ''} oninput="AchievementModule.calculateLive()">
+                        <td class="p-6 border-b border-slate-50">
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-emerald-400 text-sm">₹</span>
+                                <input type="number" class="v-ach-val pro-input pl-8 input-success focus:ring-emerald-500" 
+                                       value="${item.aDisb}" oninput="AchievementModule.calculateLive()" placeholder="Enter Actual">
+                            </div>
                         </td>
-                        <td class="p-6">
-                            <input type="text" class="v-ach-note pro-input ${isAlreadyFinalized ? 'input-locked' : ''}" 
-                                   value="${item.pd || ''}" ${isAlreadyFinalized ? 'readonly' : ''}>
+                        <td class="p-6 border-b border-slate-50">
+                            <input type="text" class="v-ach-note pro-input" 
+                                   value="${item.pd || ''}" placeholder="Explain deviation if any">
                         </td>
                     `;
                     body.appendChild(tr);
                 });
 
-                document.getElementById('kpiGoal').innerText = `₹ ${totalT.toLocaleString()}`;
-                
-                const btn = document.getElementById('submitAchBtn');
-                if (isAlreadyFinalized) {
-                    btn.disabled = true;
-                    btn.innerText = "Achievement Locked";
-                } else {
-                    btn.disabled = false;
-                    btn.innerText = "अचीव्हमेंट अपडेट करा";
-                }
-
+                document.getElementById('kpiGoal').innerText = SystemController.formatCurrency(totalT);
                 this.calculateLive();
             },
 
@@ -763,17 +952,17 @@
                 document.querySelectorAll('.v-ach-val').forEach(input => {
                     totalA += Number(input.value || 0);
                 });
-                document.getElementById('kpiActual').innerText = `₹ ${totalA.toLocaleString()}`;
+                document.getElementById('kpiActual').innerText = SystemController.formatCurrency(totalA);
             },
 
             async dispatchUpdate() {
                 const idx = document.getElementById('achievementPlanDropdown').value;
-                if (idx === "") return SystemController.showToast("आधी प्लॅन निवडा.", "error");
+                if (idx === "") return SystemController.showToast("कृपया आधी प्लॅन निवडा.", "error");
 
-                if (!confirm("अचीव्हमेंट लॉक केल्यानंतर पुन्हा बदलता येणार नाही. सुरू ठेवायचे?")) return;
+                if (!confirm("अचीव्हमेंट डेटा अपडेट आणि लॉक करायचा आहे? एकदा लॉक केल्यावर तो भविष्यातील रिपोर्टिंगसाठी फिक्स केला जाईल.")) return;
 
                 const plan = SYSTEM_STATE.historyData[idx];
-                const rows = document.querySelectorAll('#achievementTableBody tr');
+                const rows = document.querySelectorAll('#achievementTableBody tr:not(.bg-emerald-50)');
                 
                 const updatedDetails = Array.from(rows).map((row, i) => ({
                     name: plan.details[i].name,
@@ -791,11 +980,13 @@
                         fxDetails: updatedDetails
                     };
 
-                    await fetch(GLOBAL_CONFIG.API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                    SystemController.showToast("अचीव्हमेंट यशस्वीरित्या लॉक झाली!");
+                    const resp = await fetch(GLOBAL_CONFIG.API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                    if (!resp.ok) throw new Error();
+
+                    SystemController.showToast("अचीव्हमेंट यशस्वीरित्या अपडेट करण्यात आली.");
                     SystemController.handleManagerChange();
                 } catch (e) {
-                    SystemController.showToast("अपडेट त्रुटी.", "error");
+                    SystemController.showToast("अपडेट अयशस्वी. सर्व्हरशी संपर्क होऊ शकला नाही.", "error");
                 } finally {
                     SystemController.toggleLoader(false);
                 }
@@ -803,11 +994,12 @@
         };
 
         /**
-         * 6. ANALYTICS MODULE (DYNAMIC TRACKING)
+         * 6. ANALYTICS MODULE (COMPREHENSIVE PERFORMANCE INTELLIGENCE)
          */
         const AnalyticsModule = {
+            
             init() {
-                // Set default dates to current month
+                // Default date range: current month
                 const now = new Date();
                 const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
                 const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
@@ -824,78 +1016,103 @@
 
                 if (!start || !end) return;
 
-                // Filter Data
+                // Step 1: Filter plans that fall within date range
                 const filtered = SYSTEM_STATE.historyData.filter(h => h.sDate >= start && h.sDate <= end);
                 
-                // Update Stats
+                // Step 2: Aggregation for Global Stats
                 let totalT = 0, totalA = 0;
                 filtered.forEach(h => {
-                    h.details.forEach(d => { totalT += Number(d.tDisb); totalA += Number(d.aDisb); });
+                    h.details.forEach(d => { totalT += Number(d.tDisb || 0); totalA += Number(d.aDisb || 0); });
                 });
 
-                document.getElementById('statTotalTarget').innerText = `₹ ${totalT.toLocaleString()}`;
-                document.getElementById('statTotalAch').innerText = `₹ ${totalA.toLocaleString()}`;
-                document.getElementById('statAvgEff').innerText = totalT > 0 ? ((totalA/totalT)*100).toFixed(0) + '%' : '0%';
+                document.getElementById('statTotalTarget').innerText = SystemController.formatCurrency(totalT);
+                document.getElementById('statTotalAch').innerText = SystemController.formatCurrency(totalA);
+                document.getElementById('statAvgEff').innerText = totalT > 0 ? ((totalA/totalT)*100).toFixed(1) + '%' : '0%';
                 document.getElementById('statReportCount').innerText = filtered.length;
 
+                // Step 3: Draw Charts and Matrix
                 this.renderCharts(filtered);
                 this.renderMatrix(filtered);
             },
 
             renderCharts(data) {
+                // Destroy old charts to prevent memory leaks and ghosting
+                if (SYSTEM_STATE.charts.trend) SYSTEM_STATE.charts.trend.destroy();
+                if (SYSTEM_STATE.charts.unit) SYSTEM_STATE.charts.unit.destroy();
+
                 const labels = data.map(h => h.sDate);
-                const efficiency = data.map(h => {
+                const efficiencyArr = data.map(h => {
                     let t = 0, a = 0;
-                    h.details.forEach(d => { t += Number(d.tDisb); a += Number(d.aDisb); });
-                    return t > 0 ? ((a/t)*100).toFixed(0) : 0;
+                    h.details.forEach(d => { t += Number(d.tDisb || 0); a += Number(d.aDisb || 0); });
+                    return t > 0 ? ((a/t)*100).toFixed(1) : 0;
                 });
 
-                // Trend Chart
-                if (SYSTEM_STATE.charts.trend) SYSTEM_STATE.charts.trend.destroy();
+                // TREND CHART (Linear)
                 const ctx1 = document.getElementById('chartTrendCanvas').getContext('2d');
                 SYSTEM_STATE.charts.trend = new Chart(ctx1, {
                     type: 'line',
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Efficiency %',
-                            data: efficiency,
+                            label: 'Group Efficiency %',
+                            data: efficiencyArr,
                             borderColor: '#1e40af',
-                            backgroundColor: 'rgba(30, 64, 175, 0.05)',
-                            fill: true, tension: 0.4, borderWidth: 4,
-                            pointRadius: 6, pointBackgroundColor: '#fff', pointBorderWidth: 3
+                            backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                            fill: true, tension: 0.4, borderWidth: 5,
+                            pointRadius: 8, pointHoverRadius: 10,
+                            pointBackgroundColor: '#ffffff', pointBorderColor: '#1e40af', pointBorderWidth: 4
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 110 } } }
+                    options: { 
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { 
+                            y: { min: 0, max: 110, grid: { color: '#f1f5f9' }, ticks: { font: { weight: 'bold' } } },
+                            x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+                        }
+                    }
                 });
 
-                // Unit Distribution (Aggregated)
-                const unitStats = {};
+                // STAFF DISTRIBUTION (Aggregated)
+                const staffMap = {};
                 data.forEach(h => {
                     h.details.forEach(d => {
-                        if (!unitStats[d.name]) unitStats[d.name] = { t: 0, a: 0 };
-                        unitStats[d.name].t += Number(d.tDisb);
-                        unitStats[d.name].a += Number(d.aDisb);
+                        const sName = d.name.split(" || ")[0];
+                        if (!staffMap[sName]) staffMap[sName] = { t: 0, a: 0 };
+                        staffMap[sName].t += Number(d.tDisb || 0);
+                        staffMap[sName].a += Number(d.aDisb || 0);
                     });
                 });
 
-                const unitLabels = Object.keys(unitStats);
-                const unitEff = unitLabels.map(k => unitStats[k].t > 0 ? ((unitStats[k].a/unitStats[k].t)*100).toFixed(0) : 0);
+                const staffLabels = Object.keys(staffMap);
+                const staffEffArr = staffLabels.map(name => {
+                    const s = staffMap[name];
+                    return s.t > 0 ? ((s.a/s.t)*100).toFixed(1) : 0;
+                });
 
-                if (SYSTEM_STATE.charts.unit) SYSTEM_STATE.charts.unit.destroy();
                 const ctx2 = document.getElementById('chartUnitCanvas').getContext('2d');
                 SYSTEM_STATE.charts.unit = new Chart(ctx2, {
                     type: 'bar',
                     data: {
-                        labels: unitLabels.map(l => l.substring(0, 15) + '...'),
+                        labels: staffLabels,
                         datasets: [{
-                            label: 'Performance %',
-                            data: unitEff,
+                            label: 'Employee Performance Score (%)',
+                            data: staffEffArr,
                             backgroundColor: '#10b981',
-                            borderRadius: 12
+                            borderRadius: 15,
+                            hoverBackgroundColor: '#059669',
+                            barThickness: 40
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { min: 0, max: 100 } } }
+                    options: { 
+                        responsive: true, maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: { legend: { display: false } },
+                        scales: { 
+                            x: { min: 0, max: 100, grid: { color: '#f1f5f9' } },
+                            y: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+                        }
+                    }
                 });
             },
 
@@ -903,27 +1120,56 @@
                 const body = document.getElementById('performanceMatrixBody');
                 body.innerHTML = "";
 
-                // Aggregate by unit across all filtered plans
+                // Aggregating by staff
                 const matrix = {};
                 data.forEach(h => {
                     h.details.forEach(d => {
-                        if (!matrix[d.name]) matrix[d.name] = { t: 0, a: 0 };
-                        matrix[d.name].t += Number(d.tDisb);
-                        matrix[d.name].a += Number(d.aDisb);
+                        const sName = d.name.split(" || ")[0];
+                        if (!matrix[sName]) matrix[sName] = { t: 0, a: 0 };
+                        matrix[sName].t += Number(d.tDisb || 0);
+                        matrix[sName].a += Number(d.aDisb || 0);
                     });
                 });
 
-                Object.keys(matrix).forEach(unit => {
-                    const stat = matrix[unit];
+                const staffKeys = Object.keys(matrix);
+                if (staffKeys.length === 0) {
+                    body.innerHTML = '<tr><td colspan="4" class="p-10 text-center font-bold text-slate-400 italic">निवडलेल्या कालावधीत कोणताही डेटा सापडला नाही.</td></tr>';
+                    return;
+                }
+
+                staffKeys.forEach(name => {
+                    const stat = matrix[name];
                     const eff = stat.t > 0 ? ((stat.a/stat.t)*100).toFixed(1) : 0;
+                    
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50";
+                    tr.className = "hover:bg-slate-50 transition-all";
                     tr.innerHTML = `
-                        <td class="p-6 font-bold text-slate-700 text-sm">${unit}</td>
-                        <td class="p-6 font-black text-slate-800">₹ ${stat.t.toLocaleString()}</td>
-                        <td class="p-6 font-black text-emerald-600">₹ ${stat.a.toLocaleString()}</td>
-                        <td class="p-6">
-                            <span class="kpi-badge ${eff >= 80 ? 'badge-positive' : 'badge-negative'}">${eff}%</span>
+                        <td class="p-8">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black">
+                                    ${name.charAt(0)}
+                                </div>
+                                <div>
+                                    <p class="font-black text-slate-900 text-base tracking-tight">${name}</p>
+                                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Active Associate</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-8 text-center">
+                            <p class="font-black text-slate-700 tabular-nums">${SystemController.formatCurrency(stat.t)}</p>
+                        </td>
+                        <td class="p-8 text-center">
+                            <p class="font-black text-emerald-600 tabular-nums">${SystemController.formatCurrency(stat.a)}</p>
+                        </td>
+                        <td class="p-8 text-center">
+                            <div class="flex flex-col items-center gap-2">
+                                <span class="kpi-badge ${eff >= 85 ? 'badge-positive' : eff >= 50 ? 'bg-amber-100 text-amber-700' : 'badge-negative'}">
+                                    ${eff}%
+                                </span>
+                                <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full ${eff >= 85 ? 'bg-emerald-500' : 'bg-amber-500'}" style="width: ${eff > 100 ? 100 : eff}%"></div>
+                                </div>
+                            </div>
                         </td>
                     `;
                     body.appendChild(tr);
@@ -932,7 +1178,9 @@
         };
 
         // Initialize Core System on Window Load
-        window.addEventListener('load', () => SystemController.init());
+        window.addEventListener('load', () => {
+            SystemController.init();
+        });
 
     </script>
 </body>
