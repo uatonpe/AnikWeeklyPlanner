@@ -3,521 +3,432 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anik HO Intelligence | Performance Command Center</title>
+    <title>Anik Master HO Dashboard | Performance Tracker</title>
 
-    <!-- Frameworks -->
+    <!-- UI Assets -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
     <style>
         :root {
-            --bg-deep: #020617;
-            --card-glass: rgba(15, 23, 42, 0.7);
-            --primary-blue: #3b82f6;
-            --danger-red: #ef4444;
-            --success-green: #10b981;
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-deep);
-            color: #f1f5f9;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
-            min-height: 100vh;
-            overflow-x: hidden;
+            background-color: #f4f7fa;
+            color: var(--slate-800);
+            letter-spacing: -0.01em;
         }
 
-        /* Glassmorphism Styles */
         .glass-card {
-            background: var(--card-glass);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .glass-card:hover {
-            border-color: rgba(59, 130, 246, 0.3);
-            background: rgba(15, 23, 42, 0.9);
-            transform: translateY(-2px);
-        }
-
-        .neo-button {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            background: white;
+            border: 1px solid var(--slate-200);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border-radius: 20px;
             transition: all 0.3s ease;
         }
 
-        .neo-button:hover {
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
-            transform: scale(1.05);
+        .glass-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
         }
 
-        /* Custom Table Styling */
-        .table-row-red { background: rgba(239, 68, 68, 0.1) !important; border-left: 4px solid var(--danger-red); }
-        .table-row-green { background: rgba(16, 185, 129, 0.05) !important; border-left: 4px solid var(--success-green); }
-        .table-row-amber { background: rgba(245, 158, 11, 0.05) !important; border-left: 4px solid #f59e0b; }
+        .sidebar-manager-card {
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-manager-card.active {
+            background-color: var(--primary-light);
+            border-left-color: var(--primary);
+        }
+
+        .efficiency-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+
+        .status-red { background: #fee2e2; color: #991b1b; }
+        .status-amber { background: #fef3c7; color: #92400e; }
+        .status-green { background: #dcfce7; color: #166534; }
 
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: var(--slate-100); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--slate-200); border-radius: 10px; }
 
-        .stat-icon {
-            width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Chart Tooltip Customization */
-        #hoChart { max-height: 450px !important; }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
 
-        @keyframes pulse-red {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
+        .btn-refresh {
+            background: var(--primary);
+            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.3);
         }
-        .critical-dot { width: 8px; height: 8px; background: var(--danger-red); border-radius: 50%; display: inline-block; animation: pulse-red 1s infinite; }
     </style>
 </head>
-<body class="p-4 md:p-10 custom-scrollbar">
+<body class="custom-scrollbar">
 
-    <!-- HO Master Navigation -->
-    <header class="max-w-[1700px] mx-auto mb-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-        <div class="animate__animated animate__fadeInDown">
-            <div class="flex items-center gap-4 mb-2">
-                <div class="bg-blue-600 p-2.5 rounded-2xl">
+    <!-- Top Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-[1600px] mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-600 p-2 rounded-xl">
                     <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-6 brightness-0 invert" alt="Anik Logo">
                 </div>
-                <div class="h-8 w-[2px] bg-slate-700"></div>
-                <h1 class="text-3xl font-black tracking-tighter uppercase">HO <span class="text-blue-500">INTELLIGENCE</span></h1>
-            </div>
-            <p class="text-slate-400 font-bold uppercase text-[10px] tracking-[0.4em] ml-1">Live Enterprise Monitoring Dashboard (Real-Time)</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-4 animate__animated animate__fadeInRight">
-            <div class="flex flex-col text-right mr-4 hidden sm:block">
-                <p id="liveTime" class="text-xl font-black text-slate-200">00:00:00 PM</p>
-                <p id="liveDate" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Loading Calendar...</p>
-            </div>
-            <button onclick="fetchAllData()" class="neo-button px-8 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest flex items-center gap-3">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i> पूर्ण डेटा रिफ्रेश करा
-            </button>
-        </div>
-    </header>
-
-    <!-- Global Stats Overview -->
-    <section class="max-w-[1700px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <div class="glass-card p-6 animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
-            <div class="flex justify-between items-start mb-4">
-                <div class="stat-icon bg-blue-500/10 text-blue-500"><i data-lucide="target"></i></div>
-                <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-3 py-1 rounded-full">Overall Target</span>
-            </div>
-            <h3 id="statTotalTarget" class="text-4xl font-black mb-1">₹ 0</h3>
-            <p class="text-xs text-slate-500 font-bold">Total Planned Disbursement</p>
-        </div>
-
-        <div class="glass-card p-6 animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
-            <div class="flex justify-between items-start mb-4">
-                <div class="stat-icon bg-emerald-500/10 text-emerald-500"><i data-lucide="trending-up"></i></div>
-                <span class="text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full">Actual Success</span>
-            </div>
-            <h3 id="statTotalActual" class="text-4xl font-black mb-1 text-emerald-400">₹ 0</h3>
-            <p class="text-xs text-slate-500 font-bold">Total Verified Achievement</p>
-        </div>
-
-        <div class="glass-card p-6 animate__animated animate__fadeInUp" style="animation-delay: 0.3s">
-            <div class="flex justify-between items-start mb-4">
-                <div class="stat-icon bg-amber-500/10 text-amber-500"><i data-lucide="zap"></i></div>
-                <span class="text-[10px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/10 px-3 py-1 rounded-full">Efficiency Avg</span>
-            </div>
-            <h3 id="statAvgEff" class="text-4xl font-black mb-1 text-amber-400">0%</h3>
-            <div class="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-                <div id="effBar" class="bg-amber-500 h-full transition-all duration-1000" style="width: 0%"></div>
-            </div>
-        </div>
-
-        <div class="glass-card p-6 animate__animated animate__fadeInUp" style="animation-delay: 0.4s">
-            <div class="flex justify-between items-start mb-4">
-                <div class="stat-icon bg-red-500/10 text-red-500"><i data-lucide="alert-triangle"></i></div>
-                <span class="text-[10px] font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-3 py-1 rounded-full">Underperformers</span>
-            </div>
-            <h3 id="statRedCount" class="text-4xl font-black mb-1 text-red-500">0</h3>
-            <p class="text-xs text-slate-500 font-bold">Staff with Efficiency < 50%</p>
-        </div>
-    </section>
-
-    <!-- Charts & Analytics Section -->
-    <section class="max-w-[1700px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 mb-10">
-        <!-- Main Performance Chart -->
-        <div class="xl:col-span-8 glass-card p-8 min-h-[500px]">
-            <div class="flex justify-between items-center mb-10">
+                <div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
                 <div>
-                    <h3 class="text-lg font-black uppercase tracking-tight">Manager Wise Distribution</h3>
-                    <p class="text-xs text-slate-500 font-bold">Target vs Actual Comparison across all branches</p>
-                </div>
-                <div class="flex gap-4">
-                    <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-600"></div><span class="text-[10px] font-bold text-slate-400 uppercase">Target</span></div>
-                    <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-emerald-500"></div><span class="text-[10px] font-bold text-slate-400 uppercase">Actual</span></div>
+                    <h1 class="text-xl font-black text-slate-800 tracking-tight uppercase">HO COMMAND CENTER</h1>
+                    <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Live Performance Intelligence</span>
                 </div>
             </div>
-            <div class="relative h-[400px]">
-                <canvas id="hoChart"></canvas>
+
+            <div class="flex items-center gap-8">
+                <div class="hidden lg:flex flex-col text-right">
+                    <p id="liveDate" class="text-xs font-bold text-slate-500 uppercase tracking-wider"></p>
+                    <p id="liveTime" class="text-lg font-black text-slate-800 leading-none"></p>
+                </div>
+                <button onclick="fetchAllManagersData()" class="btn-refresh text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> रिफ्रेश डेटा
+                </button>
             </div>
         </div>
+    </nav>
 
-        <!-- Leaderboard -->
-        <div class="xl:col-span-4 glass-card p-8 overflow-hidden">
-            <h3 class="text-lg font-black uppercase tracking-tight mb-6">Manager Ranking</h3>
-            <div id="managerLeaderboard" class="space-y-6 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
-                <!-- Data via JS -->
-                <p class="text-slate-500 text-sm animate-pulse">Calculating rankings...</p>
+    <main class="max-w-[1600px] mx-auto p-6 space-y-8">
+        
+        <!-- Global Summary Grid -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="glass-card p-6 border-l-4 border-l-blue-600">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Target (Global)</p>
+                <h2 id="globalTarget" class="text-3xl font-black text-slate-800 tracking-tighter">₹ 0</h2>
+                <div class="mt-4 flex items-center gap-2 text-blue-600">
+                    <i data-lucide="target" class="w-4 h-4"></i>
+                    <span class="text-xs font-bold uppercase">Master Budget</span>
+                </div>
             </div>
-        </div>
-    </section>
 
-    <!-- The "Deep Probe" Detailed Staff Table -->
-    <section class="max-w-[1700px] mx-auto animate__animated animate__fadeIn">
-        <div class="glass-card overflow-hidden">
-            <div class="p-8 border-b border-slate-800 bg-slate-900/40 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div class="glass-card p-6 border-l-4 border-l-emerald-500">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Actual (Global)</p>
+                <h2 id="globalActual" class="text-3xl font-black text-emerald-600 tracking-tighter">₹ 0</h2>
+                <div class="mt-4 flex items-center gap-2 text-emerald-600">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    <span class="text-xs font-bold uppercase">Total Achievement</span>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 border-l-4 border-l-amber-500">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Overall Efficiency</p>
+                <h2 id="globalEff" class="text-3xl font-black text-amber-600 tracking-tighter">0%</h2>
+                <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4">
+                    <div id="globalEffBar" class="bg-amber-500 h-full rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 border-l-4 border-l-rose-500">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Critical Zones</p>
+                <h2 id="globalCritical" class="text-3xl font-black text-rose-600 tracking-tighter">0</h2>
+                <div class="mt-4 flex items-center gap-2 text-rose-600">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                    <span class="text-xs font-bold uppercase">Staff Under 50%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Manager Performance Charts & Leaderboard -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8 glass-card p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h3 class="text-lg font-black text-slate-800 uppercase">Manager-wise Comparison</h3>
+                        <p class="text-xs font-medium text-slate-400">Target vs Achievement across all managers</p>
+                    </div>
+                    <div class="flex gap-4 text-[10px] font-bold uppercase tracking-widest">
+                        <span class="flex items-center gap-2"><div class="w-3 h-3 bg-blue-600 rounded"></div> Target</span>
+                        <span class="flex items-center gap-2"><div class="w-3 h-3 bg-emerald-500 rounded"></div> Actual</span>
+                    </div>
+                </div>
+                <div class="h-[400px]">
+                    <canvas id="managerChart"></canvas>
+                </div>
+            </div>
+
+            <div class="lg:col-span-4 glass-card p-8">
+                <h3 class="text-lg font-black text-slate-800 uppercase mb-6">Manager Rankings</h3>
+                <div id="managerList" class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    <!-- Manager list cards via JS -->
+                    <p class="text-slate-400 text-sm italic">डेटा लोड होत आहे...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Data Audit Section -->
+        <section class="glass-card overflow-hidden">
+            <!-- Header with Filter -->
+            <div class="p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div>
-                    <h3 class="text-xl font-black uppercase tracking-tight">Staff Efficiency Audit</h3>
-                    <p class="text-xs text-slate-400 font-medium">प्रत्येक स्टाफचे टार्गेट, अ‍ॅक्चुअल आणि एकूण कार्यक्षमता तपशील</p>
+                    <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Team-wise Detailed Audit</h3>
+                    <p class="text-sm font-medium text-slate-400">स्टाफनुसार तपशीलवार कामगिरी अहवाल</p>
                 </div>
                 
-                <div class="flex flex-wrap gap-4 w-full lg:w-auto">
-                    <div class="relative flex-1 lg:w-64">
-                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
-                        <input type="text" id="staffSearch" oninput="filterTable()" placeholder="स्टाफ किंवा मॅनेजर शोधा..." class="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-12 pr-4 text-sm focus:border-blue-500 outline-none transition-all">
+                <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                    <div class="relative flex-1 md:w-64">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                        <input type="text" id="staffSearch" oninput="filterData()" placeholder="स्टाफ किंवा मॅनेजर शोधा..." class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 text-sm focus:border-blue-500 outline-none transition-all">
                     </div>
-                    <select id="filterStatus" onchange="filterTable()" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm font-bold text-slate-300 focus:border-blue-500 outline-none">
-                        <option value="all">सर्व स्टाफ</option>
-                        <option value="critical">🔴 Critical (< 50%)</option>
-                        <option value="average">🟡 Average (50-85%)</option>
-                        <option value="star">🟢 Stars (> 85%)</option>
+                    <select id="mgrFilter" onchange="filterData()" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 focus:border-blue-500 outline-none">
+                        <option value="all">सर्व मॅनेजर</option>
                     </select>
                 </div>
             </div>
 
+            <!-- Table -->
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-900/60 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
-                            <th class="p-6">मॅनेजर</th>
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 border-b border-slate-100">
+                        <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                            <th class="p-6">मॅनेजर आणि कालावधी</th>
                             <th class="p-6">स्टाफ नाव</th>
-                            <th class="p-6 text-center">टार्गेट (Target)</th>
-                            <th class="p-6 text-center">अ‍ॅक्चुअल (Actual)</th>
-                            <th class="p-6 text-center">एफिशियन्सी %</th>
-                            <th class="p-6 text-center">अ‍ॅक्शन / शेरा</th>
+                            <th class="p-6 text-center">टार्गेट (₹)</th>
+                            <th class="p-6 text-center">अ‍ॅक्चुअल (₹)</th>
+                            <th class="p-6 text-center">एफिशियन्सी (%)</th>
+                            <th class="p-6 text-center">स्टेटस</th>
                         </tr>
                     </thead>
-                    <tbody id="masterTableBody" class="divide-y divide-slate-800/50">
-                        <!-- Data will be injected here -->
+                    <tbody id="masterTableBody" class="divide-y divide-slate-50">
+                        <!-- Data rows injected here -->
                     </tbody>
                 </table>
             </div>
 
-            <!-- Table Loading State -->
+            <!-- Empty/Loading State -->
             <div id="tableLoader" class="py-20 flex flex-col items-center justify-center space-y-4">
-                <div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
-                <p class="text-slate-500 font-bold uppercase text-[10px] tracking-widest">सर्व्हर्स मधून डेटा गोळा केला जात आहे...</p>
+                <div class="w-10 h-10 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Master Data एकत्रित करत आहोत...</p>
             </div>
         </div>
     </section>
 
-    <!-- Footer Stats -->
-    <footer class="max-w-[1700px] mx-auto mt-10 py-6 flex justify-between items-center text-slate-600">
-        <p class="text-[10px] font-bold uppercase tracking-widest">&copy; 2024 Anik Financial Services | HO Monitoring Node</p>
-        <div class="flex gap-4">
-            <span class="flex items-center gap-2 text-[10px] font-black uppercase"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Online</span>
-        </div>
-    </footer>
+    </main>
 
-    <!-- Fullscreen Data Sync Loader -->
-    <div id="syncOverlay" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[100] hidden flex-col items-center justify-center">
-        <div class="relative w-32 h-32 mb-10">
-            <div class="absolute inset-0 border-4 border-blue-500/10 rounded-3xl rotate-45"></div>
-            <div class="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-3xl rotate-45 animate-spin"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <i data-lucide="cpu" class="w-10 h-10 text-blue-500 animate-pulse"></i>
-            </div>
-        </div>
-        <h2 class="text-2xl font-black uppercase tracking-widest mb-2">Master Data Sync</h2>
-        <p id="syncProgress" class="text-blue-500 font-bold uppercase text-xs tracking-[0.3em]">प्रतीक्षा करा, सर्व मॅनेजर्सचा डेटा संकलित होत आहे...</p>
+    <!-- Fullscreen Sync Overlay -->
+    <div id="syncOverlay" class="fixed inset-0 bg-white/90 backdrop-blur-md z-[100] hidden flex-col items-center justify-center">
+        <div class="w-16 h-16 border-4 border-slate-100 border-t-blue-600 rounded-full animate-spin mb-6"></div>
+        <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-2">Connecting to Master Sheet</h2>
+        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em]">कृपया प्रतीक्षा करा, सर्व मॅनेजर्सचा डेटा सिंक होत आहे...</p>
     </div>
 
     <!-- Script Intelligence -->
     <script>
-        // --- Configuration ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec"; 
         let fullDatabase = [];
         let chartInstance = null;
 
-        // --- Init ---
+        // 1. App Start
         async function init() {
             lucide.createIcons();
-            updateLiveClock();
-            setInterval(updateLiveClock, 1000);
-            fetchAllData();
+            updateTime();
+            setInterval(updateTime, 1000);
+            fetchAllManagersData();
         }
 
-        // --- Clock Logic ---
-        function updateLiveClock() {
+        function updateTime() {
             const now = new Date();
-            document.getElementById('liveTime').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            document.getElementById('liveTime').innerText = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
             document.getElementById('liveDate').innerText = now.toLocaleDateString('mr-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
 
-        // --- Global Data Fetching (The HO Heartbeat) ---
-        async function fetchAllData() {
-            toggleSyncOverlay(true);
+        // 2. Fetch Multi-Manager Data
+        async function fetchAllManagersData() {
+            toggleOverlay(true);
             try {
-                // 1. Get List of Managers
+                // Step 1: Get Managers
                 const mgrResp = await fetch(`${SCRIPT_URL}?action=getManagers`);
                 const managers = await mgrResp.json();
                 
-                fullDatabase = []; // Reset
-                let globalTarget = 0;
-                let globalActual = 0;
-                let managerStats = [];
+                // Populate Manager Filter
+                const filter = document.getElementById('mgrFilter');
+                filter.innerHTML = '<option value="all">सर्व मॅनेजर</option>';
+                managers.forEach(m => filter.innerHTML += `<option value="${m}">${m}</option>`);
 
-                // 2. Multi-threaded Fetch (Getting data for each manager)
-                const fetchPromises = managers.map(async (mgr) => {
+                fullDatabase = [];
+                let totalT = 0, totalA = 0;
+                let managerSummary = [];
+
+                // Step 2: Fetch Data for each manager concurrently
+                const promises = managers.map(async (mgr) => {
                     const resp = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
                     const data = await resp.json();
                     
-                    let mTarget = 0, mActual = 0;
-                    
+                    let mMgrT = 0, mMgrA = 0;
+
                     data.history.forEach(week => {
                         week.details.forEach(staff => {
                             const t = parseFloat(staff.tDisb || 0);
                             const a = parseFloat(staff.aDisb || 0);
-                            const eff = t > 0 ? (a / t) * 100 : 0;
-                            
-                            mTarget += t;
-                            mActual += a;
+                            mMgrT += t; mMgrA += a;
 
                             fullDatabase.push({
                                 manager: mgr,
                                 name: staff.name,
                                 target: t,
                                 actual: a,
-                                efficiency: eff.toFixed(1),
-                                dateRange: `${week.sDate} - ${week.eDate}`
+                                eff: t > 0 ? ((a/t)*100).toFixed(1) : 0,
+                                dates: `${week.sDate} - ${week.eDate}`
                             });
                         });
                     });
 
-                    managerStats.push({ 
-                        name: mgr, 
-                        target: mTarget, 
-                        actual: mActual, 
-                        efficiency: mTarget > 0 ? ((mActual/mTarget)*100).toFixed(1) : 0 
-                    });
-
-                    globalTarget += mTarget;
-                    globalActual += mActual;
+                    managerSummary.push({ name: mgr, target: mMgrT, actual: mMgrA });
+                    totalT += mMgrT; totalA += mMgrA;
                 });
 
-                await Promise.all(fetchPromises);
+                await Promise.all(promises);
 
-                // 3. Update UI
-                updateTopStats(globalTarget, globalActual);
-                updateCharts(managerStats);
-                renderLeaderboard(managerStats);
+                // Step 3: Global Update
+                updateGlobalUI(totalT, totalA, managerSummary);
                 renderTable(fullDatabase);
+                renderManagerList(managerSummary);
+                updateChart(managerSummary);
 
-                showToast("डेटा यशस्वीरित्या रिफ्रेश झाला", "success");
             } catch (err) {
-                console.error(err);
-                Swal.fire("System Error", "डेटा लोड करताना तांत्रिक अडचण आली.", "error");
+                Swal.fire("System Offline", "डेटा लोड करताना तांत्रिक अडचण आली.", "error");
             } finally {
-                toggleSyncOverlay(false);
+                toggleOverlay(false);
                 document.getElementById('tableLoader').classList.add('hidden');
             }
         }
 
-        // --- UI Rendering ---
-
-        function updateTopStats(target, actual) {
-            const eff = target > 0 ? (actual / target) * 100 : 0;
+        // 3. UI Update Logic
+        function updateGlobalUI(totalT, totalA, summaries) {
+            document.getElementById('globalTarget').innerText = `₹ ${formatINR(totalT)}`;
+            document.getElementById('globalActual').innerText = `₹ ${formatINR(totalA)}`;
             
-            document.getElementById('statTotalTarget').innerText = `₹ ${formatINR(target)}`;
-            document.getElementById('statTotalActual').innerText = `₹ ${formatINR(actual)}`;
-            document.getElementById('statAvgEff').innerText = `${eff.toFixed(1)}%`;
-            document.getElementById('effBar').style.width = `${eff}%`;
+            const globalEff = totalT > 0 ? ((totalA / totalT) * 100).toFixed(1) : 0;
+            document.getElementById('globalEff').innerText = `${globalEff}%`;
+            document.getElementById('globalEffBar').style.width = `${globalEff}%`;
 
-            const redStaff = fullDatabase.filter(s => parseFloat(s.efficiency) < 50).length;
-            document.getElementById('statRedCount').innerText = redStaff;
+            const criticalCount = fullDatabase.filter(s => parseFloat(s.eff) < 50).length;
+            document.getElementById('globalCritical').innerText = criticalCount;
         }
 
         function renderTable(data) {
             const body = document.getElementById('masterTableBody');
             body.innerHTML = "";
 
-            data.forEach(staff => {
-                const eff = parseFloat(staff.efficiency);
-                let rowClass = "";
-                let statusBadge = "";
+            data.forEach(s => {
+                const eff = parseFloat(s.eff);
+                let statusClass = "status-amber";
+                let statusTxt = "Average";
 
-                if(eff < 50) {
-                    rowClass = "table-row-red";
-                    statusBadge = `<span class="progress-indicator bg-red-500/10 text-red-500 text-[10px] font-black px-3 py-1 rounded-full uppercase">Critical</span>`;
-                } else if(eff >= 85) {
-                    rowClass = "table-row-green";
-                    statusBadge = `<span class="progress-indicator bg-emerald-500/10 text-emerald-500 text-[10px] font-black px-3 py-1 rounded-full uppercase">Top Star</span>`;
-                } else {
-                    rowClass = "table-row-amber";
-                    statusBadge = `<span class="progress-indicator bg-amber-500/10 text-amber-500 text-[10px] font-black px-3 py-1 rounded-full uppercase">Average</span>`;
-                }
+                if(eff < 50) { statusClass = "status-red"; statusTxt = "Critical"; }
+                else if(eff > 85) { statusClass = "status-green"; statusTxt = "Excellent"; }
 
                 const row = document.createElement('tr');
-                row.className = `${rowClass} transition-colors group`;
+                row.className = "hover:bg-slate-50 transition-all";
                 row.innerHTML = `
                     <td class="p-6">
-                        <div class="flex flex-col">
-                            <span class="text-[11px] font-black text-slate-300 uppercase">${staff.manager}</span>
-                            <span class="text-[9px] text-slate-500 font-bold">${staff.dateRange}</span>
-                        </div>
+                        <p class="text-[11px] font-black text-blue-600 uppercase mb-1">${s.manager}</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">${s.dates}</p>
                     </td>
-                    <td class="p-6 font-extrabold text-slate-200">${staff.name}</td>
-                    <td class="p-6 text-center font-bold text-slate-400">₹ ${formatINR(staff.target)}</td>
-                    <td class="p-6 text-center font-black text-blue-400">₹ ${formatINR(staff.actual)}</td>
+                    <td class="p-6">
+                        <p class="font-extrabold text-slate-700 tracking-tight">${s.name}</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase italic">Field Executive</p>
+                    </td>
+                    <td class="p-6 text-center font-bold text-slate-500 italic">₹ ${formatINR(s.target)}</td>
+                    <td class="p-6 text-center font-black text-slate-800">₹ ${formatINR(s.actual)}</td>
                     <td class="p-6 text-center">
                         <div class="flex flex-col items-center">
-                            <span class="font-black text-lg ${eff < 50 ? 'text-red-500' : 'text-slate-200'}">${eff}%</span>
-                            <div class="w-16 bg-slate-800 h-1 rounded-full mt-1 overflow-hidden">
-                                <div class="h-full ${eff < 50 ? 'bg-red-500' : 'bg-blue-500'}" style="width: ${eff}%"></div>
+                            <span class="text-sm font-black ${eff < 50 ? 'text-red-600' : 'text-slate-800'}">${eff}%</span>
+                            <div class="w-12 h-1 bg-slate-100 rounded-full mt-1">
+                                <div class="h-full bg-blue-500 rounded-full" style="width: ${eff > 100 ? 100 : eff}%"></div>
                             </div>
                         </div>
                     </td>
                     <td class="p-6 text-center">
-                        <div class="flex flex-col items-center gap-2">
-                            ${statusBadge}
-                            ${eff < 50 ? '<span class="text-[9px] font-bold text-red-400 uppercase italic">Review Required</span>' : ''}
-                        </div>
+                        <span class="efficiency-badge ${statusClass}">${statusTxt}</span>
                     </td>
                 `;
                 body.appendChild(row);
             });
-            lucide.createIcons();
         }
 
-        function renderLeaderboard(managerStats) {
-            const container = document.getElementById('managerLeaderboard');
-            container.innerHTML = "";
+        function renderManagerList(summaries) {
+            const list = document.getElementById('managerList');
+            list.innerHTML = "";
+            
+            // Sort by actual DESC
+            summaries.sort((a,b) => b.actual - a.actual);
 
-            // Sort by Efficiency DESC
-            managerStats.sort((a, b) => b.efficiency - a.efficiency);
-
-            managerStats.forEach((m, idx) => {
-                const card = document.createElement('div');
-                card.className = "flex items-center justify-between p-4 rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800 transition-all";
-                card.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center font-black text-xs ${idx === 0 ? 'text-yellow-500 border border-yellow-500/50' : 'text-slate-500'}">
-                            ${idx + 1}
-                        </div>
+            summaries.forEach((m, i) => {
+                const eff = m.target > 0 ? ((m.actual/m.target)*100).toFixed(1) : 0;
+                list.innerHTML += `
+                    <div class="glass-card sidebar-manager-card p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 border-l-4 ${eff < 50 ? 'border-l-red-500' : 'border-l-blue-600'}">
                         <div>
-                            <p class="text-xs font-black uppercase text-slate-200">${m.name}</p>
-                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Target: ₹ ${formatINR(m.target)}</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rank #${i+1}</p>
+                            <h4 class="font-black text-slate-800 uppercase tracking-tight">${m.name}</h4>
                         </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-black text-emerald-400">${m.efficiency}%</p>
-                        <p class="text-[9px] font-bold text-slate-500 uppercase italic">Efficiency</p>
+                        <div class="text-right">
+                            <p class="text-sm font-black text-blue-600">${eff}%</p>
+                            <p class="text-[9px] font-bold text-slate-400">EFFICIENCY</p>
+                        </div>
                     </div>
                 `;
-                container.appendChild(card);
             });
         }
 
-        function updateCharts(managerStats) {
-            const ctx = document.getElementById('hoChart').getContext('2d');
-            
+        function updateChart(summaries) {
+            const ctx = document.getElementById('managerChart').getContext('2d');
             if(chartInstance) chartInstance.destroy();
-
-            const labels = managerStats.map(m => m.name);
-            const targets = managerStats.map(m => m.target);
-            const actuals = managerStats.map(m => m.actual);
 
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
+                    labels: summaries.map(m => m.name),
                     datasets: [
-                        {
-                            label: 'Target',
-                            data: targets,
-                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                            borderColor: '#3b82f6',
-                            borderWidth: 2,
-                            borderRadius: 8,
-                            barThickness: 20
-                        },
-                        {
-                            label: 'Actual',
-                            data: actuals,
-                            backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                            borderColor: '#10b981',
-                            borderWidth: 2,
-                            borderRadius: 8,
-                            barThickness: 20
-                        }
+                        { label: 'Target', data: summaries.map(m => m.target), backgroundColor: '#2563eb', borderRadius: 8 },
+                        { label: 'Actual', data: summaries.map(m => m.actual), backgroundColor: '#10b981', borderRadius: 8 }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#0f172a',
-                            titleFont: { size: 14, weight: 'bold' },
-                            bodyFont: { size: 12 },
-                            padding: 15,
-                            cornerRadius: 12,
-                            displayColors: true
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
-                            ticks: { 
-                                color: '#64748b',
-                                font: { weight: 'bold' },
-                                callback: value => '₹' + value.toLocaleString()
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#64748b', font: { weight: 'bold' } }
-                        }
+                        y: { grid: { color: '#f1f5f9' }, ticks: { font: { weight: 'bold' } } },
+                        x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
                     }
                 }
             });
         }
 
-        // --- Filtering Logic ---
-        function filterTable() {
-            const searchTxt = document.getElementById('staffSearch').value.toLowerCase();
-            const statusFilter = document.getElementById('filterStatus').value;
-            
-            const filtered = fullDatabase.filter(staff => {
-                const matchesSearch = staff.name.toLowerCase().includes(searchTxt) || 
-                                    staff.manager.toLowerCase().includes(searchTxt);
-                
-                let matchesStatus = true;
-                const eff = parseFloat(staff.efficiency);
-                if(statusFilter === 'critical') matchesStatus = (eff < 50);
-                if(statusFilter === 'average') matchesStatus = (eff >= 50 && eff < 85);
-                if(statusFilter === 'star') matchesStatus = (eff >= 85);
+        // 4. Filtering Logic
+        function filterData() {
+            const search = document.getElementById('staffSearch').value.toLowerCase();
+            const mgr = document.getElementById('mgrFilter').value;
 
-                return matchesSearch && matchesStatus;
+            const filtered = fullDatabase.filter(s => {
+                const matchesSearch = s.name.toLowerCase().includes(search) || s.manager.toLowerCase().includes(search);
+                const matchesMgr = mgr === "all" || s.manager === mgr;
+                return matchesSearch && matchesMgr;
             });
 
             renderTable(filtered);
@@ -528,23 +439,10 @@
             return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num);
         }
 
-        function toggleSyncOverlay(show) {
-            const overlay = document.getElementById('syncOverlay');
-            overlay.classList.toggle('hidden', !show);
+        function toggleOverlay(show) {
+            document.getElementById('syncOverlay').classList.toggle('hidden', !show);
         }
 
-        function showToast(msg, icon = "success") {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            });
-            Toast.fire({ icon: icon, title: msg });
-        }
-
-        // Start App
         window.onload = init;
     </script>
 </body>
