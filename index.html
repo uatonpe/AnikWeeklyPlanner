@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anik Strategic Planner | Professional Edition</title>
     
-    <!-- Fonts & Icons -->
+    <!-- External Assets -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,19 +16,20 @@
             --anik-dark: #0f172a;
             --anik-light: #f8fafc;
             --anik-accent: #3b82f6;
+            --anik-border: #e2e8f0;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--anik-light);
+            background-color: #f1f5f9;
             color: var(--anik-dark);
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Glassmorphism Effect */
+        /* Glassmorphism Navigation */
         .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(226, 232, 240, 0.8);
             position: sticky;
             top: 0;
@@ -38,69 +39,54 @@
         /* Premium Card Design */
         .staff-card {
             background: white;
-            border-radius: 30px;
-            border: 1px solid #eef2f6;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 24px;
+            border: 1px solid var(--anik-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s ease;
+            margin-bottom: 2rem;
             overflow: hidden;
         }
 
         .staff-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             border-color: var(--anik-accent);
         }
 
-        /* Custom Input Styling */
+        /* Input Styling */
         .premium-input {
             width: 100%;
-            padding: 14px 18px;
-            border-radius: 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
             border: 2px solid #f1f5f9;
             background: #f8fafc;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             outline: none;
         }
 
         .premium-input:focus {
-            border-color: var(--anik-blue);
+            border-color: var(--anik-accent);
             background: white;
-            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.08);
-        }
-
-        /* Status & Badges */
-        .status-badge {
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
 
         /* Animations */
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .animate-slide {
-            animation: slideIn 0.6s ease-out forwards;
+        .animate-fade {
+            animation: fadeIn 0.5s ease forwards;
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        /* Lock Overlay */
+        /* Loader Overlay */
         #submissionOverlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(8px);
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
             z-index: 9999;
             flex-direction: column;
             align-items: center;
@@ -108,151 +94,231 @@
             color: white;
         }
 
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--anik-accent);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
+        /* Print Specific Styling - Highly Detailed */
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .glass-nav, #footerAction, .no-print, #placeholder, #welcomeZone input {
+                display: none !important;
+            }
+            
+            .print-container {
+                display: block !important;
+                padding: 20px;
+                width: 100%;
+            }
+
+            .staff-card {
+                box-shadow: none !important;
+                border: 1px solid #000 !important;
+                break-inside: avoid;
+                margin-bottom: 30px;
+                border-radius: 0;
+            }
+
+            .premium-input {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                font-weight: bold;
+            }
+
+            .kpi-row {
+                border-bottom: 1px solid #eee !important;
+                display: grid !important;
+                grid-template-columns: 2fr 1fr 1.5fr !important;
+            }
+
+            .print-header {
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 3px solid #1e40af;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+            }
+
+            @page {
+                size: A4;
+                margin: 1.5cm;
+            }
+            
+            /* Show text values instead of inputs in print */
+            .input-val-display { display: block !important; font-weight: 700; color: #000; }
+            input { display: none !important; }
         }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .input-val-display { display: none; }
 
         /* KPI Row Styling */
         .kpi-row {
             display: grid;
             grid-template-columns: 2fr 1fr 1.5fr;
-            gap: 1.5rem;
+            gap: 1rem;
             align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid #f8fafc;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            filter: grayscale(1);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
         }
 
         @media (max-width: 768px) {
-            .kpi-row {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-            }
+            .kpi-row { grid-template-columns: 1fr; gap: 0.5rem; }
         }
+
+        /* Floating Print Button */
+        .print-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #059669;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(5, 150, 105, 0.4);
+            cursor: pointer;
+            z-index: 500;
+            transition: transform 0.3s ease;
+        }
+
+        .print-fab:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
 
-    <!-- Submission Loader Overlay -->
+    <!-- Submission Loader -->
     <div id="submissionOverlay">
-        <div class="loader mb-4"></div>
+        <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
         <h3 class="text-2xl font-bold">प्लॅन लॉक होत आहे...</h3>
-        <p class="text-slate-400 mt-2">कृपया विंडो बंद करू नका.</p>
+        <p class="text-slate-400 mt-2 text-center px-6">तुमचा डेटा सुरक्षितपणे सर्व्हरवर सेव्ह केला जात आहे.<br>कृपया विंडो बंद करू नका.</p>
     </div>
 
-    <!-- Top Navigation -->
+    <!-- Hidden Print Header (Only visible in PDF) -->
+    <div class="print-container hidden">
+        <div class="print-header">
+            <div>
+                <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" style="height: 50px;">
+                <h2 class="text-xl font-black mt-2 text-blue-800">WEEKLY STRATEGIC PLAN</h2>
+            </div>
+            <div class="text-right text-sm">
+                <p class="font-bold">मॅनेजर: <span id="print-mgr-name">---</span></p>
+                <p>कालावधी: <span id="print-date-range">---</span></p>
+                <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest">Report Generated on: <span id="report-gen-time"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
     <nav class="glass-nav px-6 py-4">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4">
-                <div class="bg-blue-900 p-2 rounded-2xl shadow-lg shadow-blue-200">
-                    <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-8 brightness-0 invert" alt="Anik">
+                <div class="bg-blue-900 p-2 rounded-xl shadow-lg">
+                    <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-6 brightness-0 invert" alt="Anik Logo">
                 </div>
-                <div class="h-8 w-[2px] bg-slate-200 hidden md:block"></div>
                 <div>
-                    <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">Strategic Planner <span class="text-blue-600">LIVE</span></h1>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Growth & Performance Unit</p>
+                    <h1 class="text-lg font-black text-slate-800 tracking-tight leading-tight">Anik Planner <span class="text-blue-600">3.0</span></h1>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Growth Analytics Division</span>
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <div class="flex items-center gap-3 w-full md:w-auto">
                 <div class="relative flex-1 md:w-64">
-                    <i class="fa-solid fa-user-tie absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <select id="mgrSelect" class="premium-input pl-12 pr-10 appearance-none cursor-pointer" onchange="fetchStaffData()">
+                    <i class="fa-solid fa-user-shield absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <select id="mgrSelect" class="premium-input pl-11 pr-10 appearance-none cursor-pointer" onchange="fetchStaffData()">
                         <option value="">-- मॅनेजर निवडा --</option>
                     </select>
                 </div>
+                <button onclick="window.print()" class="no-print bg-slate-100 hover:bg-slate-200 p-3.5 rounded-xl text-slate-600 transition-all">
+                    <i class="fa-solid fa-print"></i>
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Welcome Message Area -->
-    <header class="max-w-7xl mx-auto px-6 pt-10 pb-6">
-        <div id="welcomeZone" class="hidden animate-slide">
-            <div class="bg-white border border-blue-100 rounded-[35px] p-8 md:p-12 shadow-sm relative overflow-hidden">
-                <div class="relative z-10">
-                    <span class="bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Welcome Back</span>
-                    <h2 class="text-3xl md:text-5xl font-black text-slate-800 mt-4 mb-2">नमस्कार, <span id="mgrTitle" class="text-blue-600">मॅनेजर</span></h2>
-                    <p class="text-slate-500 font-medium text-lg max-w-2xl">तुमच्या टीमच्या प्रगतीसाठी या आठवड्याचे टार्गेट्स आणि रणनीती खालीलप्रमाणे निश्चित करा.</p>
-                    
-                    <div class="mt-10 flex flex-wrap gap-4">
-                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex-1 min-w-[200px]">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Start Date (आठवड्याची सुरुवात)</label>
-                            <input type="date" id="sDate" class="bg-transparent font-bold text-slate-700 outline-none w-full">
+    <!-- Main Content -->
+    <header class="max-w-7xl mx-auto px-6 pt-8 pb-4">
+        <div id="welcomeZone" class="hidden animate-fade">
+            <div class="bg-white rounded-[32px] p-8 border border-slate-200 shadow-sm relative overflow-hidden">
+                <div class="relative z-10 grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-xs font-extrabold uppercase tracking-wider mb-3 inline-block">Manager Dashboard</span>
+                        <h2 class="text-3xl md:text-4xl font-black text-slate-800">नमस्कार, <span id="mgrTitle" class="text-blue-600">मॅनेजर</span></h2>
+                        <p class="text-slate-500 font-medium mt-2">खालील टीमचे साप्ताहिक टार्गेट्स सेट करा आणि प्रिंट काढून ग्रुपवर शेअर करा.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Start Date</label>
+                            <input type="date" id="sDate" oninput="syncPrintData()" class="bg-transparent font-bold text-slate-800 outline-none w-full">
                         </div>
-                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex-1 min-w-[200px]">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">End Date (आठवड्याचा शेवट)</label>
-                            <input type="date" id="eDate" class="bg-transparent font-bold text-slate-700 outline-none w-full">
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">End Date</label>
+                            <input type="date" id="eDate" oninput="syncPrintData()" class="bg-transparent font-bold text-slate-800 outline-none w-full">
                         </div>
                     </div>
                 </div>
-                <div class="absolute right-0 top-0 h-full w-1/3 bg-blue-50/50 -skew-x-12 translate-x-1/2"></div>
             </div>
         </div>
 
-        <!-- Initial Placeholder -->
-        <div id="placeholder" class="py-20 text-center bg-white rounded-[40px] border-4 border-dashed border-slate-100">
-            <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i class="fa-solid fa-folder-open text-blue-300 text-3xl"></i>
+        <!-- Empty State -->
+        <div id="placeholder" class="py-24 text-center bg-white rounded-[40px] border-4 border-dashed border-slate-100 mt-6 transition-all">
+            <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-users-viewfinder text-blue-200 text-4xl"></i>
             </div>
-            <h3 class="text-2xl font-bold text-slate-300 uppercase tracking-tighter">सुरू करण्यासाठी मॅनेजर निवडा</h3>
+            <h3 class="text-xl font-extrabold text-slate-300 uppercase tracking-widest">सुरू करण्यासाठी मॅनेजर निवडा</h3>
         </div>
     </header>
 
-    <!-- Staff Targets Section -->
-    <main class="max-w-7xl mx-auto px-6 space-y-12">
-        <div id="plannerBox" class="space-y-10">
-            <!-- Cards will be injected here -->
+    <main class="max-w-7xl mx-auto px-6 pb-20">
+        <div id="plannerBox">
+            <!-- Cards will be dynamically injected here -->
         </div>
 
-        <!-- Submit Button -->
-        <div id="footerAction" class="hidden flex flex-col items-center py-10">
-            <div class="mb-6 flex items-center gap-3 bg-amber-50 px-6 py-3 rounded-2xl border border-amber-100 text-amber-700">
-                <i class="fa-solid fa-circle-exclamation text-lg"></i>
-                <p class="text-sm font-bold">एकदा टार्गेट लॉक केले की ते पुन्हा बदलता येणार नाही.</p>
+        <div id="footerAction" class="hidden text-center mt-12 py-10 border-t border-slate-200">
+            <div class="bg-amber-50 text-amber-800 px-6 py-4 rounded-2xl border border-amber-100 inline-block mb-8">
+                <p class="font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    एकदा 'लॉक' केल्यावर डेटा बदलता येणार नाही. कृपया सर्व माहिती तपासा.
+                </p>
             </div>
-            <button onclick="finalSubmit()" id="lockBtn" class="group relative bg-blue-700 hover:bg-blue-800 text-white px-20 py-6 rounded-2xl font-black text-xl tracking-widest transition-all hover:scale-105 shadow-2xl shadow-blue-200">
-                <span class="flex items-center gap-4">
-                    साप्ताहिक टार्गेट लॉक करा
-                    <i class="fa-solid fa-lock group-hover:rotate-12 transition-transform"></i>
-                </span>
-            </button>
+            
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-5 rounded-2xl font-black text-lg transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    PDF / प्रिंट काढा
+                </button>
+                
+                <button id="lockBtn" onclick="finalSubmit()" class="bg-blue-700 hover:bg-blue-800 text-white px-10 py-5 rounded-2xl font-black text-lg transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    डेटा लॉक करा
+                </button>
+            </div>
         </div>
     </main>
 
-    <footer class="text-center py-12 text-slate-400 font-bold text-xs uppercase tracking-[4px]">
-        Anik Financial Services • Enterprise Strategic Tool
-    </footer>
+    <!-- Floating Print Button (Always visible after data loads) -->
+    <div onclick="window.print()" id="fabPrint" class="print-fab hidden no-print">
+        <i class="fa-solid fa-print text-xl"></i>
+    </div>
 
-    <!-- Logic Script -->
+    <!-- Scripting Logic -->
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec";
         
         const KPI_LIST = [
-            { name: "New Loan Disbursement (Target ₹)", icon: "fa-sack-dollar" },
-            { name: "New Loan Apprisal (Target ₹)", icon: "fa-file-invoice-dollar" },
-            { name: "OD Recovery (Target ₹)", icon: "fa-hand-holding-dollar" },
-            { name: "Regular Collection (Target ₹)", icon: "fa-money-bill-1-wave" },
-            { name: "Past Due (Target ₹)", icon: "fa-clock-rotate-left" },
-            { name: "Auto Pay Rocket Pay", icon: "fa-bolt-lightning" },
-            { name: "New Group Meeting", icon: "fa-users" }
+            { name: "Disbursement Target (₹)", icon: "fa-money-bill-trend-up", color: "text-green-600" },
+            { name: "Appraisal Target (₹)", icon: "fa-magnifying-glass-chart", color: "text-blue-600" },
+            { name: "OD Recovery Target (₹)", icon: "fa-rotate-left", color: "text-red-600" },
+            { name: "Regular Collection (₹)", icon: "fa-calendar-check", color: "text-emerald-600" },
+            { name: "Past Due Recovery (₹)", icon: "fa-hand-holding-dollar", color: "text-orange-600" },
+            { name: "Rocket Pay / Auto Pay", icon: "fa-bolt", color: "text-purple-600" },
+            { name: "Group Meetings", icon: "fa-users-rectangle", color: "text-slate-600" }
         ];
 
         let currentStaff = [];
-        let isSubmitting = false; // Prevent double submission flag
+        let isSubmitting = false;
 
-        // 1. Initial Load
+        // 1. Initialize
         async function init() {
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getManagers`);
@@ -265,19 +331,19 @@
                     sel.appendChild(opt);
                 });
             } catch (err) {
-                console.error("Init Error:", err);
+                console.error("Init failed:", err);
             }
         }
 
-        // 2. Fetch Staff Data
+        // 2. Fetch Data
         async function fetchStaffData() {
             const mgr = document.getElementById('mgrSelect').value;
             if(!mgr) return;
 
             document.getElementById('placeholder').innerHTML = `
-                <div class="flex flex-col items-center">
-                    <div class="loader mb-4"></div>
-                    <p class="font-bold text-blue-800">स्टाफ लिस्ट लोड होत आहे...</p>
+                <div class="flex flex-col items-center py-10">
+                    <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <p class="font-black text-slate-500 tracking-widest uppercase">स्टाफ डेटा लोड होत आहे...</p>
                 </div>
             `;
 
@@ -285,70 +351,76 @@
                 const res = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
                 const data = await res.json();
                 currentStaff = data.fxList;
-
                 renderUI(mgr);
+                syncPrintData();
             } catch (err) {
-                alert("डेटा लोड करण्यात अडचण आली.");
+                alert("डेटा लोड करताना एरर आली. कृपया रिफ्रेश करा.");
             }
         }
 
-        // 3. Render UI Cards
+        // 3. Render Cards
         function renderUI(mgr) {
             document.getElementById('mgrTitle').innerText = mgr;
+            document.getElementById('print-mgr-name').innerText = mgr;
+            document.getElementById('report-gen-time').innerText = new Date().toLocaleString('en-IN');
+            
             document.getElementById('welcomeZone').classList.remove('hidden');
             document.getElementById('placeholder').classList.add('hidden');
             document.getElementById('footerAction').classList.remove('hidden');
+            document.getElementById('fabPrint').classList.remove('hidden');
 
             const container = document.getElementById('plannerBox');
             container.innerHTML = "";
 
             currentStaff.forEach((staff, sIdx) => {
                 const card = document.createElement('div');
-                card.className = "staff-card animate-slide";
+                card.className = "staff-card animate-fade";
                 card.style.animationDelay = (sIdx * 0.1) + "s";
 
-                let rowsHtml = KPI_LIST.map(kpi => `
-                    <div class="kpi-row">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-blue-600">
-                                <i class="fa-solid ${kpi.icon}"></i>
+                let rowsHtml = KPI_LIST.map((kpi, kIdx) => `
+                    <div class="kpi-row hover:bg-slate-50/50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center ${kpi.color} border border-slate-100">
+                                <i class="fa-solid ${kpi.icon} text-sm"></i>
                             </div>
-                            <span class="font-bold text-slate-700 text-sm">${kpi.name}</span>
+                            <span class="font-bold text-slate-700 text-sm tracking-tight">${kpi.name}</span>
                         </div>
-                        <div>
+                        <div class="relative">
                             <input type="number" 
+                                   oninput="updateValDisplay(this)"
                                    data-staff="${staff}" 
                                    data-kpi="${kpi.name}" 
                                    class="t-val premium-input" 
-                                   placeholder="₹ 0.00">
+                                   placeholder="0.00">
+                            <span class="input-val-display text-sm font-bold"></span>
                         </div>
-                        <div>
+                        <div class="relative">
                             <input type="text" 
+                                   oninput="updateValDisplay(this)"
                                    data-staff="${staff}" 
                                    data-kpi="${kpi.name}" 
                                    class="t-note premium-input" 
-                                   placeholder="तुमची रणनीती लिहा...">
+                                   placeholder="रणनीती लिहा...">
+                            <span class="input-val-display text-xs text-slate-600"></span>
                         </div>
                     </div>
                 `).join('');
 
                 card.innerHTML = `
-                    <div class="px-8 py-6 bg-slate-50/50 flex justify-between items-center border-b">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-blue-800 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-blue-100">
+                    <div class="px-6 py-4 bg-slate-50 border-b flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-700 text-white flex items-center justify-center font-black">
                                 ${staff.charAt(0)}
                             </div>
-                            <div>
-                                <h4 class="text-xl font-extrabold text-slate-800">${staff}</h4>
-                                <span class="status-badge bg-blue-100 text-blue-700">Team Member</span>
-                            </div>
+                            <h4 class="text-lg font-black text-slate-800">${staff}</h4>
                         </div>
+                        <div class="text-[10px] font-black bg-blue-100 text-blue-700 px-3 py-1 rounded-full uppercase">Team Member</div>
                     </div>
-                    <div class="p-8">
-                        <div class="hidden md:grid grid-cols-12 gap-4 mb-4">
-                            <div class="col-span-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Performance KPI</div>
-                            <div class="col-span-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Amount Target</div>
-                            <div class="col-span-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Strategic Plan</div>
+                    <div class="p-2 md:p-4">
+                        <div class="hidden md:grid grid-cols-12 gap-4 mb-2 px-4">
+                            <div class="col-span-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Key Performance Indicator</div>
+                            <div class="col-span-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">Amount/Target</div>
+                            <div class="col-span-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">Strategy Note</div>
                         </div>
                         ${rowsHtml}
                     </div>
@@ -357,27 +429,38 @@
             });
         }
 
-        // 4. Final Submission with De-duplication Logic
+        // 4. Live Sync for Print
+        function updateValDisplay(el) {
+            const displaySpan = el.nextElementSibling;
+            if (displaySpan && displaySpan.classList.contains('input-val-display')) {
+                displaySpan.innerText = el.value || "---";
+            }
+        }
+
+        function syncPrintData() {
+            const sd = document.getElementById('sDate').value;
+            const ed = document.getElementById('eDate').value;
+            document.getElementById('print-date-range').innerText = (sd && ed) ? `${sd} To ${ed}` : "तारीख निवडली नाही";
+        }
+
+        // 5. Submit Logic
         async function finalSubmit() {
-            if(isSubmitting) return; // Prevent clicking while request is in progress
+            if(isSubmitting) return;
 
             const mgr = document.getElementById('mgrSelect').value;
             const sDate = document.getElementById('sDate').value;
             const eDate = document.getElementById('eDate').value;
-            const lockBtn = document.getElementById('lockBtn');
 
             if(!sDate || !eDate) {
-                alert("कृपया प्लॅन सुरू करण्याची आणि संपण्याची तारीख निवडा.");
+                alert("कृपया प्लॅनची सुरुवात आणि शेवटची तारीख निवडा.");
                 return;
             }
 
-            const confirmLock = confirm("तुम्ही खात्रीशीर आहात का? एकदा लॉक केल्यावर डेटा बदलता येणार नाही.");
-            if(!confirmLock) return;
+            if(!confirm("तुम्ही हा साप्ताहिक प्लॅन लॉक करू इच्छिता का? एकदा लॉक केल्यावर बदलता येणार नाही.")) return;
 
-            // Start Submission Process
             isSubmitting = true;
-            lockBtn.disabled = true; // Disable button immediately
             document.getElementById('submissionOverlay').style.display = 'flex';
+            document.getElementById('lockBtn').disabled = true;
 
             const payloadDetails = [];
             const vals = document.querySelectorAll('.t-val');
@@ -388,7 +471,7 @@
                     name: v.dataset.staff + " || " + v.dataset.kpi,
                     tDisb: v.value || 0,
                     aDisb: 0,
-                    pd: notes[i].value || "N/A"
+                    pd: notes[i].value || "Strategic focus on growth"
                 });
             });
 
@@ -400,25 +483,23 @@
             };
 
             try {
-                // Using standard POST logic
-                const response = await fetch(SCRIPT_URL, {
+                // Post request to GAS
+                await fetch(SCRIPT_URL, {
                     method: "POST",
                     body: JSON.stringify(data),
                     mode: 'no-cors' 
                 });
 
-                // Google Sheets normally takes 2-3 seconds to process
                 setTimeout(() => {
-                    alert("यशस्वी! तुमचा साप्ताहिक प्लॅन लॉक झाला आहे.");
+                    alert("अभिनंदन! तुमचा साप्ताहिक प्लॅन यशस्वीरित्या लॉक झाला आहे.");
                     window.location.reload();
                 }, 2000);
 
             } catch (err) {
-                console.error("Submit Error:", err);
-                alert("काहीतरी तांत्रिक अडचण आली. कृपया पुन्हा प्रयत्न करा.");
+                alert("डेटा सेव्ह करताना तांत्रिक अडचण आली.");
                 isSubmitting = false;
-                lockBtn.disabled = false;
                 document.getElementById('submissionOverlay').style.display = 'none';
+                document.getElementById('lockBtn').disabled = false;
             }
         }
 
