@@ -129,6 +129,12 @@
             border-bottom: 1px solid #f8fafc;
         }
 
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
         @media (max-width: 768px) {
             .kpi-row {
                 grid-template-columns: 1fr;
@@ -244,6 +250,7 @@
         ];
 
         let currentStaff = [];
+        let isSubmitting = false; // Prevent double submission flag
 
         // 1. Initial Load
         async function init() {
@@ -336,12 +343,6 @@
                                 <span class="status-badge bg-blue-100 text-blue-700">Team Member</span>
                             </div>
                         </div>
-                        <div class="hidden md:flex gap-8">
-                            <div class="text-right">
-                                <p class="text-[10px] font-black text-slate-400 uppercase">Weekly Target Status</p>
-                                <p class="text-sm font-bold text-amber-600">Pending Locking</p>
-                            </div>
-                        </div>
                     </div>
                     <div class="p-8">
                         <div class="hidden md:grid grid-cols-12 gap-4 mb-4">
@@ -356,11 +357,14 @@
             });
         }
 
-        // 4. Final Submission with Error Handling Fix
+        // 4. Final Submission with De-duplication Logic
         async function finalSubmit() {
+            if(isSubmitting) return; // Prevent clicking while request is in progress
+
             const mgr = document.getElementById('mgrSelect').value;
             const sDate = document.getElementById('sDate').value;
             const eDate = document.getElementById('eDate').value;
+            const lockBtn = document.getElementById('lockBtn');
 
             if(!sDate || !eDate) {
                 alert("कृपया प्लॅन सुरू करण्याची आणि संपण्याची तारीख निवडा.");
@@ -370,7 +374,9 @@
             const confirmLock = confirm("तुम्ही खात्रीशीर आहात का? एकदा लॉक केल्यावर डेटा बदलता येणार नाही.");
             if(!confirmLock) return;
 
-            // Show Loader
+            // Start Submission Process
+            isSubmitting = true;
+            lockBtn.disabled = true; // Disable button immediately
             document.getElementById('submissionOverlay').style.display = 'flex';
 
             const payloadDetails = [];
@@ -393,24 +399,26 @@
                 fxDetails: payloadDetails
             };
 
-            // FIX: Using fetch with standard POST but handling the CORS 'Error'
             try {
+                // Using standard POST logic
                 const response = await fetch(SCRIPT_URL, {
                     method: "POST",
                     body: JSON.stringify(data),
-                    mode: 'no-cors' // This avoids the CORS error, but we can't read the result
+                    mode: 'no-cors' 
                 });
 
-                // If no-cors is used, we assume success if it doesn't throw
-                // because Google Sheets will receive the data anyway.
-                alert("यशस्वी! तुमचा साप्ताहिक प्लॅन लॉक झाला आहे.");
-                window.location.reload();
+                // Google Sheets normally takes 2-3 seconds to process
+                setTimeout(() => {
+                    alert("यशस्वी! तुमचा साप्ताहिक प्लॅन लॉक झाला आहे.");
+                    window.location.reload();
+                }, 2000);
 
             } catch (err) {
-                // If it really fails (no internet etc)
                 console.error("Submit Error:", err);
-                alert("प्लॅन सबमिट झाला आहे (कृपया तुमची शीट तपासा).");
-                window.location.reload();
+                alert("काहीतरी तांत्रिक अडचण आली. कृपया पुन्हा प्रयत्न करा.");
+                isSubmitting = false;
+                lockBtn.disabled = false;
+                document.getElementById('submissionOverlay').style.display = 'none';
             }
         }
 
