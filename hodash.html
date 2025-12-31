@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anik HO Master Dashboard | Professional Analytics</title>
+    <title>Anik Fin | HO Advanced Strategy Dashboard</title>
 
-    <!-- UI Core -->
+    <!-- UI Frameworks -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,465 +15,622 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f0f4f8; 
+        :root {
+            --primary: #1e40af;
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-light);
             color: #1e293b;
             letter-spacing: -0.02em;
         }
-        .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .stat-card { 
-            background: white; 
-            border-radius: 24px; 
-            padding: 24px; 
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
-        }
-        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.05); }
-        .kpi-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; }
-        .efficiency-badge { padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; }
-        .bg-success-soft { background: #dcfce7; color: #15803d; }
-        .bg-warning-soft { background: #fef3c7; color: #b45309; }
-        .bg-danger-soft { background: #fee2e2; color: #b91c1c; }
-        
-        select, input {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1em;
+
+        /* High-End Glassmorphism & UI Components */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
         }
 
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .premium-card {
+            background: white;
+            border-radius: 28px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .premium-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            border-color: var(--primary);
+        }
+
+        .kpi-icon-box {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            margin-bottom: 16px;
+        }
+
+        /* Performance Badges */
+        .badge-elite { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-average { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .badge-critical { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Animations */
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide { animation: slideIn 0.5s ease-out forwards; }
+
+        /* Loader Pulse */
+        .loader-ring {
+            width: 80px; height: 80px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .date-picker-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #334155;
+            cursor: pointer;
+        }
     </style>
 </head>
-<body class="custom-scrollbar">
+<body class="custom-scroll">
 
-    <!-- Top Navigation -->
-    <nav class="glass-header sticky top-0 z-[100] border-b border-slate-200">
-        <div class="max-w-[1600px] mx-auto px-6 h-20 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="bg-blue-600 p-2 rounded-xl">
+    <!-- Sidebar / Top Navigation -->
+    <nav class="glass-nav sticky top-0 z-[100] h-20">
+        <div class="max-w-[1700px] mx-auto px-8 h-full flex justify-between items-center">
+            <div class="flex items-center gap-6">
+                <div class="bg-blue-600 p-2.5 rounded-2xl shadow-lg shadow-blue-200">
                     <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-6 brightness-0 invert" alt="Anik Logo">
                 </div>
+                <div class="h-10 w-[1px] bg-slate-200"></div>
                 <div>
-                    <h1 class="text-lg font-black text-slate-800 leading-tight">HO COMMAND CENTER</h1>
+                    <h1 class="text-xl font-black text-slate-800 tracking-tighter">HO COMMAND CENTER</h1>
                     <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Performance Matrix</p>
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Real-Time Strategy Matrix</p>
                     </div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4">
-                <div id="dateRangeContainer" class="hidden md:flex items-center bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 cursor-pointer">
-                    <i data-lucide="calendar" class="w-4 h-4 text-slate-500 mr-2"></i>
-                    <input type="text" id="dateRange" class="bg-transparent border-none outline-none text-sm font-bold text-slate-700 w-48 pointer-events-none" placeholder="कालावधी निवडा">
+            <div class="flex items-center gap-6">
+                <!-- Date Filter -->
+                <div class="hidden lg:flex items-center gap-3 bg-slate-100 border border-slate-200 px-5 py-2.5 rounded-2xl hover:bg-white transition-all cursor-pointer group">
+                    <i data-lucide="calendar" class="w-4 h-4 text-slate-400 group-hover:text-blue-600"></i>
+                    <input type="text" id="globalDateRange" class="date-picker-input w-48" placeholder="Select Period">
                 </div>
-                <button onclick="fetchAllData()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-200 flex items-center gap-2 transition-all active:scale-95">
-                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> रिफ्रेश
+                
+                <button onclick="fetchAllData()" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-3 rounded-2xl font-bold text-sm shadow-xl shadow-blue-200 flex items-center gap-3 transition-all active:scale-95">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> रिफ्रेश डेटा
                 </button>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-[1600px] mx-auto p-6 space-y-8">
-        
-        <!-- Selection & Filter Section -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-            <div class="space-y-2">
-                <label class="kpi-label ml-1">मॅनेजर फिल्टर</label>
-                <div class="relative">
-                    <i data-lucide="users" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                    <select id="mgrFilter" onchange="updateStaffDropdown()" class="w-full bg-slate-50 border border-slate-200 pl-12 pr-4 py-3.5 rounded-2xl font-bold text-slate-700 focus:ring-2 ring-blue-500/20 outline-none transition-all">
-                        <option value="all">सर्व मॅनेजर</option>
-                    </select>
-                </div>
-            </div>
+    <main class="max-w-[1700px] mx-auto p-8 space-y-10">
 
-            <div class="space-y-2">
-                <label class="kpi-label ml-1">स्टाफ निवडा (फक्त नाव)</label>
-                <div class="relative">
-                    <i data-lucide="user-check" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                    <select id="staffFilter" onchange="renderDashboard()" class="w-full bg-slate-50 border border-slate-200 pl-12 pr-4 py-3.5 rounded-2xl font-bold text-slate-700 focus:ring-2 ring-blue-500/20 outline-none transition-all">
-                        <option value="all">सर्व स्टाफ</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <label class="kpi-label ml-1">नाव शोधा</label>
-                <div class="relative">
-                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                    <input type="text" id="searchTerm" oninput="renderDashboard()" placeholder="स्टाफचे नाव टाईप करा..." class="w-full bg-slate-50 border border-slate-200 pl-12 pr-4 py-3.5 rounded-2xl font-bold text-slate-700 focus:ring-2 ring-blue-500/20 outline-none transition-all">
-                </div>
-            </div>
-        </section>
-
-        <!-- KPI Scoreboard -->
-        <section class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-            <!-- Disb -->
-            <div class="stat-card border-l-4 border-l-blue-600">
-                <p class="kpi-label">Disbursement</p>
-                <h3 id="valDisb" class="text-xl font-black text-slate-800 mt-1">₹ 0</h3>
-                <div id="percDisb" class="mt-2 text-[11px] font-bold text-blue-600 bg-blue-50 inline-block px-2 py-0.5 rounded">0% Achieved</div>
-            </div>
-            <!-- Appr -->
-            <div class="stat-card border-l-4 border-l-indigo-500">
-                <p class="kpi-label">Appraisal</p>
-                <h3 id="valAppr" class="text-xl font-black text-slate-800 mt-1">₹ 0</h3>
-                <div id="percAppr" class="mt-2 text-[11px] font-bold text-indigo-600 bg-indigo-50 inline-block px-2 py-0.5 rounded">0%</div>
-            </div>
-            <!-- Recovery -->
-            <div class="stat-card border-l-4 border-l-rose-500">
-                <p class="kpi-label">OD Recovery</p>
-                <h3 id="valOD" class="text-xl font-black text-slate-800 mt-1">₹ 0</h3>
-                <div id="percOD" class="mt-2 text-[11px] font-bold text-rose-600 bg-rose-50 inline-block px-2 py-0.5 rounded">0%</div>
-            </div>
-            <!-- Regular -->
-            <div class="stat-card border-l-4 border-l-emerald-500">
-                <p class="kpi-label">Regular Coll.</p>
-                <h3 id="valReg" class="text-xl font-black text-slate-800 mt-1">₹ 0</h3>
-                <div id="percReg" class="mt-2 text-[11px] font-bold text-emerald-600 bg-emerald-50 inline-block px-2 py-0.5 rounded">0%</div>
-            </div>
-            <!-- Past Due -->
-            <div class="stat-card border-l-4 border-l-amber-500">
-                <p class="kpi-label">Past Due</p>
-                <h3 id="valPast" class="text-xl font-black text-slate-800 mt-1">₹ 0</h3>
-                <div id="percPast" class="mt-2 text-[11px] font-bold text-amber-600 bg-amber-50 inline-block px-2 py-0.5 rounded">0%</div>
-            </div>
-            <!-- Rocket -->
-            <div class="stat-card border-l-4 border-l-purple-500">
-                <p class="kpi-label">Rocket Pay</p>
-                <h3 id="valRocket" class="text-xl font-black text-slate-800 mt-1">₹ 0</h3>
-                <div id="percRocket" class="mt-2 text-[11px] font-bold text-purple-600 bg-purple-50 inline-block px-2 py-0.5 rounded">0%</div>
-            </div>
-            <!-- Meetings -->
-            <div class="stat-card border-l-4 border-l-cyan-500">
-                <p class="kpi-label">Group Meet</p>
-                <h3 id="valMeet" class="text-xl font-black text-slate-800 mt-1">0</h3>
-                <div id="percMeet" class="mt-2 text-[11px] font-bold text-cyan-600 bg-cyan-50 inline-block px-2 py-0.5 rounded">0%</div>
-            </div>
-        </section>
-
-        <!-- Charts & Analysis -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm">
-                <div class="flex justify-between items-center mb-8">
-                    <div>
-                        <h2 class="text-xl font-black text-slate-800">Target vs Actual Performance</h2>
-                        <p class="text-xs font-bold text-slate-400 uppercase mt-1">७ मुख्य KPIs मधील प्रगती</p>
+        <!-- Filters & Intelligence Controls -->
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="md:col-span-3 premium-card p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="space-y-3">
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">मॅनेजर निवडा</label>
+                    <div class="relative group">
+                        <i data-lucide="users" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-blue-600 transition-colors"></i>
+                        <select id="mgrDropdown" onchange="syncStaffDropdown()" class="w-full bg-slate-50 border border-slate-100 pl-12 pr-4 py-4 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 ring-blue-500/10 focus:bg-white transition-all appearance-none">
+                            <option value="all">सर्व मॅनेजर्स</option>
+                        </select>
                     </div>
                 </div>
-                <div class="h-[400px]">
-                    <canvas id="perfChart"></canvas>
+
+                <div class="space-y-3">
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">स्टाफ निवडा (Unique Names)</label>
+                    <div class="relative group">
+                        <i data-lucide="user-check" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-blue-600 transition-colors"></i>
+                        <select id="staffDropdown" onchange="processAndRender()" class="w-full bg-slate-50 border border-slate-100 pl-12 pr-4 py-4 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 ring-blue-500/10 focus:bg-white transition-all appearance-none">
+                            <option value="all">सर्व स्टाफ सदस्य</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">द्रुत शोध (Quick Search)</label>
+                    <div class="relative group">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-blue-600 transition-colors"></i>
+                        <input type="text" id="staffSearch" oninput="processAndRender()" placeholder="नाव टाईप करा..." class="w-full bg-slate-50 border border-slate-100 pl-12 pr-4 py-4 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 ring-blue-500/10 focus:bg-white transition-all">
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-                <h2 class="text-xl font-black text-slate-800 mb-6 uppercase tracking-tight">Top Rankers</h2>
-                <div id="rankList" class="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                    <!-- Ranks -->
+            <div class="premium-card p-8 bg-blue-600 border-none flex flex-col justify-center items-center text-center">
+                <p class="text-blue-200 text-xs font-bold uppercase tracking-widest mb-2">Overall Achievement</p>
+                <h2 id="totalPercentage" class="text-5xl font-black text-white">0%</h2>
+                <p class="text-blue-100 text-[10px] mt-4 font-medium opacity-80 uppercase">निवडलेल्या कालावधीतील सरासरी कामगिरी</p>
+            </div>
+        </section>
+
+        <!-- Main Scoreboard (7 Detailed KPIs) -->
+        <section class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
+            <!-- 1. Disbursement -->
+            <div class="premium-card p-6 border-l-4 border-l-blue-600">
+                <div class="kpi-icon-box bg-blue-50 text-blue-600">
+                    <i data-lucide="wallet" class="w-6 h-6"></i>
+                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Disbursement</p>
+                <h3 id="v_disb" class="text-xl font-black text-slate-800 mt-2 truncate">₹ 0</h3>
+                <div class="mt-3 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div id="p_disb_bar" class="bg-blue-600 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+                <div id="p_disb_txt" class="mt-2 text-[11px] font-extrabold text-blue-600">0% Achieved</div>
+            </div>
+
+            <!-- 2. Appraisal -->
+            <div class="premium-card p-6 border-l-4 border-l-indigo-500">
+                <div class="kpi-icon-box bg-indigo-50 text-indigo-600">
+                    <i data-lucide="file-check" class="w-6 h-6"></i>
+                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Appraisal</p>
+                <h3 id="v_appr" class="text-xl font-black text-slate-800 mt-2 truncate">₹ 0</h3>
+                <div class="mt-3 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div id="p_appr_bar" class="bg-indigo-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+                <div id="p_appr_txt" class="mt-2 text-[11px] font-extrabold text-indigo-600">0% Achieved</div>
+            </div>
+
+            <!-- 3. OD Recovery -->
+            <div class="premium-card p-6 border-l-4 border-l-rose-500">
+                <div class="kpi-icon-box bg-rose-50 text-rose-600">
+                    <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">OD Recovery</p>
+                <h3 id="v_od" class="text-xl font-black text-slate-800 mt-2 truncate">₹ 0</h3>
+                <div class="mt-3 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div id="p_od_bar" class="bg-rose-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+                <div id="p_od_txt" class="mt-2 text-[11px] font-extrabold text-rose-600">0% Achieved</div>
+            </div>
+
+            <!-- 4. Regular Collection -->
+            <div class="premium-card p-6 border-l-4 border-l-emerald-500">
+                <div class="kpi-icon-box bg-emerald-50 text-emerald-600">
+                    <i data-lucide="calendar-check" class="w-6 h-6"></i>
+                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Regular Coll.</p>
+                <h3 id="v_reg" class="text-xl font-black text-slate-800 mt-2 truncate">₹ 0</h3>
+                <div class="mt-3 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div id="p_reg_bar" class="bg-emerald-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+                <div id="p_reg_txt" class="mt-2 text-[11px] font-extrabold text-emerald-600">0% Achieved</div>
+            </div>
+
+            <!-- 5. Past Due -->
+            <div class="premium-card p-6 border-l-4 border-l-amber-500">
+                <div class="kpi-icon-box bg-amber-50 text-amber-600">
+                    <i data-lucide="history" class="w-6 h-6"></i>
+                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Past Due</p>
+                <h3 id="v_past" class="text-xl font-black text-slate-800 mt-2 truncate">₹ 0</h3>
+                <div class="mt-3 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div id="p_past_bar" class="bg-amber-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+                <div id="p_past_txt" class="mt-2 text-[11px] font-extrabold text-amber-600">0% Achieved</div>
+            </div>
+
+            <!-- 6. Rocket Pay -->
+            <div class="premium-card p-6 border-l-4 border-l-purple-500">
+                <div class="kpi-icon-box bg-purple-50 text-purple-600">
+                    <i data-lucide="rocket" class="w-6 h-6"></i>
+                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rocket Pay</p>
+                <h3 id="v_rock" class="text-xl font-black text-slate-800 mt-2 truncate">₹ 0</h3>
+                <div class="mt-3 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div id="p_rock_bar" class="bg-purple-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+                <div id="p_rock_txt" class="mt-2 text-[11px] font-extrabold text-purple-600">0% Achieved</div>
+            </div>
+
+            <!-- 7. Group Meetings -->
+            <div class="premium-card p-6 border-l-4 border-l-cyan-500">
+                <div class="kpi-icon-box bg-cyan-50 text-cyan-600">
+                    <i data-lucide="users-2" class="w-6 h-6"></i>
+                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Group Meet</p>
+                <h3 id="v_meet" class="text-xl font-black text-slate-800 mt-2 truncate">0</h3>
+                <div class="mt-3 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div id="p_meet_bar" class="bg-cyan-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+                <div id="p_meet_txt" class="mt-2 text-[11px] font-extrabold text-cyan-600">0% Achieved</div>
+            </div>
+        </section>
+
+        <!-- Advanced Visualizations -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Major Chart Area -->
+            <div class="lg:col-span-8 premium-card p-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800">Performance Intelligence</h2>
+                        <p class="text-sm font-bold text-slate-400 uppercase mt-1">Plan vs Achievement Gap Analysis</p>
+                    </div>
+                    <div class="flex items-center gap-6 bg-slate-50 px-6 py-3 rounded-2xl border border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-blue-600 shadow-sm"></div>
+                            <span class="text-[10px] font-black text-slate-500 uppercase">Actual</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-slate-200 shadow-sm"></div>
+                            <span class="text-[10px] font-black text-slate-500 uppercase">Target</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="h-[450px]">
+                    <canvas id="performanceChart"></canvas>
                 </div>
             </div>
-        </div>
 
-        <!-- Audit Table -->
-        <section class="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
-            <div class="p-8 border-b border-slate-100 flex justify-between items-center">
-                <h2 class="text-xl font-black text-slate-800">DETAILED AUDIT LOG</h2>
-                <div id="rowCounter" class="text-[10px] font-black bg-slate-100 text-slate-500 px-3 py-1 rounded-full uppercase tracking-widest">0 Records Found</div>
+            <!-- Regional/Staff Rankings -->
+            <div class="lg:col-span-4 premium-card p-8 flex flex-col">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight">Top Performers</h2>
+                    <i data-lucide="trophy" class="w-6 h-6 text-amber-500"></i>
+                </div>
+                <div id="rankContainer" class="space-y-4 flex-1 overflow-y-auto pr-2 custom-scroll">
+                    <!-- Ranks will be injected here -->
+                </div>
             </div>
+        </section>
+
+        <!-- Granular Audit Matrix (Table) -->
+        <section class="premium-card overflow-hidden">
+            <div class="p-10 border-b border-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-slate-50/30">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Detailed Audit Matrix</h2>
+                    <p class="text-sm font-bold text-slate-400 uppercase mt-1">प्रत्येक स्टाफचे कालावधीनुसार सविस्तर विश्लेषण</p>
+                </div>
+                <div id="totalRowsCount" class="bg-blue-600 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-100">
+                    0 Records Found
+                </div>
+            </div>
+            
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
-                    <thead class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    <thead class="bg-slate-50/80 text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]">
                         <tr>
-                            <th class="px-8 py-4">स्टाफ तपशील</th>
-                            <th class="px-6 py-4">Disbursement (Ach.)</th>
-                            <th class="px-6 py-4">Collection (Ach.)</th>
-                            <th class="px-6 py-4">Rocket Pay</th>
-                            <th class="px-6 py-4 text-center">Efficiency Status</th>
+                            <th class="px-10 py-6">स्टाफ आणि मॅनेजर</th>
+                            <th class="px-6 py-6 text-center">Disbursement %</th>
+                            <th class="px-6 py-6 text-center">Regular Coll. %</th>
+                            <th class="px-6 py-6 text-center">Rocket Pay</th>
+                            <th class="px-6 py-6 text-center">Audit Status</th>
                         </tr>
                     </thead>
-                    <tbody id="auditTable" class="divide-y divide-slate-100">
-                        <!-- Rows -->
+                    <tbody id="masterAuditBody" class="divide-y divide-slate-100">
+                        <!-- Data rows injected by JS -->
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Table Loading State -->
+            <div id="tableLoader" class="hidden py-20 flex flex-col items-center justify-center space-y-4">
+                <div class="loader-ring"></div>
+                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Loading Records...</p>
             </div>
         </section>
 
     </main>
 
-    <!-- Syncing Screen -->
-    <div id="syncLoader" class="fixed inset-0 bg-white/90 backdrop-blur-md z-[200] flex flex-col items-center justify-center">
-        <div class="relative">
-            <div class="w-20 h-20 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
-            <i data-lucide="database" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-600 w-6 h-6"></i>
+    <!-- Full Screen Initial Loader -->
+    <div id="initialLoader" class="fixed inset-0 bg-white z-[999] flex flex-col items-center justify-center">
+        <div class="loader-ring mb-8"></div>
+        <div class="text-center">
+            <h2 class="text-3xl font-black text-slate-800 tracking-tighter uppercase mb-2">ANIK INTELLIGENCE SYSTEM</h2>
+            <div class="flex items-center justify-center gap-3">
+                <span class="w-3 h-3 bg-blue-600 rounded-full animate-bounce"></span>
+                <p id="loadingMsg" class="text-xs font-bold text-slate-400 uppercase tracking-[0.4em]">Connecting to HQ Database...</p>
+            </div>
         </div>
-        <h2 class="text-2xl font-black text-slate-800 mt-6 tracking-tighter">ANIK INTELLIGENCE SYNC</h2>
-        <p class="text-xs font-bold text-slate-400 uppercase tracking-[0.4em] mt-2">Connecting to Master Data...</p>
     </div>
 
+    <!-- Logic Engine -->
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec";
         
-        let database = [];
-        let chartInstance = null;
+        let fullDatabase = [];
+        let chartObj = null;
 
-        // 1. Initial Load
+        // 1. Initial Launch
         async function init() {
             lucide.createIcons();
             
-            flatpickr("#dateRange", {
+            // Initialize Flatpickr
+            flatpickr("#globalDateRange", {
                 mode: "range",
                 dateFormat: "Y-m-d",
-                defaultDate: [new Date().setDate(new Date().getDate() - 30), new Date()],
-                onClose: () => renderDashboard()
+                defaultDate: [new Date().setDate(new Date().getDate() - 60), new Date()],
+                onChange: () => processAndRender()
             });
 
             await fetchAllData();
         }
 
-        // 2. Data Fetching & Aggregation Logic
+        // 2. Fetch Core Data
         async function fetchAllData() {
-            document.getElementById('syncLoader').classList.remove('hidden');
+            document.getElementById('initialLoader').style.display = 'flex';
+            document.getElementById('loadingMsg').innerText = "Syncing All Manager Sheets...";
+
             try {
+                // Get Managers List
                 const mgrResp = await fetch(`${SCRIPT_URL}?action=getManagers`);
                 const managers = await mgrResp.json();
                 
-                // Set Managers Dropdown
-                const mgrSelect = document.getElementById('mgrFilter');
-                mgrSelect.innerHTML = '<option value="all">सर्व मॅनेजर</option>';
-                managers.forEach(m => mgrSelect.innerHTML += `<option value="${m}">${m}</option>`);
+                const mgrDrop = document.getElementById('mgrDropdown');
+                mgrDrop.innerHTML = '<option value="all">सर्व मॅनेजर्स</option>';
+                managers.forEach(m => mgrDrop.innerHTML += `<option value="${m}">${m}</option>`);
 
-                database = [];
-                const promises = managers.map(async (mgr) => {
-                    const resp = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
-                    const json = await resp.json();
-                    
-                    json.history.forEach(week => {
-                        week.details.forEach(item => {
-                            // !!! CRITICAL FIX: Parsing the staff name to remove KPI labels !!!
-                            const rawName = item.name || "";
-                            const cleanName = rawName.split(' || ')[0].trim();
-                            const kpiType = rawName.includes('||') ? rawName.split(' || ')[1] : "Unknown";
+                fullDatabase = [];
+                
+                // Fetch each manager's data in parallel
+                const fetchPromises = managers.map(async (mgr) => {
+                    try {
+                        const dResp = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
+                        const data = await dResp.json();
+                        
+                        data.history.forEach(week => {
+                            week.details.forEach(item => {
+                                // Staff Name Logic: Split "Suraj || Disbursement" to just "Suraj"
+                                const rawName = item.name || "Unknown";
+                                const cleanName = rawName.includes('||') ? rawName.split('||')[0].trim() : rawName.trim();
+                                const kpiLabel = rawName.includes('||') ? rawName.split('||')[1].trim() : "Default";
 
-                            database.push({
-                                mgr: mgr,
-                                staff: cleanName,
-                                kpiType: kpiType,
-                                target: parseFloat(item.tDisb || item.tAppr || item.tOD || item.tReg || item.tPast || item.tRocket || item.tGroup || 0),
-                                actual: parseFloat(item.aDisb || item.aAppr || item.aOD || item.aReg || item.aPast || item.aRocket || item.aGroup || 0),
-                                sDate: week.sDate,
-                                eDate: week.eDate
+                                fullDatabase.push({
+                                    mgr: mgr,
+                                    staff: cleanName,
+                                    kpiKey: kpiLabel,
+                                    t: parseFloat(item.tDisb || item.tAppr || item.tOD || item.tReg || item.tPast || item.tRocket || item.tGroup || 0),
+                                    a: parseFloat(item.aDisb || item.aAppr || item.aOD || item.aReg || item.aPast || item.aRocket || item.aGroup || 0),
+                                    date: week.sDate,
+                                    endDate: week.eDate
+                                });
                             });
                         });
-                    });
+                    } catch (e) { console.error(`Failed to fetch for ${mgr}`, e); }
                 });
 
-                await Promise.all(promises);
-                updateStaffDropdown();
-                renderDashboard();
+                await Promise.all(fetchPromises);
+                
+                syncStaffDropdown();
+                processAndRender();
 
             } catch (err) {
-                console.error(err);
-                Swal.fire("Sync Failed", "डेटाबेसशी संपर्क होऊ शकला नाही.", "error");
+                Swal.fire("System Error", "डेटाबेसशी संपर्क तुटला आहे. रिफ्रेश करा.", "error");
             } finally {
-                document.getElementById('syncLoader').classList.add('hidden');
+                document.getElementById('initialLoader').style.opacity = '0';
+                setTimeout(() => document.getElementById('initialLoader').style.display = 'none', 500);
             }
         }
 
-        // 3. Update Staff Dropdown based on Manager
-        function updateStaffDropdown() {
-            const selectedMgr = document.getElementById('mgrFilter').value;
-            const staffSelect = document.getElementById('staffFilter');
-            staffSelect.innerHTML = '<option value="all">सर्व स्टाफ</option>';
+        // 3. Dropdown Logic
+        function syncStaffDropdown() {
+            const selectedMgr = document.getElementById('mgrDropdown').value;
+            const staffDrop = document.getElementById('staffDropdown');
+            staffDrop.innerHTML = '<option value="all">सर्व स्टाफ सदस्य</option>';
 
             const staffList = [...new Set(
-                database
+                fullDatabase
                 .filter(d => selectedMgr === 'all' || d.mgr === selectedMgr)
                 .map(d => d.staff)
             )].sort();
 
             staffList.forEach(s => {
-                if(s) staffSelect.innerHTML += `<option value="${s}">${s}</option>`;
+                if(s) staffDrop.innerHTML += `<option value="${s}">${s}</option>`;
             });
-            renderDashboard();
         }
 
-        // 4. Dashboard Engine
-        function renderDashboard() {
-            const mgr = document.getElementById('mgrFilter').value;
-            const staff = document.getElementById('staffFilter').value;
-            const search = document.getElementById('searchTerm').value.toLowerCase();
-            const dateStr = document.getElementById('dateRange').value;
+        // 4. Processing & Rendering Engine
+        function processAndRender() {
+            const mgr = document.getElementById('mgrDropdown').value;
+            const staff = document.getElementById('staffDropdown').value;
+            const search = document.getElementById('staffSearch').value.toLowerCase();
+            const dateRange = document.getElementById('globalDateRange').value;
 
-            // Date Range Filter
-            let filtered = database.filter(d => {
-                const matchMgr = mgr === 'all' || d.mgr === mgr;
-                const matchStaff = staff === 'all' || d.staff === staff;
+            // Apply Filters
+            let filtered = fullDatabase.filter(d => {
+                const matchM = (mgr === 'all' || d.mgr === mgr);
+                const matchS = (staff === 'all' || d.staff === staff);
                 const matchSearch = d.staff.toLowerCase().includes(search);
                 
                 let matchDate = true;
-                if(dateStr.includes(' to ')) {
-                    const [s, e] = dateStr.split(' to ');
-                    matchDate = (d.sDate >= s && d.sDate <= e);
+                if (dateRange.includes(' to ')) {
+                    const [s, e] = dateRange.split(' to ');
+                    matchDate = (d.date >= s && d.date <= e);
                 }
-                return matchMgr && matchStaff && matchSearch && matchDate;
+                return matchM && matchS && matchSearch && matchDate;
             });
 
-            // Aggregate Data for KPIs
-            const kpiSummary = {
+            // Aggregate Data into 7 KPI Buckets
+            const stats = {
                 disb: {t:0, a:0}, appr: {t:0, a:0}, od: {t:0, a:0},
-                reg: {t:0, a:0}, past: {t:0, a:0}, rocket: {t:0, a:0}, meet: {t:0, a:0}
+                reg: {t:0, a:0}, past: {t:0, a:0}, rock: {t:0, a:0}, meet: {t:0, a:0}
             };
 
             filtered.forEach(d => {
-                if(d.kpiType.includes('Disbursement')) { kpiSummary.disb.t += d.target; kpiSummary.disb.a += d.actual; }
-                else if(d.kpiType.includes('Apprisal')) { kpiSummary.appr.t += d.target; kpiSummary.appr.a += d.actual; }
-                else if(d.kpiType.includes('OD Recovery')) { kpiSummary.od.t += d.target; kpiSummary.od.a += d.actual; }
-                else if(d.kpiType.includes('Regular Collection')) { kpiSummary.reg.t += d.target; kpiSummary.reg.a += d.actual; }
-                else if(d.kpiType.includes('Past Due')) { kpiSummary.past.t += d.target; kpiSummary.past.a += d.actual; }
-                else if(d.kpiType.includes('Rocket Pay')) { kpiSummary.rocket.t += d.target; kpiSummary.rocket.a += d.actual; }
-                else if(d.kpiType.includes('Meeting')) { kpiSummary.meet.t += d.target; kpiSummary.meet.a += d.actual; }
+                const k = d.kpiKey.toLowerCase();
+                if(k.includes('disbursement')) { stats.disb.t += d.t; stats.disb.a += d.a; }
+                else if(k.includes('apprisal')) { stats.appr.t += d.t; stats.appr.a += d.a; }
+                else if(k.includes('recovery')) { stats.od.t += d.t; stats.od.a += d.a; }
+                else if(k.includes('regular collection')) { stats.reg.t += d.t; stats.reg.a += d.a; }
+                else if(k.includes('past due')) { stats.past.t += d.t; stats.past.a += d.a; }
+                else if(k.includes('rocket')) { stats.rock.t += d.t; stats.rock.a += d.a; }
+                else if(k.includes('meeting') || k.includes('group')) { stats.meet.t += d.t; stats.meet.a += d.a; }
             });
 
-            updateUI(kpiSummary, filtered);
+            // Update UI Scoreboard
+            updateCards(stats);
+            updateChart(stats);
+            updateRankings(filtered);
+            updateTable(filtered);
         }
 
         // 5. UI Components
-        function updateUI(summary, rawFiltered) {
-            // Update Score Cards
-            setVal('valDisb', 'percDisb', summary.disb, true);
-            setVal('valAppr', 'percAppr', summary.appr, true);
-            setVal('valOD', 'percOD', summary.od, true);
-            setVal('valReg', 'percReg', summary.reg, true);
-            setVal('valPast', 'percPast', summary.past, true);
-            setVal('valRocket', 'percRocket', summary.rocket, true);
-            setVal('valMeet', 'percMeet', summary.meet, false);
-
-            // Update Chart
-            renderChart(summary);
-
-            // Update Table & Ranks
-            renderTable(rawFiltered);
-            renderRanks(rawFiltered);
-        }
-
-        function setVal(vId, pId, obj, isCurrency) {
-            const perc = obj.t > 0 ? ((obj.a / obj.t) * 100).toFixed(1) : 0;
-            document.getElementById(vId).innerText = isCurrency ? `₹ ${formatINR(obj.a)}` : obj.a;
-            document.getElementById(pId).innerText = `${perc}% Achieved`;
-        }
-
-        function renderChart(summary) {
-            const ctx = document.getElementById('perfChart').getContext('2d');
-            const data = {
-                labels: ['Disb', 'Appr', 'OD', 'Reg', 'Past', 'Rocket', 'Meet'],
-                datasets: [
-                    { label: 'Achievement', data: [summary.disb.a, summary.appr.a, summary.od.a, summary.reg.a, summary.past.a, summary.rocket.a, summary.meet.a], backgroundColor: '#2563eb', borderRadius: 8 },
-                    { label: 'Target', data: [summary.disb.t, summary.appr.t, summary.od.t, summary.reg.t, summary.past.t, summary.rocket.t, summary.meet.t], backgroundColor: '#e2e8f0', borderRadius: 8 }
-                ]
+        function updateCards(s) {
+            const up = (idPrefix, obj, isCurrency) => {
+                const p = obj.t > 0 ? ((obj.a / obj.t) * 100).toFixed(1) : 0;
+                document.getElementById(`v_${idPrefix}`).innerText = isCurrency ? `₹ ${formatINR(obj.a)}` : obj.a;
+                document.getElementById(`p_${idPrefix}_txt`).innerText = `${p}% Achieved`;
+                document.getElementById(`p_${idPrefix}_bar`).style.width = `${p > 100 ? 100 : p}%`;
             };
 
-            if(chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx, {
+            up('disb', s.disb, true);
+            up('appr', s.appr, true);
+            up('od', s.od, true);
+            up('reg', s.reg, true);
+            up('past', s.past, true);
+            up('rock', s.rock, true);
+            up('meet', s.meet, false);
+
+            // Calculate Overall Percentage
+            let totalA = 0, totalT = 0;
+            Object.values(s).forEach(item => { totalA += item.a; totalT += item.t; });
+            const overall = totalT > 0 ? ((totalA / totalT) * 100).toFixed(0) : 0;
+            document.getElementById('totalPercentage').innerText = `${overall}%`;
+        }
+
+        function updateChart(s) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if(chartObj) chartObj.destroy();
+
+            chartObj = new Chart(ctx, {
                 type: 'bar',
-                data: data,
+                data: {
+                    labels: ['Disbursement', 'Appraisal', 'OD Recovery', 'Regular Coll', 'Past Due', 'Rocket Pay', 'Group Meet'],
+                    datasets: [
+                        { label: 'Actual', data: [s.disb.a, s.appr.a, s.od.a, s.reg.a, s.past.a, s.rock.a, s.meet.a], backgroundColor: '#1e40af', borderRadius: 12, barThickness: 30 },
+                        { label: 'Target', data: [s.disb.t, s.appr.t, s.od.t, s.reg.t, s.past.t, s.rock.t, s.meet.t], backgroundColor: '#f1f5f9', borderRadius: 12, barThickness: 30 }
+                    ]
+                },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                    scales: {
+                        y: { grid: { color: '#f8fafc' }, ticks: { font: { weight: '600' } } },
+                        x: { grid: { display: false }, ticks: { font: { weight: '600' } } }
+                    }
                 }
             });
         }
 
-        function renderRanks(data) {
-            const list = document.getElementById('rankList');
-            list.innerHTML = "";
+        function updateRankings(data) {
+            const container = document.getElementById('rankContainer');
+            container.innerHTML = "";
 
-            // Group by staff
+            // Group by Staff Name
             const staffTotals = {};
             data.forEach(d => {
                 if(!staffTotals[d.staff]) staffTotals[d.staff] = { name: d.staff, mgr: d.mgr, a: 0, t: 0 };
-                staffTotals[d.staff].a += d.actual;
-                staffTotals[d.staff].t += d.target;
+                staffTotals[d.staff].a += d.a;
+                staffTotals[d.staff].t += d.t;
             });
 
-            const sorted = Object.values(staffTotals).sort((a,b) => (b.a/b.t) - (a.a/a.t));
-            
-            sorted.slice(0, 10).forEach((s, i) => {
-                const eff = s.t > 0 ? ((s.a/s.t)*100).toFixed(0) : 0;
-                list.innerHTML += `
-                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                        <div class="flex items-center gap-3">
-                            <span class="w-7 h-7 bg-white text-[10px] font-black flex items-center justify-center rounded-full border border-slate-200">${i+1}</span>
+            const sorted = Object.values(staffTotals)
+                .sort((a,b) => (b.a/b.t) - (a.a/a.t))
+                .slice(0, 10);
+
+            sorted.forEach((s, idx) => {
+                const perc = s.t > 0 ? ((s.a/s.t)*100).toFixed(0) : 0;
+                container.innerHTML += `
+                    <div class="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 animate-slide">
+                        <div class="flex items-center gap-4">
+                            <span class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-xs font-black border border-slate-200">${idx+1}</span>
                             <div>
-                                <p class="text-sm font-black text-slate-800">${s.name}</p>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase">${s.mgr}</p>
+                                <h4 class="font-black text-slate-800 text-sm leading-none">${s.name}</h4>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase mt-1 tracking-widest">${s.mgr}</p>
                             </div>
                         </div>
-                        <span class="font-black text-blue-600 text-sm">${eff}%</span>
+                        <div class="text-right">
+                            <span class="text-sm font-black text-blue-600">${perc}%</span>
+                            <div class="w-16 h-1 bg-slate-200 rounded-full mt-1"><div class="h-full bg-blue-600 rounded-full" style="width: ${perc}%"></div></div>
+                        </div>
                     </div>
                 `;
             });
         }
 
-        function renderTable(data) {
-            const body = document.getElementById('auditTable');
+        function updateTable(data) {
+            const body = document.getElementById('masterAuditBody');
             body.innerHTML = "";
             
-            // Group data by staff and date for row aggregation
-            const grouped = {};
+            // Group by Staff + Date for the table rows
+            const tableGroups = {};
             data.forEach(d => {
-                const key = `${d.staff}-${d.sDate}`;
-                if(!grouped[key]) {
-                    grouped[key] = { staff: d.staff, mgr: d.mgr, date: d.sDate, dAch:0, dTar:0, rAch:0, rTar:0, rocket:0 };
+                const key = `${d.staff}_${d.date}`;
+                if(!tableGroups[key]) {
+                    tableGroups[key] = { name: d.staff, mgr: d.mgr, date: d.date, disbA:0, disbT:0, regA:0, regT:0, rockA:0 };
                 }
-                if(d.kpiType.includes('Disbursement')) { grouped[key].dAch += d.actual; grouped[key].dTar += d.target; }
-                if(d.kpiType.includes('Regular')) { grouped[key].rAch += d.actual; grouped[key].rTar += d.target; }
-                if(d.kpiType.includes('Rocket')) { grouped[key].rocket += d.actual; }
+                const k = d.kpiKey.toLowerCase();
+                if(k.includes('disbursement')) { tableGroups[key].disbA += d.a; tableGroups[key].disbT += d.t; }
+                if(k.includes('regular collection')) { tableGroups[key].regA += d.a; tableGroups[key].regT += d.t; }
+                if(k.includes('rocket')) { tableGroups[key].rockA += d.a; }
             });
 
-            const rows = Object.values(grouped);
-            document.getElementById('rowCounter').innerText = `${rows.length} Records Found`;
+            const finalRows = Object.values(tableGroups);
+            document.getElementById('totalRowsCount').innerText = `${finalRows.length} Records Found`;
 
-            rows.forEach(r => {
-                const dEff = r.dTar > 0 ? ((r.dAch/r.dTar)*100).toFixed(0) : 0;
-                const rEff = r.rTar > 0 ? ((r.rAch/r.rTar)*100).toFixed(0) : 0;
-                const overall = ((parseInt(dEff) + parseInt(rEff)) / 2).toFixed(0);
+            finalRows.forEach(r => {
+                const dp = r.disbT > 0 ? ((r.disbA/r.disbT)*100).toFixed(0) : 0;
+                const rp = r.regT > 0 ? ((r.regA/r.regT)*100).toFixed(0) : 0;
+                const avg = ((parseInt(dp) + parseInt(rp)) / 2).toFixed(0);
 
-                let badge = "bg-warning-soft";
-                let status = "Average";
-                if(overall > 85) { badge="bg-success-soft"; status="Elite"; }
-                if(overall < 50) { badge="bg-danger-soft"; status="Critical"; }
+                let badge = "badge-average";
+                let status = "Moderate";
+                if(avg > 85) { badge="badge-elite"; status="Elite"; }
+                if(avg < 50) { badge="badge-critical"; status="Critical"; }
 
                 body.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition-all">
-                        <td class="px-8 py-5">
-                            <p class="font-black text-slate-700">${r.staff}</p>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">${r.mgr} | ${r.date}</p>
-                        </td>
-                        <td class="px-6 py-5">
-                            <div class="flex items-center gap-2">
-                                <span class="text-[11px] font-black w-8">${dEff}%</span>
-                                <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
-                                    <div class="h-full bg-blue-600" style="width: ${dEff}%"></div>
-                                </div>
+                    <tr class="hover:bg-slate-50/80 transition-all group">
+                        <td class="px-10 py-6">
+                            <div class="flex flex-col">
+                                <span class="font-black text-slate-700 text-sm">${r.name}</span>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">${r.mgr} | ${r.date}</span>
                             </div>
                         </td>
-                        <td class="px-6 py-5">
-                            <div class="flex items-center gap-2">
-                                <span class="text-[11px] font-black w-8">${rEff}%</span>
-                                <div class="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
-                                    <div class="h-full bg-emerald-500" style="width: ${rEff}%"></div>
-                                </div>
+                        <td class="px-6 py-6">
+                            <div class="flex flex-col items-center">
+                                <span class="text-xs font-black text-slate-700">${dp}%</span>
+                                <div class="w-24 h-1 bg-slate-100 rounded-full mt-2 overflow-hidden"><div class="h-full bg-blue-600" style="width: ${dp}%"></div></div>
                             </div>
                         </td>
-                        <td class="px-6 py-5 font-bold text-xs text-slate-600">₹ ${formatINR(r.rocket)}</td>
-                        <td class="px-6 py-5 text-center">
+                        <td class="px-6 py-6">
+                             <div class="flex flex-col items-center">
+                                <span class="text-xs font-black text-slate-700">${rp}%</span>
+                                <div class="w-24 h-1 bg-slate-100 rounded-full mt-2 overflow-hidden"><div class="h-full bg-emerald-500" style="width: ${rp}%"></div></div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-6 text-center font-black text-slate-600 text-sm">₹ ${formatINR(r.rockA)}</td>
+                        <td class="px-6 py-6 text-center">
                             <span class="efficiency-badge ${badge}">${status}</span>
                         </td>
                     </tr>
@@ -481,10 +638,12 @@
             });
         }
 
-        function formatINR(num) {
-            return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num);
+        // Helper: Format INR
+        function formatINR(val) {
+            return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(val);
         }
 
+        // App Start
         window.onload = init;
     </script>
 </body>
