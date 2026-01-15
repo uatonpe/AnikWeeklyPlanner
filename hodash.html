@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anik Fin | HO Advanced Strategy Dashboard</title>
+    <title>Anik Fin | HO Enterprise Strategy Command Center</title>
 
-    <!-- UI Frameworks -->
+    <!-- UI Frameworks & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,342 +17,302 @@
     <style>
         :root {
             --primary: #1e40af;
+            --secondary: #0f172a;
             --success: #059669;
             --danger: #dc2626;
             --warning: #d97706;
-            --bg-light: #f8fafc;
+            --bg-slate: #f8fafc;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-light);
+            background-color: var(--bg-slate);
             color: #1e293b;
             letter-spacing: -0.02em;
-            overflow-x: hidden;
         }
 
-        /* High-End Glassmorphism */
+        /* Premium Glass Design */
         .glass-nav {
             background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(226, 232, 240, 0.8);
         }
 
-        .premium-card {
+        .hq-card {
             background: white;
             border-radius: 28px;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .premium-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        .hq-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 30px -10px rgba(0, 0, 0, 0.06);
             border-color: var(--primary);
         }
 
-        .kpi-icon-box {
-            width: 44px; height: 44px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 12px; margin-bottom: 12px;
+        .kpi-indicator {
+            height: 6px;
+            border-radius: 10px;
+            background: #e2e8f0;
+            overflow: hidden;
         }
 
-        /* Performance Badges */
-        .efficiency-badge { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .badge-elite { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-        .badge-average { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-        .badge-critical { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .kpi-indicator-fill {
+            height: 100%;
+            transition: width 1s ease-out;
+        }
 
-        /* Custom Scrollbar */
+        /* Custom Scrollbar for 1000+ Lines */
         .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* Loader Animation */
-        .loader-ring {
-            width: 60px; height: 60px;
-            border: 4px solid #f3f3f3; border-top: 4px solid var(--primary);
-            border-radius: 50%; animation: spin 1s linear infinite;
+        /* Professional Audit Badges */
+        .status-badge {
+            padding: 5px 14px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .status-elite { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .status-avg { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .status-low { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
-        /* PRINT STYLES - A4 Optimization */
-        #printArea { display: none; }
-
+        /* Print Formatting (A4 Optimization) */
         @media print {
-            body > *:not(#printArea) { display: none !important; }
-            #printArea { 
-                display: block !important; 
-                position: absolute; left: 0; top: 0; width: 100%;
-                background: white; padding: 20px;
-            }
-            .print-header { 
-                text-align: center; border-bottom: 3px solid #1e40af; 
-                padding-bottom: 20px; margin-bottom: 30px; 
-            }
-            .print-logo { height: 60px; margin: 0 auto 10px; display: block; }
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+            .no-print { display: none !important; }
             .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            .print-table th, .print-table td { 
-                border: 1px solid #000; padding: 10px; 
-                text-align: left; font-size: 11px; color: black;
-            }
-            .print-table th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; }
-            @page { size: A4; margin: 10mm; }
-            .no-print { display: none; }
+            .print-table th, .print-table td { border: 1px solid #000; padding: 10px; text-align: left; font-size: 11px; }
+            .print-header { text-align: center; border-bottom: 3px solid #1e40af; padding-bottom: 20px; }
         }
+        #printArea { display: none; }
     </style>
 </head>
 <body class="custom-scroll">
 
-    <!-- 1. PROFESSIONAL PRINT LAYOUT (Hidden on Screen) -->
+    <!-- 1. AUDIT PRINT TEMPLATE -->
     <div id="printArea">
         <div class="print-header">
-            <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="print-logo">
-            <h1 style="font-size: 26px; font-weight: 900; color: #1e40af; margin: 0;">ANIK FINANCIAL SERVICES PVT LTD</h1>
-            <p style="font-size: 12px; font-weight: 700; color: #444; text-transform: uppercase; margin-top: 5px; letter-spacing: 2px;">
-                Strategy & Plan Achievement Audit Report
-            </p>
+            <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" style="height: 50px;">
+            <h1 style="font-size: 24px; font-weight: 800; color: #1e40af; margin-top: 10px;">ANIK FINANCIAL SERVICES PVT LTD</h1>
+            <p style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #444;">Monthly Strategy Achievement & Audit Matrix</p>
         </div>
-
-        <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 12px; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px;">
-            <div>
-                <p><strong>Manager Name:</strong> <span id="p_mgr_val">-</span></p>
-                <p><strong>Audit Period:</strong> <span id="p_period_val">-</span></p>
-            </div>
-            <div style="text-align: right;">
-                <p><strong>Report ID:</strong> ANIK/HQ/2024/<span id="p_id">001</span></p>
-                <p><strong>Generated On:</strong> <span id="p_date_val">-</span></p>
-            </div>
+        <div style="margin-top: 20px; display: flex; justify-content: space-between; font-size: 12px; font-weight: bold;">
+            <span>Manager: <span id="pr_mgr">-</span></span>
+            <span>Generated Date: <span id="pr_date">-</span></span>
         </div>
-
         <table class="print-table">
             <thead>
-                <tr>
-                    <th style="width: 50px; text-align: center;">Sr.</th>
-                    <th>Name of FX (Staff)</th>
-                    <th>Task / KPI Description</th>
-                    <th style="text-align: right;">Plan Target</th>
-                    <th style="text-align: right;">Achieved</th>
-                    <th style="text-align: center;">Achv. %</th>
+                <tr style="background: #f1f5f9;">
+                    <th>#</th>
+                    <th>Staff Name</th>
+                    <th>KPI Details</th>
+                    <th>Target</th>
+                    <th>Achieved</th>
+                    <th>Gap</th>
+                    <th>Achv. %</th>
                 </tr>
             </thead>
-            <tbody id="print_table_body">
-                <!-- Data Rows Injected via JavaScript -->
-            </tbody>
+            <tbody id="print_table_rows"></tbody>
         </table>
-
-        <div style="margin-top: 80px; display: flex; justify-content: space-between; padding: 0 40px;">
-            <div style="text-align: center;">
-                <div style="border-top: 1.5px solid #000; width: 180px; margin-bottom: 8px;"></div>
-                <p style="font-size: 12px; font-weight: bold;">Area Manager Signature</p>
-            </div>
-            <div style="text-align: center;">
-                <div style="border-top: 1.5px solid #000; width: 180px; margin-bottom: 8px;"></div>
-                <p style="font-size: 12px; font-weight: bold;">HO Strategy Auditor</p>
-            </div>
-        </div>
-
-        <div style="position: fixed; bottom: 20px; width: 100%; text-align: center; font-size: 9px; color: #888;">
-            <p>Copyright © Anik Financial Services Pvt Ltd. System Generated Audit Matrix.</p>
+        <div style="margin-top: 100px; display: flex; justify-content: space-between;">
+            <div style="text-align: center; width: 200px; border-top: 1.5px solid #000; padding-top: 5px; font-weight: bold;">Area Manager Signature</div>
+            <div style="text-align: center; width: 200px; border-top: 1.5px solid #000; padding-top: 5px; font-weight: bold;">HO Strategy Auditor</div>
         </div>
     </div>
 
     <!-- 2. MAIN DASHBOARD UI -->
-    <nav class="glass-nav sticky top-0 z-[100] h-20">
-        <div class="max-w-[1700px] mx-auto px-8 h-full flex justify-between items-center">
+    <nav class="glass-nav sticky top-0 z-[100] h-20 no-print">
+        <div class="max-w-[1750px] mx-auto px-8 h-full flex justify-between items-center">
             <div class="flex items-center gap-6">
-                <div class="bg-blue-600 p-2 rounded-2xl">
-                    <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-6 brightness-0 invert" alt="Anik Logo">
+                <div class="bg-blue-600 p-2.5 rounded-2xl shadow-lg shadow-blue-200">
+                    <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-5 brightness-0 invert">
                 </div>
-                <div class="h-10 w-[1px] bg-slate-200"></div>
+                <div class="h-10 w-[1.5px] bg-slate-200"></div>
                 <div>
-                    <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase">HO Command Center</h1>
-                    <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Real-Time Strategy Matrix</p>
+                    <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase">Command Center</h1>
+                    <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Live Strategy Achievement Matrix</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
-                <div class="hidden lg:flex items-center gap-3 bg-slate-100 border px-4 py-2.5 rounded-2xl">
+                <div class="flex items-center gap-3 bg-slate-100 border px-4 py-2.5 rounded-2xl">
                     <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
-                    <input type="text" id="globalDateRange" class="bg-transparent text-sm font-bold outline-none w-48 cursor-pointer" placeholder="Select Period">
+                    <input type="text" id="dateRange" class="bg-transparent text-sm font-bold outline-none w-48" placeholder="Select Period">
                 </div>
-                
                 <button onclick="fetchAllData()" class="bg-slate-800 hover:bg-black text-white px-6 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-3 transition-all">
                     <i data-lucide="refresh-cw" class="w-4 h-4"></i> रिफ्रेश डेटा
                 </button>
-
-                <button onclick="generateProfessionalReport()" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-2xl font-bold text-xs shadow-xl shadow-blue-100 flex items-center gap-3 transition-all">
-                    <i data-lucide="printer" class="w-4 h-4"></i> प्रिंट ऑडिट रिपोर्ट
+                <button onclick="generateAuditReport()" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-2.5 rounded-2xl font-bold text-xs shadow-xl shadow-blue-100 flex items-center gap-3 transition-all">
+                    <i data-lucide="printer" class="w-4 h-4"></i> ऑडिट रिपोर्ट प्रिंट
                 </button>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-[1700px] mx-auto p-8 space-y-8">
+    <main class="max-w-[1750px] mx-auto p-8 space-y-8 no-print">
 
-        <!-- Quick Info & Filters -->
+        <!-- Top Statistics & Filters -->
         <section class="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div class="md:col-span-3 premium-card p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="md:col-span-3 hq-card p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="space-y-3">
                     <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">मॅनेजर निवडा</label>
-                    <select id="mgrDropdown" onchange="syncStaffDropdown()" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 ring-blue-500/10 transition-all appearance-none">
+                    <select id="mgrFilter" onchange="syncStaffDropdown()" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 ring-blue-500/10">
                         <option value="all">सर्व मॅनेजर्स</option>
                     </select>
                 </div>
                 <div class="space-y-3">
-                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">स्टाफ निवडा (Unique)</label>
-                    <select id="staffDropdown" onchange="processAndRender()" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 ring-blue-500/10 transition-all appearance-none">
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">स्टाफ निवडा</label>
+                    <select id="staffFilter" onchange="processAndRender()" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 ring-blue-500/10">
                         <option value="all">सर्व स्टाफ सदस्य</option>
                     </select>
                 </div>
                 <div class="space-y-3">
-                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">शोध (Search)</label>
-                    <input type="text" id="staffSearch" oninput="processAndRender()" placeholder="नाव टाईप करा..." class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 ring-blue-500/10 transition-all">
-                </div>
-            </div>
-
-            <div class="premium-card p-8 bg-gradient-to-br from-blue-600 to-blue-800 border-none flex flex-col justify-center items-center text-center text-white">
-                <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mb-2 opacity-80">Achievement</p>
-                <h2 id="totalPercentage" class="text-6xl font-black">0%</h2>
-            </div>
-        </section>
-
-        <!-- KPI Scoreboard -->
-        <section class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
-            <!-- 1. Disbursement -->
-            <div onclick="showKPIDetails('disb', 'Disbursement')" class="premium-card p-6 border-b-4 border-b-blue-600 cursor-pointer">
-                <div class="kpi-icon-box bg-blue-50 text-blue-600"><i data-lucide="wallet" class="w-5 h-5"></i></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Disbursement</p>
-                <h3 id="v_disb" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
-                <div class="mt-4 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div id="p_disb_bar" class="bg-blue-600 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
-                </div>
-                <div id="p_disb_txt" class="mt-2 text-[10px] font-extrabold text-blue-600 uppercase">0% Done</div>
-            </div>
-
-            <!-- 2. Appraisal -->
-            <div onclick="showKPIDetails('appr', 'Appraisal')" class="premium-card p-6 border-b-4 border-b-indigo-500 cursor-pointer">
-                <div class="kpi-icon-box bg-indigo-50 text-indigo-600"><i data-lucide="file-check" class="w-5 h-5"></i></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Appraisal</p>
-                <h3 id="v_appr" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
-                <div class="mt-4 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div id="p_appr_bar" class="bg-indigo-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
-                </div>
-                <div id="p_appr_txt" class="mt-2 text-[10px] font-extrabold text-indigo-600 uppercase">0% Done</div>
-            </div>
-
-            <!-- 3. OD Recovery -->
-            <div onclick="showKPIDetails('od', 'OD Recovery')" class="premium-card p-6 border-b-4 border-b-rose-500 cursor-pointer">
-                <div class="kpi-icon-box bg-rose-50 text-rose-600"><i data-lucide="alert-circle" class="w-5 h-5"></i></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">OD Recovery</p>
-                <h3 id="v_od" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
-                <div class="mt-4 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div id="p_od_bar" class="bg-rose-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
-                </div>
-                <div id="p_od_txt" class="mt-2 text-[10px] font-extrabold text-rose-600 uppercase">0% Done</div>
-            </div>
-
-            <!-- 4. Regular Coll -->
-            <div onclick="showKPIDetails('reg', 'Regular Coll.')" class="premium-card p-6 border-b-4 border-b-emerald-500 cursor-pointer">
-                <div class="kpi-icon-box bg-emerald-50 text-emerald-600"><i data-lucide="calendar-check" class="w-5 h-5"></i></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Regular Coll.</p>
-                <h3 id="v_reg" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
-                <div class="mt-4 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div id="p_reg_bar" class="bg-emerald-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
-                </div>
-                <div id="p_reg_txt" class="mt-2 text-[10px] font-extrabold text-emerald-600 uppercase">0% Done</div>
-            </div>
-
-            <!-- 5. Past Due -->
-            <div onclick="showKPIDetails('past', 'Past Due')" class="premium-card p-6 border-b-4 border-b-amber-500 cursor-pointer">
-                <div class="kpi-icon-box bg-amber-50 text-amber-600"><i data-lucide="history" class="w-5 h-5"></i></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Past Due</p>
-                <h3 id="v_past" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
-                <div class="mt-4 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div id="p_past_bar" class="bg-amber-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
-                </div>
-                <div id="p_past_txt" class="mt-2 text-[10px] font-extrabold text-amber-600 uppercase">0% Done</div>
-            </div>
-
-            <!-- 6. Rocket Pay -->
-            <div onclick="showKPIDetails('rock', 'Rocket Pay')" class="premium-card p-6 border-b-4 border-b-purple-500 cursor-pointer">
-                <div class="kpi-icon-box bg-purple-50 text-purple-600"><i data-lucide="rocket" class="w-5 h-5"></i></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rocket Pay</p>
-                <h3 id="v_rock" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
-                <div class="mt-4 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div id="p_rock_bar" class="bg-purple-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
-                </div>
-                <div id="p_rock_txt" class="mt-2 text-[10px] font-extrabold text-purple-600 uppercase">0% Done</div>
-            </div>
-
-            <!-- 7. Meetings -->
-            <div onclick="showKPIDetails('meet', 'Group Meeting')" class="premium-card p-6 border-b-4 border-b-cyan-500 cursor-pointer">
-                <div class="kpi-icon-box bg-cyan-50 text-cyan-600"><i data-lucide="users-2" class="w-5 h-5"></i></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Group Meeting</p>
-                <h3 id="v_meet" class="text-xl font-black text-slate-800 mt-1 truncate">0</h3>
-                <div class="mt-4 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div id="p_meet_bar" class="bg-cyan-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
-                </div>
-                <div id="p_meet_txt" class="mt-2 text-[10px] font-extrabold text-cyan-600 uppercase">0% Done</div>
-            </div>
-        </section>
-
-        <!-- Analytics & Rankings -->
-        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Chart Area -->
-            <div class="lg:col-span-8 premium-card p-10">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
-                    <div>
-                        <h2 class="text-2xl font-black text-slate-800">Gap Intelligence</h2>
-                        <p class="text-sm font-bold text-slate-400 uppercase tracking-tighter mt-1">Plan vs Achievement Ratio Analysis</p>
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">नाव शोधा</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                        <input type="text" id="searchTerm" oninput="processAndRender()" placeholder="नाव टाईप करा..." class="w-full bg-slate-50 border border-slate-100 p-4 pl-12 rounded-2xl font-bold text-slate-700 outline-none">
                     </div>
-                    <div class="flex items-center gap-6 bg-slate-50 px-6 py-3 rounded-2xl border">
-                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-600"></div><span class="text-[10px] font-black text-slate-500 uppercase">Actual</span></div>
-                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-slate-200"></div><span class="text-[10px] font-black text-slate-500 uppercase">Target</span></div>
+                </div>
+            </div>
+
+            <div class="hq-card p-8 bg-gradient-to-br from-blue-700 to-indigo-900 border-none flex flex-col justify-center items-center text-white relative overflow-hidden">
+                <div class="absolute -right-4 -bottom-4 opacity-10"><i data-lucide="award" class="w-32 h-32"></i></div>
+                <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mb-2 z-10">Total Efficiency</p>
+                <h2 id="overallPerc" class="text-6xl font-black z-10 tracking-tighter">0%</h2>
+                <div id="overallTrend" class="mt-4 text-[10px] font-bold bg-white/10 px-4 py-1.5 rounded-full z-10">ANALYZING TREND...</div>
+            </div>
+        </section>
+
+        <!-- KPI Power Grid (7 Key Indicators) -->
+        <section class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
+            <!-- Disb -->
+            <div onclick="showDetailedKPIData('disb', 'Disbursement')" class="hq-card p-6 border-b-4 border-b-blue-600 cursor-pointer">
+                <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="wallet" class="w-5 h-5"></i></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Disbursement</p>
+                <h3 id="v_disb" class="text-lg font-black text-slate-800">₹ 0</h3>
+                <div class="kpi-indicator mt-4"><div id="b_disb" class="kpi-indicator-fill bg-blue-600" style="width: 0%"></div></div>
+                <div id="p_disb" class="mt-2 text-[10px] font-black text-blue-600">0% ACHIEVED</div>
+            </div>
+
+            <!-- Appr -->
+            <div onclick="showDetailedKPIData('appr', 'Appraisal')" class="hq-card p-6 border-b-4 border-b-indigo-500 cursor-pointer">
+                <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="file-check" class="w-5 h-5"></i></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Appraisal</p>
+                <h3 id="v_appr" class="text-lg font-black text-slate-800">₹ 0</h3>
+                <div class="kpi-indicator mt-4"><div id="b_appr" class="kpi-indicator-fill bg-indigo-600" style="width: 0%"></div></div>
+                <div id="p_appr" class="mt-2 text-[10px] font-black text-indigo-600">0% ACHIEVED</div>
+            </div>
+
+            <!-- OD -->
+            <div onclick="showDetailedKPIData('od', 'OD Recovery')" class="hq-card p-6 border-b-4 border-b-rose-600 cursor-pointer">
+                <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">OD Recovery</p>
+                <h3 id="v_od" class="text-lg font-black text-slate-800">₹ 0</h3>
+                <div class="kpi-indicator mt-4"><div id="b_od" class="kpi-indicator-fill bg-rose-600" style="width: 0%"></div></div>
+                <div id="p_od" class="mt-2 text-[10px] font-black text-rose-600">0% ACHIEVED</div>
+            </div>
+
+            <!-- Reg -->
+            <div onclick="showDetailedKPIData('reg', 'Regular Coll.')" class="hq-card p-6 border-b-4 border-b-emerald-600 cursor-pointer">
+                <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="check-circle" class="w-5 h-5"></i></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Regular Coll.</p>
+                <h3 id="v_reg" class="text-lg font-black text-slate-800">₹ 0</h3>
+                <div class="kpi-indicator mt-4"><div id="b_reg" class="kpi-indicator-fill bg-emerald-600" style="width: 0%"></div></div>
+                <div id="p_reg" class="mt-2 text-[10px] font-black text-emerald-600">0% ACHIEVED</div>
+            </div>
+
+            <!-- Past -->
+            <div onclick="showDetailedKPIData('past', 'Past Due')" class="hq-card p-6 border-b-4 border-b-amber-600 cursor-pointer">
+                <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="history" class="w-5 h-5"></i></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Past Due</p>
+                <h3 id="v_past" class="text-lg font-black text-slate-800">₹ 0</h3>
+                <div class="kpi-indicator mt-4"><div id="b_past" class="kpi-indicator-fill bg-amber-600" style="width: 0%"></div></div>
+                <div id="p_past" class="mt-2 text-[10px] font-black text-amber-600">0% ACHIEVED</div>
+            </div>
+
+            <!-- Rock -->
+            <div onclick="showDetailedKPIData('rock', 'Rocket Pay')" class="hq-card p-6 border-b-4 border-b-purple-600 cursor-pointer">
+                <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="rocket" class="w-5 h-5"></i></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Rocket Pay</p>
+                <h3 id="v_rock" class="text-lg font-black text-slate-800">0</h3>
+                <div class="kpi-indicator mt-4"><div id="b_rock" class="kpi-indicator-fill bg-purple-600" style="width: 0%"></div></div>
+                <div id="p_rock" class="mt-2 text-[10px] font-black text-purple-600">0% ACHIEVED</div>
+            </div>
+
+            <!-- Meet -->
+            <div onclick="showDetailedKPIData('meet', 'Meetings')" class="hq-card p-6 border-b-4 border-b-cyan-600 cursor-pointer">
+                <div class="w-10 h-10 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="users" class="w-5 h-5"></i></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Meetings</p>
+                <h3 id="v_meet" class="text-lg font-black text-slate-800">0</h3>
+                <div class="kpi-indicator mt-4"><div id="b_meet" class="kpi-indicator-fill bg-cyan-600" style="width: 0%"></div></div>
+                <div id="p_meet" class="mt-2 text-[10px] font-black text-cyan-600">0% ACHIEVED</div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Main Chart -->
+            <div class="lg:col-span-8 hq-card p-8">
+                <div class="flex justify-between items-center mb-10">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800">Strategy Performance Ratio</h2>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Target vs Achievement Gap Intelligence</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-blue-600"></div><span class="text-[10px] font-bold text-slate-500 uppercase">Actual</span></div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-slate-200"></div><span class="text-[10px] font-bold text-slate-500 uppercase">Target</span></div>
                     </div>
                 </div>
                 <div class="h-[400px]">
-                    <canvas id="mainPerformanceChart"></canvas>
+                    <canvas id="strategyChart"></canvas>
                 </div>
             </div>
 
-            <!-- Rankings Area -->
-            <div class="lg:col-span-4 premium-card p-8 flex flex-col">
+            <!-- Top Performance Ranking -->
+            <div class="lg:col-span-4 hq-card p-8">
                 <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-xl font-black text-slate-800 uppercase">Top Performers</h2>
-                    <i data-lucide="award" class="w-6 h-6 text-amber-500"></i>
+                    <h2 class="text-xl font-black text-slate-800 uppercase">Top 10 Leaders</h2>
+                    <i data-lucide="trophy" class="w-6 h-6 text-amber-500"></i>
                 </div>
-                <div id="rankingsList" class="space-y-4 flex-1 overflow-y-auto pr-2 custom-scroll">
-                    <!-- Dynamic Ranks -->
+                <div id="rankingsList" class="space-y-4 max-h-[420px] overflow-y-auto pr-2 custom-scroll">
+                    <!-- Leaderboard Rows -->
                 </div>
             </div>
         </section>
 
-        <!-- Detailed Audit Matrix Table -->
-        <section class="premium-card overflow-hidden">
-            <div class="p-8 border-b border-slate-50 bg-slate-50/40 flex justify-between items-center">
+        <!-- Detailed Matrix (1000+ Lines Capacity) -->
+        <section class="hq-card overflow-hidden">
+            <div class="p-8 bg-slate-50/50 border-b flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-black text-slate-800 uppercase">Detailed Audit Matrix</h2>
-                    <p class="text-xs font-bold text-slate-400 uppercase mt-1">प्रत्येक स्टाफचे कालावधीनुसार सविस्तर विश्लेषण</p>
+                    <p class="text-xs font-bold text-slate-400 mt-1 uppercase">प्रत्येक स्टाफचे कालावधीनुसार सविस्तर विश्लेषण</p>
                 </div>
-                <div id="totalEntriesCount" class="bg-slate-800 text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase">
-                    0 Records Found
+                <div id="recordInfo" class="bg-slate-800 text-white px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest">
+                    0 Records Filtered
                 </div>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto max-h-[800px] overflow-y-auto custom-scroll">
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-50/80 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                        <tr>
-                            <th class="px-10 py-6">FX Staff Name</th>
+                    <thead class="bg-white sticky top-0 z-10 shadow-sm">
+                        <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.1em]">
+                            <th class="px-10 py-6">FX Staff Name & Branch</th>
                             <th class="px-6 py-6 text-center">Disbursement %</th>
-                            <th class="px-6 py-6 text-center">Regular Coll. %</th>
+                            <th class="px-6 py-6 text-center">Recovery %</th>
                             <th class="px-6 py-6 text-center">Rocket Pay</th>
+                            <th class="px-6 py-6 text-center">Group Meeting</th>
                             <th class="px-6 py-6 text-center">Audit Status</th>
                         </tr>
                     </thead>
-                    <tbody id="auditTableBody" class="divide-y divide-slate-100">
-                        <!-- Table Rows -->
+                    <tbody id="matrixTableBody" class="divide-y divide-slate-100">
+                        <!-- Matrix Rows -->
                     </tbody>
                 </table>
             </div>
@@ -360,29 +320,33 @@
 
     </main>
 
-    <!-- Initial Loader Overlay -->
-    <div id="initialOverlay" class="fixed inset-0 bg-white z-[1000] flex flex-col items-center justify-center">
-        <div class="loader-ring mb-8"></div>
-        <div class="text-center">
+    <!-- Initial Loading Overlay -->
+    <div id="loaderOverlay" class="fixed inset-0 bg-white z-[2000] flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <div class="mt-8 text-center">
             <h2 class="text-3xl font-black text-slate-800 tracking-tighter uppercase">Anik Intelligence System</h2>
-            <p id="loadingStatusText" class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-4 animate-pulse">Synchronizing Data From HQ Database...</p>
+            <p id="loaderStatus" class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-4 animate-pulse">Syncing Enterprise Database...</p>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec";
-        let masterData = [];
-        let chartInstance = null;
-        let globalBuckets = {}; // Global storage for Click Action
+        // HO API Configuration
+        const API_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec";
+        
+        // State Management for 1000+ Lines
+        let masterStore = [];
+        let filteredStore = [];
+        let mainChart = null;
+        let globalAggregates = {};
 
         async function init() {
             lucide.createIcons();
             
-            // Initialize Date Picker
-            flatpickr("#globalDateRange", {
+            // Period Initializer
+            flatpickr("#dateRange", {
                 mode: "range",
                 dateFormat: "Y-m-d",
-                defaultDate: [new Date().setDate(new Date().getDate() - 60), new Date()],
+                defaultDate: [new Date().setDate(new Date().getDate() - 30), new Date()],
                 onChange: () => processAndRender()
             });
 
@@ -390,158 +354,131 @@
         }
 
         async function fetchAllData() {
-            document.getElementById('initialOverlay').style.display = 'flex';
-            document.getElementById('loadingStatusText').innerText = "Querying Manager Data Layers...";
+            document.getElementById('loaderOverlay').style.display = 'flex';
+            document.getElementById('loaderStatus').innerText = "QUERYING HQ MANAGERS...";
 
             try {
-                const mgrResp = await fetch(`${SCRIPT_URL}?action=getManagers`);
-                const managersList = await mgrResp.json();
+                // Fetch Managers First
+                const mResp = await fetch(`${API_URL}?action=getManagers`);
+                const managers = await mResp.json();
                 
-                const mgrDropdown = document.getElementById('mgrDropdown');
-                mgrDropdown.innerHTML = '<option value="all">सर्व मॅनेजर्स</option>';
-                managersList.forEach(m => mgrDropdown.innerHTML += `<option value="${m}">${m}</option>`);
+                const mgrSelect = document.getElementById('mgrFilter');
+                mgrSelect.innerHTML = '<option value="all">सर्व मॅनेजर्स</option>';
+                managers.forEach(m => mgrSelect.innerHTML += `<option value="${m}">${m}</option>`);
 
-                masterData = [];
-                
-                const fetchTasks = managersList.map(async (manager) => {
+                document.getElementById('loaderStatus').innerText = "FETCHING 1000+ LINE KPI DATA...";
+                masterStore = [];
+
+                // Parallel Fetching for Efficiency
+                const fetchPromises = managers.map(async (mgr) => {
                     try {
-                        const dataResp = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(manager)}`);
-                        const result = await dataResp.json();
+                        const dResp = await fetch(`${API_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
+                        const data = await dResp.json();
                         
-                        result.history.forEach(week => {
+                        data.history.forEach(week => {
                             week.details.forEach(item => {
-                                const rawLabel = item.name || "Unknown";
-                                const cleanStaffName = rawLabel.includes('||') ? rawLabel.split('||')[0].trim() : rawLabel.trim();
-                                const specificKpi = rawLabel.includes('||') ? rawLabel.split('||')[1].trim() : "Default";
+                                // Smart Parser: "Name || KPI Description"
+                                const rawName = item.name || "Unknown";
+                                let staff = rawName;
+                                let kpi = "General";
+                                
+                                if (rawName.includes('||')) {
+                                    const parts = rawName.split('||');
+                                    staff = parts[0].trim();
+                                    kpi = parts[1].trim();
+                                }
 
-                                masterData.push({
-                                    manager: manager,
-                                    staff: cleanStaffName,
-                                    kpi: specificKpi,
+                                masterStore.push({
+                                    mgr: mgr,
+                                    staff: staff,
+                                    kpi: kpi,
                                     target: parseFloat(item.tDisb || item.tAppr || item.tOD || item.tReg || item.tPast || item.tRocket || item.tGroup || 0),
                                     achieved: parseFloat(item.aDisb || item.aAppr || item.aOD || item.aReg || item.aPast || item.aRocket || item.aGroup || 0),
-                                    startDate: week.sDate,
-                                    endDate: week.eDate
+                                    sDate: week.sDate,
+                                    eDate: week.eDate,
+                                    remarks: item.pd || "-"
                                 });
                             });
                         });
-                    } catch (e) { console.error(`Manager Sync Failed: ${manager}`, e); }
+                    } catch (err) { console.error(`Manager ${mgr} Fail:`, err); }
                 });
 
-                await Promise.all(fetchTasks);
+                await Promise.all(fetchPromises);
                 syncStaffDropdown();
                 processAndRender();
 
-            } catch (err) {
+            } catch (error) {
                 Swal.fire("Connection Error", "HQ डेटाबेसशी संपर्क होऊ शकला नाही.", "error");
             } finally {
-                document.getElementById('initialOverlay').style.opacity = '0';
-                setTimeout(() => document.getElementById('initialOverlay').style.display = 'none', 600);
+                document.getElementById('loaderOverlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loaderOverlay').style.display = 'none', 700);
             }
         }
 
         function syncStaffDropdown() {
-            const selectedMgr = document.getElementById('mgrDropdown').value;
-            const staffDrop = document.getElementById('staffDropdown');
-            staffDrop.innerHTML = '<option value="all">सर्व स्टाफ सदस्य</option>';
+            const selectedMgr = document.getElementById('mgrFilter').value;
+            const staffFilter = document.getElementById('staffFilter');
+            staffFilter.innerHTML = '<option value="all">सर्व स्टाफ सदस्य</option>';
 
-            const filteredStaff = [...new Set(
-                masterData
-                .filter(d => selectedMgr === 'all' || d.manager === selectedMgr)
+            const staffList = [...new Set(
+                masterStore
+                .filter(d => selectedMgr === 'all' || d.mgr === selectedMgr)
                 .map(d => d.staff)
             )].sort();
 
-            filteredStaff.forEach(s => staffDrop.innerHTML += `<option value="${s}">${s}</option>`);
+            staffList.forEach(s => staffFilter.innerHTML += `<option value="${s}">${s}</option>`);
         }
 
         function processAndRender() {
-            const mgr = document.getElementById('mgrDropdown').value;
-            const staff = document.getElementById('staffDropdown').value;
-            const search = document.getElementById('staffSearch').value.toLowerCase();
-            const dateStr = document.getElementById('globalDateRange').value;
+            const mgr = document.getElementById('mgrFilter').value;
+            const staff = document.getElementById('staffFilter').value;
+            const search = document.getElementById('searchTerm').value.toLowerCase();
+            const dateVal = document.getElementById('dateRange').value;
 
-            const filtered = masterData.filter(d => {
-                const matchM = (mgr === 'all' || d.manager === mgr);
+            filteredStore = masterStore.filter(d => {
+                const matchM = (mgr === 'all' || d.mgr === mgr);
                 const matchS = (staff === 'all' || d.staff === staff);
                 const matchQ = d.staff.toLowerCase().includes(search);
                 let matchD = true;
-                if (dateStr.includes(' to ')) {
-                    const [s, e] = dateStr.split(' to ');
-                    matchD = (d.startDate >= s && d.startDate <= e);
+                if (dateVal.includes(' to ')) {
+                    const [s, e] = dateVal.split(' to ');
+                    matchD = (d.sDate >= s && d.sDate <= e);
                 }
                 return matchM && matchS && matchQ && matchD;
             });
 
+            // Aggregate Calculations for 7 KPIs
             const buckets = {
                 disb: {t:0, a:0}, appr: {t:0, a:0}, od: {t:0, a:0},
                 reg: {t:0, a:0}, past: {t:0, a:0}, rock: {t:0, a:0}, meet: {t:0, a:0}
             };
 
-            filtered.forEach(d => {
+            filteredStore.forEach(d => {
                 const k = d.kpi.toLowerCase();
                 if(k.includes('disbursement')) { buckets.disb.t += d.target; buckets.disb.a += d.achieved; }
-                else if(k.includes('apprisal')) { buckets.appr.t += d.target; buckets.appr.a += d.achieved; }
-                else if(k.includes('recovery')) { buckets.od.t += d.target; buckets.od.a += d.achieved; }
-                else if(k.includes('regular')) { buckets.reg.t += d.target; buckets.reg.a += d.achieved; }
-                else if(k.includes('past')) { buckets.past.t += d.target; buckets.past.a += d.achieved; }
-                else if(k.includes('rocket')) { buckets.rock.t += d.target; buckets.rock.a += d.achieved; }
-                else if(k.includes('meeting') || k.includes('group')) { buckets.meet.t += d.target; buckets.meet.a += d.achieved; }
+                else if(k.includes('appraisal') || k.includes('apprisal')) { buckets.appr.t += d.target; buckets.appr.a += d.achieved; }
+                else if(k.includes('od recovery') || k.includes('recovery')) { buckets.od.t += d.target; buckets.od.a += d.achieved; }
+                else if(k.includes('regular collection')) { buckets.reg.t += d.target; buckets.reg.a += d.achieved; }
+                else if(k.includes('past due')) { buckets.past.t += d.target; buckets.past.a += d.achieved; }
+                else if(k.includes('rocket pay') || k.includes('auto pay')) { buckets.rock.t += d.target; buckets.rock.a += d.achieved; }
+                else if(k.includes('group meeting') || k.includes('meeting')) { buckets.meet.t += d.target; buckets.meet.a += d.achieved; }
             });
 
-            globalBuckets = buckets; // Store for global click access
-            updateKPIBars(buckets);
-            updateAnalyticsChart(buckets);
-            updateTopRankings(filtered);
-            updateDetailedAuditTable(filtered);
+            globalAggregates = buckets;
+            renderKPIBoxes(buckets);
+            renderMainChart(buckets);
+            renderLeaderboard(filteredStore);
+            renderMatrixTable(filteredStore);
+            
+            document.getElementById('recordInfo').innerText = `${filteredStore.length} Records Found`;
         }
 
-        // --- NEW CLICKABLE KPI ACTION ---
-        function showKPIDetails(key, label) {
-            const data = globalBuckets[key];
-            if(!data) return;
-
-            const perc = data.t > 0 ? ((data.a / data.t) * 100).toFixed(2) : 0;
-            const isCurrency = key !== 'meet';
-            const sign = isCurrency ? '₹ ' : '';
-
-            Swal.fire({
-                title: `<span class="text-slate-800 font-black uppercase text-xl">${label} Matrix</span>`,
-                html: `
-                    <div class="text-left space-y-4 p-4">
-                        <div class="flex justify-between items-center border-b pb-3">
-                            <span class="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Planned Target</span>
-                            <span class="text-slate-800 font-black text-lg">${sign}${formatINR(data.t)}</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b pb-3">
-                            <span class="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Actual Achieved</span>
-                            <span class="text-emerald-600 font-black text-lg">${sign}${formatINR(data.a)}</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b pb-3">
-                            <span class="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Pending Gap</span>
-                            <span class="text-rose-600 font-black text-lg">${sign}${formatINR(Math.max(0, data.t - data.a))}</span>
-                        </div>
-                        <div class="flex justify-between items-center pt-2">
-                            <span class="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Efficiency Rate</span>
-                            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg font-black">${perc}%</span>
-                        </div>
-                    </div>
-                `,
-                confirmButtonText: 'डेटा बंद करा',
-                confirmButtonColor: '#1e40af',
-                buttonsStyling: true,
-                customClass: {
-                    popup: 'rounded-[28px]',
-                    confirmButton: 'rounded-xl px-8 py-3 text-xs font-bold uppercase tracking-widest'
-                }
-            });
-        }
-
-        function updateKPIBars(b) {
-            const updateUI = (key, data, isCurr) => {
-                const p = data.t > 0 ? ((data.a / data.t) * 100).toFixed(0) : 0;
-                document.getElementById(`v_${key}`).innerText = isCurr ? `₹ ${formatINR(data.a)}` : data.a;
-                document.getElementById(`p_${key}_txt`).innerText = `${p}% Done`;
-                document.getElementById(`p_${key}_bar`).style.width = `${Math.min(p, 100)}%`;
+        function renderKPIBoxes(b) {
+            const updateUI = (id, data, isCurrency) => {
+                const p = data.t > 0 ? Math.round((data.a / data.t) * 100) : 0;
+                document.getElementById(`v_${id}`).innerText = isCurrency ? `₹ ${formatINR(data.a)}` : data.a;
+                document.getElementById(`p_${id}`).innerText = `${p}% ACHIEVED`;
+                document.getElementById(`b_${id}`).style.width = `${Math.min(p, 100)}%`;
             };
 
             updateUI('disb', b.disb, true);
@@ -549,59 +486,68 @@
             updateUI('od', b.od, true);
             updateUI('reg', b.reg, true);
             updateUI('past', b.past, true);
-            updateUI('rock', b.rock, true);
+            updateUI('rock', b.rock, false);
             updateUI('meet', b.meet, false);
 
             let totalA = 0, totalT = 0;
-            Object.values(b).forEach(i => { totalA += i.a; totalT += i.t; });
-            document.getElementById('totalPercentage').innerText = `${totalT > 0 ? ((totalA / totalT) * 100).toFixed(0) : 0}%`;
+            Object.values(b).forEach(v => { totalA += v.a; totalT += v.t; });
+            const finalPerc = totalT > 0 ? Math.round((totalA/totalT)*100) : 0;
+            document.getElementById('overallPerc').innerText = `${finalPerc}%`;
+            
+            const trend = document.getElementById('overallTrend');
+            if(finalPerc >= 90) { trend.innerText = "EXCELLENT EXECUTION"; trend.style.color = "#4ade80"; }
+            else if(finalPerc >= 70) { trend.innerText = "STEADY GROWTH"; trend.style.color = "#fbbf24"; }
+            else { trend.innerText = "ATTENTION REQUIRED"; trend.style.color = "#f87171"; }
         }
 
-        function updateAnalyticsChart(b) {
-            const ctx = document.getElementById('mainPerformanceChart').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
+        function renderMainChart(b) {
+            const ctx = document.getElementById('strategyChart').getContext('2d');
+            if(mainChart) mainChart.destroy();
 
-            chartInstance = new Chart(ctx, {
+            mainChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Disbursement', 'Appraisal', 'OD Recovery', 'Regular Coll', 'Past Due', 'Rocket Pay', 'Meeting'],
+                    labels: ['Disb', 'Appr', 'Recovery', 'Regular', 'Past Due', 'Rocket', 'Meetings'],
                     datasets: [
-                        { label: 'Actual Achievement', data: [b.disb.a, b.appr.a, b.od.a, b.reg.a, b.past.a, b.rock.a, b.meet.a], backgroundColor: '#1e40af', borderRadius: 10, barThickness: 35 },
-                        { label: 'Target Plan', data: [b.disb.t, b.appr.t, b.od.t, b.reg.t, b.past.t, b.rock.t, b.meet.t], backgroundColor: '#e2e8f0', borderRadius: 10, barThickness: 35 }
+                        { label: 'Actual', data: [b.disb.a, b.appr.a, b.od.a, b.reg.a, b.past.a, b.rock.a, b.meet.a], backgroundColor: '#1e40af', borderRadius: 8, barThickness: 40 },
+                        { label: 'Target', data: [b.disb.t, b.appr.t, b.od.t, b.reg.t, b.past.t, b.rock.t, b.meet.t], backgroundColor: '#e2e8f0', borderRadius: 8, barThickness: 40 }
                     ]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                    scales: { 
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
                 }
             });
         }
 
-        function updateTopRankings(data) {
+        function renderLeaderboard(data) {
             const container = document.getElementById('rankingsList');
             container.innerHTML = "";
-            const staffStats = {};
+            const stats = {};
 
             data.forEach(d => {
-                if(!staffStats[d.staff]) staffStats[d.staff] = { n: d.staff, m: d.manager, a:0, t:0 };
-                staffStats[d.staff].a += d.achieved;
-                staffStats[d.staff].t += d.target;
+                if(!stats[d.staff]) stats[d.staff] = { n: d.staff, m: d.mgr, a: 0, t: 0 };
+                stats[d.staff].a += d.achieved;
+                stats[d.staff].t += d.target;
             });
 
-            const sorted = Object.values(staffStats)
+            const sorted = Object.values(stats)
                 .sort((a,b) => (b.a/b.t) - (a.a/a.t))
-                .slice(0, 8);
+                .slice(0, 10);
 
             sorted.forEach((s, idx) => {
-                const perc = s.t > 0 ? ((s.a/s.t)*100).toFixed(0) : 0;
+                const perc = s.t > 0 ? Math.round((s.a/s.t)*100) : 0;
                 container.innerHTML += `
-                    <div class="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 transition-all hover:bg-white hover:border-blue-200">
+                    <div class="flex items-center justify-between p-5 bg-slate-50 rounded-3xl border border-slate-100 transition-all hover:bg-white hover:border-blue-200">
                         <div class="flex items-center gap-4">
-                            <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-black">${idx+1}</span>
+                            <span class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px] font-black">${idx+1}</span>
                             <div>
                                 <h4 class="font-black text-slate-800 text-sm leading-none">${s.n}</h4>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase mt-1 tracking-widest">${s.m}</p>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase mt-1.5 tracking-widest">${s.m}</p>
                             </div>
                         </div>
                         <div class="text-right">
@@ -612,31 +558,30 @@
             });
         }
 
-        function updateDetailedAuditTable(data) {
-            const body = document.getElementById('auditTableBody');
+        function renderMatrixTable(data) {
+            const body = document.getElementById('matrixTableBody');
             body.innerHTML = "";
-            const groupMatrix = {};
+            const staffHistory = {};
 
+            // Grouping for 1000+ line matrix view
             data.forEach(d => {
-                const key = `${d.staff}_${d.startDate}`;
-                if(!groupMatrix[key]) groupMatrix[key] = { n: d.staff, m: d.manager, d: d.startDate, da:0, dt:0, ra:0, rt:0, rck:0 };
-                const label = d.kpi.toLowerCase();
-                if(label.includes('disbursement')) { groupMatrix[key].da += d.achieved; groupMatrix[key].dt += d.target; }
-                if(label.includes('regular')) { groupMatrix[key].ra += d.achieved; groupMatrix[key].rt += d.target; }
-                if(label.includes('rocket')) { groupMatrix[key].rck += d.achieved; }
+                const key = `${d.staff}_${d.sDate}`;
+                if(!staffHistory[key]) staffHistory[key] = { n: d.staff, m: d.mgr, d: d.sDate, da:0, dt:0, ra:0, rt:0, rock:0, mt:0 };
+                const k = d.kpi.toLowerCase();
+                if(k.includes('disbursement')) { staffHistory[key].da += d.achieved; staffHistory[key].dt += d.target; }
+                if(k.includes('regular collection')) { staffHistory[key].ra += d.achieved; staffHistory[key].rt += d.target; }
+                if(k.includes('rocket')) { staffHistory[key].rock += d.achieved; }
+                if(k.includes('meeting')) { staffHistory[key].mt += d.achieved; }
             });
 
-            const rows = Object.values(groupMatrix);
-            document.getElementById('totalEntriesCount').innerText = `${rows.length} Records Found`;
-
-            rows.forEach(r => {
-                const dp = r.dt > 0 ? ((r.da/r.dt)*100).toFixed(0) : 0;
-                const rp = r.rt > 0 ? ((r.ra/r.rt)*100).toFixed(0) : 0;
-                const avg = (parseInt(dp)+parseInt(rp))/2;
+            Object.values(staffHistory).forEach(r => {
+                const dp = r.dt > 0 ? Math.round((r.da/r.dt)*100) : 0;
+                const rp = r.rt > 0 ? Math.round((r.ra/r.rt)*100) : 0;
+                const avg = (dp + rp) / 2;
                 
-                let bCls = "badge-average"; let status = "Moderate";
-                if(avg > 85) { bCls="badge-elite"; status="Elite"; }
-                if(avg < 50) { bCls="badge-critical"; status="Critical"; }
+                let bCls = "status-avg"; let status = "MODERATE";
+                if(avg >= 90) { bCls="status-elite"; status="ELITE"; }
+                if(avg < 50) { bCls="status-low"; status="CRITICAL"; }
 
                 body.innerHTML += `
                     <tr class="hover:bg-slate-50 transition-all">
@@ -646,59 +591,63 @@
                         </td>
                         <td class="px-6 py-6 text-center font-bold text-slate-600">${dp}%</td>
                         <td class="px-6 py-6 text-center font-bold text-slate-600">${rp}%</td>
-                        <td class="px-6 py-6 text-center font-black text-slate-600">₹ ${formatINR(r.rck)}</td>
-                        <td class="px-6 py-6 text-center"><span class="efficiency-badge ${bCls}">${status}</span></td>
+                        <td class="px-6 py-6 text-center font-black text-slate-700">${r.rock}</td>
+                        <td class="px-6 py-6 text-center font-black text-slate-700">${r.mt}</td>
+                        <td class="px-6 py-6 text-center"><span class="status-badge ${bCls}">${status}</span></td>
                     </tr>
                 `;
             });
         }
 
-        function generateProfessionalReport() {
-            const mgr = document.getElementById('mgrDropdown').value;
-            const dateStr = document.getElementById('globalDateRange').value;
+        function showDetailedKPIData(id, label) {
+            const d = globalAggregates[id];
+            if(!d) return;
+            const p = d.t > 0 ? ((d.a / d.t) * 100).toFixed(2) : 0;
+            const sym = (id !== 'rock' && id !== 'meet') ? '₹ ' : '';
 
-            document.getElementById('p_mgr_val').innerText = mgr === 'all' ? 'All System Managers' : mgr;
-            document.getElementById('p_period_val').innerText = dateStr || 'Selected Date Range';
-            document.getElementById('p_date_val').innerText = new Date().toLocaleDateString('en-IN', { dateStyle: 'full' });
-            document.getElementById('p_id').innerText = Math.floor(1000 + Math.random() * 9000);
-
-            const printTBody = document.getElementById('print_table_body');
-            printTBody.innerHTML = "";
-
-            const mgrFilter = document.getElementById('mgrDropdown').value;
-            const staffFilter = document.getElementById('staffDropdown').value;
-
-            let reportData = masterData.filter(d => {
-                const matchM = (mgrFilter === 'all' || d.manager === mgrFilter);
-                const matchS = (staffFilter === 'all' || d.staff === staffFilter);
-                let matchD = true;
-                if (dateStr.includes(' to ')) {
-                    const [s, e] = dateStr.split(' to ');
-                    matchD = (d.startDate >= s && d.startDate <= e);
-                }
-                return matchM && matchS && matchD;
+            Swal.fire({
+                title: `<span class="uppercase font-black">${label} Intelligence</span>`,
+                html: `
+                    <div class="text-left space-y-4 p-4 font-bold text-slate-700">
+                        <div class="flex justify-between border-b pb-2"><span>Planned Target:</span> <span>${sym}${formatINR(d.t)}</span></div>
+                        <div class="flex justify-between border-b pb-2 text-emerald-600"><span>Actual Achieved:</span> <span>${sym}${formatINR(d.a)}</span></div>
+                        <div class="flex justify-between border-b pb-2 text-rose-600"><span>Gap Pending:</span> <span>${sym}${formatINR(Math.max(0, d.t-d.a))}</span></div>
+                        <div class="flex justify-between pt-2 text-xl font-black"><span>Performance:</span> <span class="text-blue-600">${p}%</span></div>
+                    </div>
+                `,
+                confirmButtonText: 'CLOSE MATRIX',
+                confirmButtonColor: '#1e40af'
             });
+        }
 
-            if(reportData.length === 0) {
-                Swal.fire("Data Missing", "प्रिंट करण्यासाठी डेटा उपलब्ध नाही.", "warning");
-                return;
-            }
+        function generateAuditReport() {
+            const mgr = document.getElementById('mgrFilter').value;
+            const pBody = document.getElementById('print_table_rows');
+            pBody.innerHTML = "";
 
-            reportData.forEach((row, i) => {
-                const p = row.target > 0 ? ((row.achieved / row.target) * 100).toFixed(1) : "0.0";
-                printTBody.innerHTML += `
+            document.getElementById('pr_mgr').innerText = mgr === 'all' ? 'All Area Managers' : mgr;
+            document.getElementById('pr_date').innerText = new Date().toLocaleDateString('en-IN', {dateStyle:'full'});
+
+            filteredStore.forEach((d, i) => {
+                const perc = d.target > 0 ? ((d.achieved/d.target)*100).toFixed(1) : 0;
+                pBody.innerHTML += `
                     <tr>
-                        <td style="text-align:center;">${i + 1}</td>
-                        <td><strong>${row.staff}</strong><br><small style="color:#666">${row.manager}</small></td>
-                        <td>${row.kpi}</td>
-                        <td style="text-align:right;">${formatINR(row.target)}</td>
-                        <td style="text-align:right;">${formatINR(row.achieved)}</td>
-                        <td style="text-align:center; font-weight:bold; color: ${p >= 90 ? '#059669' : (p < 50 ? '#dc2626' : '#000')}">${p}%</td>
+                        <td>${i+1}</td>
+                        <td><b>${d.staff}</b><br><small>${d.mgr}</small></td>
+                        <td>${d.kpi}</td>
+                        <td>${formatINR(d.target)}</td>
+                        <td>${formatINR(d.achieved)}</td>
+                        <td>${formatINR(Math.max(0, d.target-d.achieved))}</td>
+                        <td style="font-weight:bold; color:${perc >= 90 ? 'green' : (perc < 50 ? 'red' : 'black')}">${perc}%</td>
                     </tr>
                 `;
             });
 
-            window.print();
+            if(filteredStore.length === 0) {
+                Swal.fire("Data Empty", "प्रिंट करण्यासाठी डेटा उपलब्ध नाही.", "warning");
+            } else {
+                window.print();
+            }
         }
 
         function formatINR(val) {
