@@ -1,3 +1,4 @@
+--- START OF FILE ---
 <!DOCTYPE html>
 <html lang="mr">
 <head>
@@ -373,12 +374,11 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec";
         let masterData = [];
         let chartInstance = null;
-        let globalBuckets = {}; // Global storage for Click Action
+        let globalBuckets = {}; 
 
         async function init() {
             lucide.createIcons();
             
-            // Initialize Date Picker
             flatpickr("#globalDateRange", {
                 mode: "range",
                 dateFormat: "Y-m-d",
@@ -412,14 +412,50 @@
                             week.details.forEach(item => {
                                 const rawLabel = item.name || "Unknown";
                                 const cleanStaffName = rawLabel.includes('||') ? rawLabel.split('||')[0].trim() : rawLabel.trim();
-                                const specificKpi = rawLabel.includes('||') ? rawLabel.split('||')[1].trim() : "Default";
+                                const kpiLabelLower = rawLabel.toLowerCase();
+
+                                // UPDATE: Targeted data extraction to prevent "Double Targets"
+                                let targetVal = 0;
+                                let achievedVal = 0;
+                                let kpiType = "Other";
+
+                                if (kpiLabelLower.includes('disbursement')) {
+                                    targetVal = parseFloat(item.tDisb || 0);
+                                    achievedVal = parseFloat(item.aDisb || 0);
+                                    kpiType = "Disbursement";
+                                } else if (kpiLabelLower.includes('apprisal') || kpiLabelLower.includes('appraisal')) {
+                                    targetVal = parseFloat(item.tAppr || 0);
+                                    achievedVal = parseFloat(item.aAppr || 0);
+                                    kpiType = "Appraisal";
+                                } else if (kpiLabelLower.includes('recovery')) {
+                                    targetVal = parseFloat(item.tOD || 0);
+                                    achievedVal = parseFloat(item.aOD || 0);
+                                    kpiType = "Recovery";
+                                } else if (kpiLabelLower.includes('regular')) {
+                                    targetVal = parseFloat(item.tReg || 0);
+                                    achievedVal = parseFloat(item.aReg || 0);
+                                    kpiType = "Regular";
+                                } else if (kpiLabelLower.includes('past')) {
+                                    targetVal = parseFloat(item.tPast || 0);
+                                    achievedVal = parseFloat(item.aPast || 0);
+                                    kpiType = "Past Due";
+                                } else if (kpiLabelLower.includes('rocket')) {
+                                    targetVal = parseFloat(item.tRocket || 0);
+                                    achievedVal = parseFloat(item.aRocket || 0);
+                                    kpiType = "Rocket Pay";
+                                } else if (kpiLabelLower.includes('meeting') || kpiLabelLower.includes('group')) {
+                                    targetVal = parseFloat(item.tGroup || 0);
+                                    achievedVal = parseFloat(item.aGroup || 0);
+                                    kpiType = "Meeting";
+                                }
 
                                 masterData.push({
                                     manager: manager,
                                     staff: cleanStaffName,
-                                    kpi: specificKpi,
-                                    target: parseFloat(item.tDisb || item.tAppr || item.tOD || item.tReg || item.tPast || item.tRocket || item.tGroup || 0),
-                                    achieved: parseFloat(item.aDisb || item.aAppr || item.aOD || item.aReg || item.aPast || item.aRocket || item.aGroup || 0),
+                                    kpi: kpiType,
+                                    originalLabel: rawLabel,
+                                    target: targetVal,
+                                    achieved: achievedVal,
                                     startDate: week.sDate,
                                     endDate: week.eDate
                                 });
@@ -478,24 +514,23 @@
             };
 
             filtered.forEach(d => {
-                const k = d.kpi.toLowerCase();
-                if(k.includes('disbursement')) { buckets.disb.t += d.target; buckets.disb.a += d.achieved; }
-                else if(k.includes('apprisal')) { buckets.appr.t += d.target; buckets.appr.a += d.achieved; }
-                else if(k.includes('recovery')) { buckets.od.t += d.target; buckets.od.a += d.achieved; }
-                else if(k.includes('regular')) { buckets.reg.t += d.target; buckets.reg.a += d.achieved; }
-                else if(k.includes('past')) { buckets.past.t += d.target; buckets.past.a += d.achieved; }
-                else if(k.includes('rocket')) { buckets.rock.t += d.target; buckets.rock.a += d.achieved; }
-                else if(k.includes('meeting') || k.includes('group')) { buckets.meet.t += d.target; buckets.meet.a += d.achieved; }
+                const k = d.kpi;
+                if(k === "Disbursement") { buckets.disb.t += d.target; buckets.disb.a += d.achieved; }
+                else if(k === "Appraisal") { buckets.appr.t += d.target; buckets.appr.a += d.achieved; }
+                else if(k === "Recovery") { buckets.od.t += d.target; buckets.od.a += d.achieved; }
+                else if(k === "Regular") { buckets.reg.t += d.target; buckets.reg.a += d.achieved; }
+                else if(k === "Past Due") { buckets.past.t += d.target; buckets.past.a += d.achieved; }
+                else if(k === "Rocket Pay") { buckets.rock.t += d.target; buckets.rock.a += d.achieved; }
+                else if(k === "Meeting") { buckets.meet.t += d.target; buckets.meet.a += d.achieved; }
             });
 
-            globalBuckets = buckets; // Store for global click access
+            globalBuckets = buckets; 
             updateKPIBars(buckets);
             updateAnalyticsChart(buckets);
             updateTopRankings(filtered);
             updateDetailedAuditTable(filtered);
         }
 
-        // --- NEW CLICKABLE KPI ACTION ---
         function showKPIDetails(key, label) {
             const data = globalBuckets[key];
             if(!data) return;
@@ -528,7 +563,6 @@
                 `,
                 confirmButtonText: 'डेटा बंद करा',
                 confirmButtonColor: '#1e40af',
-                buttonsStyling: true,
                 customClass: {
                     popup: 'rounded-[28px]',
                     confirmButton: 'rounded-xl px-8 py-3 text-xs font-bold uppercase tracking-widest'
@@ -620,10 +654,10 @@
             data.forEach(d => {
                 const key = `${d.staff}_${d.startDate}`;
                 if(!groupMatrix[key]) groupMatrix[key] = { n: d.staff, m: d.manager, d: d.startDate, da:0, dt:0, ra:0, rt:0, rck:0 };
-                const label = d.kpi.toLowerCase();
-                if(label.includes('disbursement')) { groupMatrix[key].da += d.achieved; groupMatrix[key].dt += d.target; }
-                if(label.includes('regular')) { groupMatrix[key].ra += d.achieved; groupMatrix[key].rt += d.target; }
-                if(label.includes('rocket')) { groupMatrix[key].rck += d.achieved; }
+                
+                if(d.kpi === "Disbursement") { groupMatrix[key].da += d.achieved; groupMatrix[key].dt += d.target; }
+                if(d.kpi === "Regular") { groupMatrix[key].ra += d.achieved; groupMatrix[key].rt += d.target; }
+                if(d.kpi === "Rocket Pay") { groupMatrix[key].rck += d.achieved; }
             });
 
             const rows = Object.values(groupMatrix);
@@ -690,7 +724,7 @@
                     <tr>
                         <td style="text-align:center;">${i + 1}</td>
                         <td><strong>${row.staff}</strong><br><small style="color:#666">${row.manager}</small></td>
-                        <td>${row.kpi}</td>
+                        <td>${row.originalLabel.includes('||') ? row.originalLabel.split('||')[1] : row.kpi}</td>
                         <td style="text-align:right;">${formatINR(row.target)}</td>
                         <td style="text-align:right;">${formatINR(row.achieved)}</td>
                         <td style="text-align:center; font-weight:bold; color: ${p >= 90 ? '#059669' : (p < 50 ? '#dc2626' : '#000')}">${p}%</td>
