@@ -307,337 +307,302 @@
         <p id="loaderStatus" class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-3 animate-pulse">Initializing Data Merging Engine...</p>
     </div>
 
-    <script>
-        const CONFIG = {
-            API_URL: "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec",
-            REFRESH_INTERVAL: 600000 // 10 mins
+   <script>
+    const CONFIG = {
+        API_URL: "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec",
+        REFRESH_INTERVAL: 600000 
+    };
+
+    let masterDataStore = [];
+    let chartInstance = null;
+    let globalAggregates = {};
+
+    async function init() {
+        lucide.createIcons();
+        flatpickr("#globalDateRange", {
+            mode: "range", dateFormat: "Y-m-d",
+            defaultDate: [new Date().setDate(new Date().getDate() - 30), new Date()],
+            onChange: () => processAndRender()
+        });
+        await fetchAllData();
+    }
+
+    async function fetchAllData() {
+        const loader = document.getElementById('globalLoader');
+        const status = document.getElementById('loaderStatus');
+        loader.style.display = 'flex';
+        loader.style.opacity = '1';
+
+        try {
+            status.innerText = "QUERYING AREA MANAGERS...";
+            const mgrResp = await fetch(`${CONFIG.API_URL}?action=getManagers`);
+            const mgrList = await mgrResp.json();
+
+            const mgrSelect = document.getElementById('mgrDropdown');
+            mgrSelect.innerHTML = '<option value="all">सर्व मॅनेजर्स</option>';
+            mgrList.forEach(m => mgrSelect.innerHTML += `<option value="${m}">${m}</option>`);
+
+            status.innerText = "SYNCING TARGETS & ACHIEVEMENTS...";
+            let allRawRecords = [];
+
+            const fetchTasks = mgrList.map(async (mgr) => {
+                try {
+                    const dResp = await fetch(`${CONFIG.API_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
+                    const result = await dResp.json();
+                    result.history.forEach(week => {
+                        week.details.forEach(item => {
+                            allRawRecords.push({ ...item, mgr: mgr, sDate: week.sDate, eDate: week.eDate });
+                        });
+                    });
+                } catch (e) { console.warn(`Manager ${mgr} sync failed.`); }
+            });
+
+            await Promise.all(fetchTasks);
+
+            // --- FIXED MERGING LOGIC ---
+            const mergedMap = {};
+            allRawRecords.forEach(item => {
+                // Extract clean staff name and KPI type
+                const nameParts = item.name.split('||');
+                const staffName = nameParts[0].trim();
+                const kpiType = nameParts[1] ? nameParts[1].trim() : "General";
+                
+                // Key based on Staff + KPI Type + Date
+                const uniqueKey = `${item.mgr}_${staffName}_${kpiType}_${item.sDate}`;
+                
+                if (!mergedMap[uniqueKey]) {
+                    mergedMap[uniqueKey] = {
+                        mgr: item.mgr,
+                        staff: staffName,
+                        kpiDesc: kpiType,
+                        target: 0,
+                        achieved: 0,
+                        sDate: item.sDate,
+                        eDate: item.eDate
+                    };
+                }
+
+                // Use Addition (+=) to sum up values from multiple rows (Target vs Achievement rows)
+                const targetVal = parseFloat(item.tDisb || 0);
+                const achvVal = parseFloat(item.aDisb || 0);
+
+                if (targetVal > 0) mergedMap[uniqueKey].target += targetVal;
+                if (achvVal > 0) mergedMap[uniqueKey].achieved += achvVal;
+            });
+
+            masterDataStore = Object.values(mergedMap);
+            syncStaffDropdown();
+            processAndRender();
+
+        } catch (err) {
+            console.error(err);
+            Swal.fire("System Error", "डेटा सिंक करताना त्रुटी आली.", "error");
+        } finally {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
+        }
+    }
+
+    function syncStaffDropdown() {
+        const selectedMgr = document.getElementById('mgrDropdown').value;
+        const staffSelect = document.getElementById('staffDropdown');
+        const currentVal = staffSelect.value;
+        
+        staffSelect.innerHTML = '<option value="all">सर्व स्टाफ सदस्य</option>';
+        const staffList = [...new Set(
+            masterDataStore
+            .filter(d => selectedMgr === 'all' || d.mgr === selectedMgr)
+            .map(d => d.staff)
+        )].sort();
+
+        staffList.forEach(s => staffSelect.innerHTML += `<option value="${s}">${s}</option>`);
+        staffSelect.value = currentVal;
+    }
+
+    function processAndRender() {
+        const mgr = document.getElementById('mgrDropdown').value;
+        const staff = document.getElementById('staffDropdown').value;
+        const search = document.getElementById('searchBox').value.toLowerCase();
+        const dateRange = document.getElementById('globalDateRange').value;
+
+        const filtered = masterDataStore.filter(d => {
+            const matchM = (mgr === 'all' || d.mgr === mgr);
+            const matchS = (staff === 'all' || d.staff === staff);
+            const matchQ = d.staff.toLowerCase().includes(search) || d.kpiDesc.toLowerCase().includes(search);
+            let matchD = true;
+            if (dateRange.includes(' to ')) {
+                const [s, e] = dateRange.split(' to ');
+                matchD = (d.sDate >= s && d.sDate <= e);
+            }
+            return matchM && matchS && matchQ && matchD;
+        });
+
+        const buckets = {
+            disb: {t:0, a:0}, appr: {t:0, a:0}, od: {t:0, a:0},
+            reg: {t:0, a:0}, past: {t:0, a:0}, rock: {t:0, a:0}, meet: {t:0, a:0}
         };
 
-        let masterDataStore = [];
-        let chartInstance = null;
-        let globalAggregates = {};
+        filtered.forEach(d => {
+            const k = d.kpiDesc.toLowerCase();
+            if (k.includes('disbursement')) { buckets.disb.t += d.target; buckets.disb.a += d.achieved; }
+            else if (k.includes('appraisal') || k.includes('apprisal')) { buckets.appr.t += d.target; buckets.appr.a += d.achieved; }
+            else if (k.includes('od recovery')) { buckets.od.t += d.target; buckets.od.a += d.achieved; }
+            else if (k.includes('regular collection')) { buckets.reg.t += d.target; buckets.reg.a += d.achieved; }
+            else if (k.includes('past due')) { buckets.past.t += d.target; buckets.past.a += d.achieved; }
+            else if (k.includes('rocket') || k.includes('auto pay')) { buckets.rock.t += d.target; buckets.rock.a += d.achieved; }
+            else if (k.includes('meeting')) { buckets.meet.t += d.target; buckets.meet.a += d.achieved; }
+        });
 
-        async function init() {
-            lucide.createIcons();
-            
-            // Period Picker
-            flatpickr("#globalDateRange", {
-                mode: "range", dateFormat: "Y-m-d",
-                defaultDate: [new Date().setDate(new Date().getDate() - 30), new Date()],
-                onChange: () => processAndRender()
-            });
+        globalAggregates = buckets;
+        updateKPICards(buckets);
+        updateLeaderboard(filtered);
+        updateMatrixTable(filtered);
+        updateMainChart(buckets);
 
-            await fetchAllData();
-        }
+        document.getElementById('rowCountDisplay').innerText = `${filtered.length} Records Analyzed`;
+    }
 
-        async function fetchAllData() {
-            const loader = document.getElementById('globalLoader');
-            const status = document.getElementById('loaderStatus');
-            loader.style.display = 'flex';
-            loader.style.opacity = '1';
+    function updateKPICards(b) {
+        const set = (id, data, isCurr) => {
+            const p = data.t > 0 ? Math.round((data.a / data.t) * 100) : 0;
+            document.getElementById(`v_${id}`).innerText = isCurr ? `₹ ${formatINR(data.a)}` : data.a;
+            document.getElementById(`p_${id}`).innerText = `${p}% Achieved`;
+            document.getElementById(`b_${id}`).style.width = `${Math.min(p, 100)}%`;
+        };
 
-            try {
-                status.innerText = "QUERYING AREA MANAGERS...";
-                const mgrResp = await fetch(`${CONFIG.API_URL}?action=getManagers`);
-                const mgrList = await mgrResp.json();
+        set('disb', b.disb, true);
+        set('appr', b.appr, true);
+        set('od', b.od, true);
+        set('reg', b.reg, true);
+        set('past', b.past, true);
+        set('rock', b.rock, false);
+        set('meet', b.meet, false);
 
-                // Update Manager Dropdown
-                const mgrSelect = document.getElementById('mgrDropdown');
-                mgrSelect.innerHTML = '<option value="all">सर्व मॅनेजर्स</option>';
-                mgrList.forEach(m => mgrSelect.innerHTML += `<option value="${m}">${m}</option>`);
+        let totalA = b.disb.a + b.reg.a + b.od.a;
+        let totalT = b.disb.t + b.reg.t + b.od.t;
+        document.getElementById('overallAchv').innerText = (totalT > 0 ? Math.round((totalA/totalT)*100) : 0) + '%';
+    }
 
-                status.innerText = "FETCHING 1000+ PERFORMANCE LAYERS...";
-                let allRawRecords = [];
+    function updateLeaderboard(data) {
+        const container = document.getElementById('leaderboardList');
+        container.innerHTML = "";
+        const stats = {};
 
-                // Parallel fetching for performance
-                const fetchTasks = mgrList.map(async (mgr) => {
-                    try {
-                        const dResp = await fetch(`${CONFIG.API_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
-                        const result = await dResp.json();
-                        result.history.forEach(week => {
-                            week.details.forEach(item => {
-                                allRawRecords.push({ ...item, mgr: mgr, sDate: week.sDate, eDate: week.eDate });
-                            });
-                        });
-                    } catch (e) { console.warn(`Manager ${mgr} failed to sync.`); }
-                });
+        data.forEach(d => {
+            if (!stats[d.staff]) stats[d.staff] = { n: d.staff, m: d.mgr, a: 0, t: 0 };
+            stats[d.staff].a += d.achieved;
+            stats[d.staff].t += d.target;
+        });
 
-                await Promise.all(fetchTasks);
+        const sorted = Object.values(stats)
+            .sort((a,b) => (b.t > 0 ? b.a/b.t : 0) - (a.t > 0 ? a.a/a.t : 0))
+            .slice(0, 10);
 
-                status.innerText = "MERGING TARGET & ACHIEVEMENT STREAMS...";
-                
-                // --- CRITICAL MERGING LOGIC ---
-                const mergedMap = {};
-                allRawRecords.forEach(item => {
-                    const uniqueKey = `${item.mgr}_${item.name}_${item.sDate}`;
-                    
-                    if (!mergedMap[uniqueKey]) {
-                        mergedMap[uniqueKey] = {
-                            mgr: item.mgr,
-                            rawName: item.name,
-                            staff: item.name.split('||')[0].trim(),
-                            kpiDesc: item.name.split('||')[1] ? item.name.split('||')[1].trim() : "General",
-                            target: parseFloat(item.tDisb || 0),
-                            achieved: 0,
-                            sDate: item.sDate,
-                            eDate: item.eDate,
-                            remarks: item.pd || ""
-                        };
-                    }
-
-                    // Achievement logic: जर aDisb 0 नसेल तर ते अचिव्हमेंट आहे
-                    const valA = parseFloat(item.aDisb || 0);
-                    if (valA > 0) {
-                        mergedMap[uniqueKey].achieved = valA;
-                    }
-                    
-                    // काहीवेळा target आणि achievement दोन्ही एकाच ओळीत येतात, तेही मॅप करा
-                    if (parseFloat(item.tDisb || 0) > 0) {
-                        mergedMap[uniqueKey].target = parseFloat(item.tDisb);
-                    }
-                });
-
-                masterDataStore = Object.values(mergedMap);
-                syncStaffDropdown();
-                processAndRender();
-
-            } catch (err) {
-                Swal.fire("System Error", "HQ डेटाबेस सिंक करताना त्रुटी आली.", "error");
-            } finally {
-                loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 500);
-            }
-        }
-
-        function syncStaffDropdown() {
-            const selectedMgr = document.getElementById('mgrDropdown').value;
-            const staffSelect = document.getElementById('staffDropdown');
-            staffSelect.innerHTML = '<option value="all">सर्व स्टाफ सदस्य</option>';
-
-            const staffList = [...new Set(
-                masterDataStore
-                .filter(d => selectedMgr === 'all' || d.mgr === selectedMgr)
-                .map(d => d.staff)
-            )].sort();
-
-            staffList.forEach(s => staffSelect.innerHTML += `<option value="${s}">${s}</option>`);
-        }
-
-        function processAndRender() {
-            const mgr = document.getElementById('mgrDropdown').value;
-            const staff = document.getElementById('staffDropdown').value;
-            const search = document.getElementById('searchBox').value.toLowerCase();
-            const dateRange = document.getElementById('globalDateRange').value;
-
-            const filtered = masterDataStore.filter(d => {
-                const matchM = (mgr === 'all' || d.mgr === mgr);
-                const matchS = (staff === 'all' || d.staff === staff);
-                const matchQ = d.staff.toLowerCase().includes(search) || d.kpiDesc.toLowerCase().includes(search);
-                let matchD = true;
-                if (dateRange.includes(' to ')) {
-                    const [s, e] = dateRange.split(' to ');
-                    matchD = (d.sDate >= s && d.sDate <= e);
-                }
-                return matchM && matchS && matchQ && matchD;
-            });
-
-            // Aggregate Calculations for 7 Pillars
-            const buckets = {
-                disb: {t:0, a:0}, appr: {t:0, a:0}, od: {t:0, a:0},
-                reg: {t:0, a:0}, past: {t:0, a:0}, rock: {t:0, a:0}, meet: {t:0, a:0}
-            };
-
-            filtered.forEach(d => {
-                const k = d.kpiDesc.toLowerCase();
-                if (k.includes('disbursement')) { buckets.disb.t += d.target; buckets.disb.a += d.achieved; }
-                else if (k.includes('appraisal') || k.includes('apprisal')) { buckets.appr.t += d.target; buckets.appr.a += d.achieved; }
-                else if (k.includes('recovery')) { buckets.od.t += d.target; buckets.od.a += d.achieved; }
-                else if (k.includes('regular')) { buckets.reg.t += d.target; buckets.reg.a += d.achieved; }
-                else if (k.includes('past due')) { buckets.past.t += d.target; buckets.past.a += d.achieved; }
-                else if (k.includes('rocket') || k.includes('auto pay')) { buckets.rock.t += d.target; buckets.rock.a += d.achieved; }
-                else if (k.includes('meeting')) { buckets.meet.t += d.target; buckets.meet.a += d.achieved; }
-            });
-
-            globalAggregates = buckets;
-            updateKPICards(buckets);
-            updateLeaderboard(filtered);
-            updateMatrixTable(filtered);
-            updateMainChart(buckets);
-
-            document.getElementById('rowCountDisplay').innerText = `${filtered.length} Records Processed`;
-        }
-
-        function updateKPICards(b) {
-            const set = (id, data, isCurr) => {
-                const p = data.t > 0 ? Math.round((data.a / data.t) * 100) : 0;
-                document.getElementById(`v_${id}`).innerText = isCurr ? `₹ ${formatINR(data.a)}` : data.a;
-                document.getElementById(`p_${id}`).innerText = `${p}% Achieved`;
-                document.getElementById(`b_${id}`).style.width = `${Math.min(p, 100)}%`;
-            };
-
-            set('disb', b.disb, true);
-            set('appr', b.appr, true);
-            set('od', b.od, true);
-            set('reg', b.reg, true);
-            set('past', b.past, true);
-            set('rock', b.rock, false);
-            set('meet', b.meet, false);
-
-            let totalA = 0, totalT = 0;
-            Object.values(b).forEach(v => { totalA += v.a; totalT += v.t; });
-            document.getElementById('overallAchv').innerText = (totalT > 0 ? Math.round((totalA/totalT)*100) : 0) + '%';
-        }
-
-        function updateLeaderboard(data) {
-            const container = document.getElementById('leaderboardList');
-            container.innerHTML = "";
-            const stats = {};
-
-            data.forEach(d => {
-                if (!stats[d.staff]) stats[d.staff] = { n: d.staff, m: d.mgr, a: 0, t: 0 };
-                stats[d.staff].a += d.achieved;
-                stats[d.staff].t += d.target;
-            });
-
-            const sorted = Object.values(stats)
-                .sort((a,b) => (b.a/b.t) - (a.a/a.t))
-                .slice(0, 10);
-
-            sorted.forEach((s, i) => {
-                const p = s.t > 0 ? Math.round((s.a/s.t)*100) : 0;
-                container.innerHTML += `
-                    <div class="flex items-center justify-between p-5 bg-slate-50 rounded-3xl border border-slate-100 transition-all hover:bg-white hover:border-blue-200">
-                        <div class="flex items-center gap-4">
-                            <span class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px] font-black">${i+1}</span>
-                            <div>
-                                <h4 class="font-black text-slate-800 text-sm leading-none">${s.n}</h4>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase mt-1.5 tracking-widest">${s.m}</p>
-                            </div>
+        sorted.forEach((s, i) => {
+            const p = s.t > 0 ? Math.round((s.a/s.t)*100) : 0;
+            container.innerHTML += `
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px] font-bold">${i+1}</span>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-xs">${s.n}</h4>
+                            <p class="text-[8px] text-slate-400 uppercase font-bold">${s.m}</p>
                         </div>
-                        <span class="text-sm font-black text-blue-600">${p}%</span>
                     </div>
-                `;
-            });
-        }
+                    <span class="text-xs font-black text-blue-600">${p}%</span>
+                </div>
+            `;
+        });
+    }
 
-        function updateMatrixTable(data) {
-            const body = document.getElementById('matrixTableBody');
-            body.innerHTML = "";
-            const groupMap = {};
+    function updateMatrixTable(data) {
+        const body = document.getElementById('matrixTableBody');
+        body.innerHTML = "";
+        const groupMap = {};
 
-            // Table grouping logic for merged view
-            data.forEach(d => {
-                const key = `${d.staff}_${d.sDate}`;
-                if (!groupMap[key]) groupMap[key] = { n: d.staff, m: d.mgr, d: d.sDate, da:0, dt:0, ra:0, rt:0, rock:0, mt:0 };
-                const k = d.kpiDesc.toLowerCase();
-                if (k.includes('disbursement')) { groupMap[key].da += d.achieved; groupMap[key].dt += d.target; }
-                if (k.includes('regular')) { groupMap[key].ra += d.achieved; groupMap[key].rt += d.target; }
-                if (k.includes('rocket')) { groupMap[key].rock += d.achieved; }
-                if (k.includes('meeting')) { groupMap[key].mt += d.achieved; }
-            });
+        data.forEach(d => {
+            const key = `${d.staff}_${d.sDate}`;
+            if (!groupMap[key]) groupMap[key] = { n: d.staff, m: d.mgr, d: d.sDate, da:0, dt:0, ra:0, rt:0, rock:0, mt:0 };
+            const k = d.kpiDesc.toLowerCase();
+            if (k.includes('disbursement')) { groupMap[key].da += d.achieved; groupMap[key].dt += d.target; }
+            if (k.includes('regular collection')) { groupMap[key].ra += d.achieved; groupMap[key].rt += d.target; }
+            if (k.includes('rocket')) { groupMap[key].rock += d.achieved; }
+            if (k.includes('meeting')) { groupMap[key].mt += d.achieved; }
+        });
 
-            Object.values(groupMap).forEach(r => {
-                const dp = r.dt > 0 ? Math.round((r.da/r.dt)*100) : 0;
-                const rp = r.rt > 0 ? Math.round((r.ra/r.rt)*100) : 0;
-                const avg = (dp + rp) / 2;
-                let bCls = "badge-average"; let status = "Moderate";
-                if (avg >= 90) { bCls="badge-elite"; status="Elite"; }
-                if (avg < 50) { bCls="badge-critical"; status="Critical"; }
+        Object.values(groupMap).forEach(r => {
+            const dp = r.dt > 0 ? Math.round((r.da/r.dt)*100) : 0;
+            const rp = r.rt > 0 ? Math.round((r.ra/r.rt)*100) : 0;
+            const avg = (dp + rp) / 2;
+            let bCls = "badge-average"; let status = "Moderate";
+            if (avg >= 90) { bCls="badge-elite"; status="Elite"; }
+            if (avg < 50) { bCls="badge-critical"; status="Critical"; }
 
-                body.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition-all group">
-                        <td class="px-10 py-6">
-                            <span class="font-black text-slate-700 text-sm group-hover:text-blue-600 transition-colors">${r.n}</span><br>
-                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${r.m} | ${r.d}</span>
-                        </td>
-                        <td class="px-6 py-6 text-center font-bold text-slate-600">${dp}%</td>
-                        <td class="px-6 py-6 text-center font-bold text-slate-600">${rp}%</td>
-                        <td class="px-6 py-6 text-center font-black text-slate-700">${r.rock}</td>
-                        <td class="px-6 py-6 text-center font-black text-slate-700">${r.mt}</td>
-                        <td class="px-6 py-6 text-center"><span class="status-badge ${bCls}">${status}</span></td>
-                    </tr>
-                `;
-            });
-        }
+            body.innerHTML += `
+                <tr class="hover:bg-slate-50 transition-all group">
+                    <td class="px-10 py-5">
+                        <span class="font-bold text-slate-700 text-sm">${r.n}</span><br>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase">${r.m} | ${r.d}</span>
+                    </td>
+                    <td class="px-6 py-5 text-center font-bold text-slate-600">${dp}%</td>
+                    <td class="px-6 py-5 text-center font-bold text-slate-600">${rp}%</td>
+                    <td class="px-6 py-5 text-center font-bold text-slate-700">${r.rock}</td>
+                    <td class="px-6 py-5 text-center font-bold text-slate-700">${r.mt}</td>
+                    <td class="px-6 py-5 text-center"><span class="status-badge ${bCls}">${status}</span></td>
+                </tr>
+            `;
+        });
+    }
 
-        function updateMainChart(b) {
-            const ctx = document.getElementById('mainChartCanvas').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
+    function updateMainChart(b) {
+        const ctx = document.getElementById('mainChartCanvas').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
 
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Disb', 'Appr', 'OD Rec', 'Regular', 'Past Due', 'Rocket', 'Meetings'],
-                    datasets: [
-                        { label: 'Actual', data: [b.disb.a, b.appr.a, b.od.a, b.reg.a, b.past.a, b.rock.a, b.meet.a], backgroundColor: '#1e40af', borderRadius: 10, barThickness: 35 },
-                        { label: 'Target', data: [b.disb.t, b.appr.t, b.od.t, b.reg.t, b.past.t, b.rock.t, b.meet.t], backgroundColor: '#e2e8f0', borderRadius: 10, barThickness: 35 }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Disb', 'Appr', 'OD Rec', 'Regular', 'Past Due', 'Rocket', 'Meetings'],
+                datasets: [
+                    { label: 'Actual', data: [b.disb.a, b.appr.a, b.od.a, b.reg.a, b.past.a, b.rock.a, b.meet.a], backgroundColor: '#1e40af', borderRadius: 8 },
+                    { label: 'Target', data: [b.disb.t, b.appr.t, b.od.t, b.reg.t, b.past.t, b.rock.t, b.meet.t], backgroundColor: '#e2e8f0', borderRadius: 8 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
                 }
-            });
-        }
-
-        function showKPIStats(id, label) {
-            const d = globalAggregates[id];
-            const p = d.t > 0 ? ((d.a/d.t)*100).toFixed(2) : 0;
-            const sym = (id !== 'rock' && id !== 'meet') ? '₹ ' : '';
-
-            Swal.fire({
-                title: `<span class="uppercase font-black">${label} Analysis</span>`,
-                html: `
-                    <div class="text-left space-y-4 p-4">
-                        <div class="flex justify-between border-b pb-2"><span class="text-slate-500 text-xs font-bold uppercase">Target:</span><span class="font-black text-slate-800">${sym}${formatINR(d.t)}</span></div>
-                        <div class="flex justify-between border-b pb-2"><span class="text-slate-500 text-xs font-bold uppercase">Achieved:</span><span class="font-black text-emerald-600">${sym}${formatINR(d.a)}</span></div>
-                        <div class="flex justify-between border-b pb-2"><span class="text-slate-500 text-xs font-bold uppercase">Gap:</span><span class="font-black text-rose-600">${sym}${formatINR(Math.max(0, d.t-d.a))}</span></div>
-                        <div class="flex justify-between pt-2 text-xl"><span class="font-black">Ratio:</span><span class="font-black text-blue-600">${p}%</span></div>
-                    </div>
-                `,
-                confirmButtonText: 'CLOSE MATRIX',
-                confirmButtonColor: '#1e40af'
-            });
-        }
-
-        function generateAuditReport() {
-            const mgr = document.getElementById('mgrDropdown').value;
-            const period = document.getElementById('globalDateRange').value;
-            
-            document.getElementById('p_mgr_name').innerText = mgr === 'all' ? 'All Area Managers' : mgr;
-            document.getElementById('p_date_range').innerText = period || 'Current Period';
-            document.getElementById('p_report_id').innerText = Math.floor(1000 + Math.random() * 9000);
-
-            const printTBody = document.getElementById('print_table_body');
-            printTBody.innerHTML = "";
-
-            masterDataStore.forEach((d, i) => {
-                const perc = d.target > 0 ? ((d.achieved/d.target)*100).toFixed(1) : 0;
-                printTBody.innerHTML += `
-                    <tr>
-                        <td style="text-align:center;">${i+1}</td>
-                        <td><b>${d.staff}</b><br><small style="color:#666">${d.mgr}</small></td>
-                        <td>${d.kpiDesc}</td>
-                        <td style="text-align:right;">${formatINR(d.target)}</td>
-                        <td style="text-align:right;">${formatINR(d.achieved)}</td>
-                        <td style="text-align:center; font-weight:bold;">${perc}%</td>
-                    </tr>
-                `;
-            });
-
-            if(masterDataStore.length === 0) {
-                Swal.fire("Data Missing", "प्रिंट करण्यासाठी कोणताही डेटा उपलब्ध नाही.", "warning");
-            } else {
-                window.print();
             }
-        }
+        });
+    }
 
-        function formatINR(val) {
-            return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(val);
-        }
+    function showKPIStats(id, label) {
+        const d = globalAggregates[id];
+        const p = d.t > 0 ? ((d.a/d.t)*100).toFixed(2) : 0;
+        const sym = (id !== 'rock' && id !== 'meet') ? '₹ ' : '';
 
-        window.onload = init;
-    </script>
+        Swal.fire({
+            title: `<span class="uppercase font-black">${label} Analysis</span>`,
+            html: `
+                <div class="text-left space-y-4 p-4">
+                    <div class="flex justify-between border-b pb-2"><span class="text-slate-500 text-xs font-bold uppercase">Target:</span><span class="font-black text-slate-800">${sym}${formatINR(d.t)}</span></div>
+                    <div class="flex justify-between border-b pb-2"><span class="text-slate-500 text-xs font-bold uppercase">Achieved:</span><span class="font-black text-emerald-600">${sym}${formatINR(d.a)}</span></div>
+                    <div class="flex justify-between border-b pb-2"><span class="text-slate-500 text-xs font-bold uppercase">Gap:</span><span class="font-black text-rose-600">${sym}${formatINR(Math.max(0, d.t-d.a))}</span></div>
+                    <div class="flex justify-between pt-2 text-xl"><span class="font-black">Ratio:</span><span class="font-black text-blue-600">${p}%</span></div>
+                </div>
+            `,
+            confirmButtonText: 'CLOSE MATRIX',
+            confirmButtonColor: '#1e40af'
+        });
+    }
+
+    function formatINR(val) {
+        return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(val);
+    }
+
+    window.onload = init;
+</script>
 </body>
 </html>
