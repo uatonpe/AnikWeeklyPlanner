@@ -1,6 +1,3 @@
---- START OF FILE Paste January 15, 2026 - 8:49PM ---
-
-
 <!DOCTYPE html>
 <html lang="mr">
 <head>
@@ -100,7 +97,7 @@
             <p style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #555;">Strategy Achievement & Audit Matrix Report</p>
         </div>
         <div style="display: flex; justify-content: space-between; margin: 30px 0; font-size: 13px; font-weight: bold; border: 1px solid #eee; padding: 15px; border-radius: 10px;">
-            <div> मॅनेजर: <span id="p_mgr_name">-</span> </div>
+            <div> मैनेजर: <span id="p_mgr_name">-</span> </div>
             <div> कालावधी: <span id="p_date_range">-</span> </div>
             <div> रिपोर्ट आयडी: #AF/<span id="p_report_id">000</span> </div>
         </div>
@@ -216,7 +213,7 @@
                 <div class="kpi-bar-bg"><div id="b_reg" class="kpi-bar-fill bg-emerald-500" style="width: 0%"></div></div>
                 <div id="p_reg" class="mt-2 text-[10px] font-extrabold text-emerald-600">0% Achieved</div>
             </div>
-            <!-- Past Due (FIXED) -->
+            <!-- Past Due -->
             <div onclick="showKPIStats('past', 'Past Due')" class="premium-card p-6 border-b-4 border-b-amber-500 cursor-pointer">
                 <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="history" class="w-5 h-5"></i></div>
                 <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Past Due</p>
@@ -291,8 +288,8 @@
                             <th class="px-10 py-6">FX Staff Name & Branch</th>
                             <th class="px-6 py-6 text-center">Disbursement %</th>
                             <th class="px-6 py-6 text-center">Recovery %</th>
-                            <th class="px-6 py-6 text-center">Past Due Achv</th>
                             <th class="px-6 py-6 text-center">Rocket Pay</th>
+                            <th class="px-6 py-6 text-center">Meetings</th>
                             <th class="px-6 py-6 text-center">Audit Status</th>
                         </tr>
                     </thead>
@@ -369,7 +366,7 @@
 
                 status.innerText = "MERGING TARGET & ACHIEVEMENT STREAMS...";
                 
-                // --- FIXED MERGING LOGIC ---
+                // --- CRITICAL MERGING LOGIC ---
                 const mergedMap = {};
                 allRawRecords.forEach(item => {
                     const uniqueKey = `${item.mgr}_${item.name}_${item.sDate}`;
@@ -380,7 +377,7 @@
                             rawName: item.name,
                             staff: item.name.split('||')[0].trim(),
                             kpiDesc: item.name.split('||')[1] ? item.name.split('||')[1].trim() : "General",
-                            target: 0,
+                            target: parseFloat(item.tDisb || 0),
                             achieved: 0,
                             sDate: item.sDate,
                             eDate: item.eDate,
@@ -388,9 +385,16 @@
                         };
                     }
 
-                    // Accumulate target and achievement
-                    mergedMap[uniqueKey].target += parseFloat(item.tDisb || 0);
-                    mergedMap[uniqueKey].achieved += parseFloat(item.aDisb || 0);
+                    // Achievement logic: जर aDisb 0 नसेल तर ते अचिव्हमेंट आहे
+                    const valA = parseFloat(item.aDisb || 0);
+                    if (valA > 0) {
+                        mergedMap[uniqueKey].achieved = valA;
+                    }
+                    
+                    // काहीवेळा target आणि achievement दोन्ही एकाच ओळीत येतात, तेही मॅप करा
+                    if (parseFloat(item.tDisb || 0) > 0) {
+                        mergedMap[uniqueKey].target = parseFloat(item.tDisb);
+                    }
                 });
 
                 masterDataStore = Object.values(mergedMap);
@@ -446,12 +450,11 @@
             filtered.forEach(d => {
                 const k = d.kpiDesc.toLowerCase();
                 if (k.includes('disbursement')) { buckets.disb.t += d.target; buckets.disb.a += d.achieved; }
-                else if (k.includes('appraisal')) { buckets.appr.t += d.target; buckets.appr.a += d.achieved; }
+                else if (k.includes('appraisal') || k.includes('apprisal')) { buckets.appr.t += d.target; buckets.appr.a += d.achieved; }
                 else if (k.includes('recovery')) { buckets.od.t += d.target; buckets.od.a += d.achieved; }
                 else if (k.includes('regular')) { buckets.reg.t += d.target; buckets.reg.a += d.achieved; }
-                // --- FIXED KEYWORD MATCHING FOR PAST DUE ---
-                else if (k.includes('past') || k.includes('due')) { buckets.past.t += d.target; buckets.past.a += d.achieved; }
-                else if (k.includes('rocket') || k.includes('auto')) { buckets.rock.t += d.target; buckets.rock.a += d.achieved; }
+                else if (k.includes('past due')) { buckets.past.t += d.target; buckets.past.a += d.achieved; }
+                else if (k.includes('rocket') || k.includes('auto pay')) { buckets.rock.t += d.target; buckets.rock.a += d.achieved; }
                 else if (k.includes('meeting')) { buckets.meet.t += d.target; buckets.meet.a += d.achieved; }
             });
 
@@ -522,13 +525,13 @@
             body.innerHTML = "";
             const groupMap = {};
 
+            // Table grouping logic for merged view
             data.forEach(d => {
                 const key = `${d.staff}_${d.sDate}`;
-                if (!groupMap[key]) groupMap[key] = { n: d.staff, m: d.mgr, d: d.sDate, da:0, dt:0, ra:0, rt:0, rock:0, mt:0, pa:0 };
+                if (!groupMap[key]) groupMap[key] = { n: d.staff, m: d.mgr, d: d.sDate, da:0, dt:0, ra:0, rt:0, rock:0, mt:0 };
                 const k = d.kpiDesc.toLowerCase();
                 if (k.includes('disbursement')) { groupMap[key].da += d.achieved; groupMap[key].dt += d.target; }
                 if (k.includes('regular')) { groupMap[key].ra += d.achieved; groupMap[key].rt += d.target; }
-                if (k.includes('past') || k.includes('due')) { groupMap[key].pa += d.achieved; }
                 if (k.includes('rocket')) { groupMap[key].rock += d.achieved; }
                 if (k.includes('meeting')) { groupMap[key].mt += d.achieved; }
             });
@@ -549,8 +552,8 @@
                         </td>
                         <td class="px-6 py-6 text-center font-bold text-slate-600">${dp}%</td>
                         <td class="px-6 py-6 text-center font-bold text-slate-600">${rp}%</td>
-                        <td class="px-6 py-6 text-center font-black text-amber-600">₹ ${formatINR(r.pa)}</td>
                         <td class="px-6 py-6 text-center font-black text-slate-700">${r.rock}</td>
+                        <td class="px-6 py-6 text-center font-black text-slate-700">${r.mt}</td>
                         <td class="px-6 py-6 text-center"><span class="status-badge ${bCls}">${status}</span></td>
                     </tr>
                 `;
