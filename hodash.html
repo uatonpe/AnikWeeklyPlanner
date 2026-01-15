@@ -221,7 +221,7 @@
         <!-- KPI Scoreboard -->
         <section class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
             <!-- 1. Disbursement -->
-            <div class="premium-card p-6 border-b-4 border-b-blue-600">
+            <div onclick="showKPIDetails('disb', 'Disbursement')" class="premium-card p-6 border-b-4 border-b-blue-600 cursor-pointer">
                 <div class="kpi-icon-box bg-blue-50 text-blue-600"><i data-lucide="wallet" class="w-5 h-5"></i></div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Disbursement</p>
                 <h3 id="v_disb" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
@@ -232,7 +232,7 @@
             </div>
 
             <!-- 2. Appraisal -->
-            <div class="premium-card p-6 border-b-4 border-b-indigo-500">
+            <div onclick="showKPIDetails('appr', 'Appraisal')" class="premium-card p-6 border-b-4 border-b-indigo-500 cursor-pointer">
                 <div class="kpi-icon-box bg-indigo-50 text-indigo-600"><i data-lucide="file-check" class="w-5 h-5"></i></div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Appraisal</p>
                 <h3 id="v_appr" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
@@ -243,7 +243,7 @@
             </div>
 
             <!-- 3. OD Recovery -->
-            <div class="premium-card p-6 border-b-4 border-b-rose-500">
+            <div onclick="showKPIDetails('od', 'OD Recovery')" class="premium-card p-6 border-b-4 border-b-rose-500 cursor-pointer">
                 <div class="kpi-icon-box bg-rose-50 text-rose-600"><i data-lucide="alert-circle" class="w-5 h-5"></i></div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">OD Recovery</p>
                 <h3 id="v_od" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
@@ -254,7 +254,7 @@
             </div>
 
             <!-- 4. Regular Coll -->
-            <div class="premium-card p-6 border-b-4 border-b-emerald-500">
+            <div onclick="showKPIDetails('reg', 'Regular Coll.')" class="premium-card p-6 border-b-4 border-b-emerald-500 cursor-pointer">
                 <div class="kpi-icon-box bg-emerald-50 text-emerald-600"><i data-lucide="calendar-check" class="w-5 h-5"></i></div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Regular Coll.</p>
                 <h3 id="v_reg" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
@@ -265,7 +265,7 @@
             </div>
 
             <!-- 5. Past Due -->
-            <div class="premium-card p-6 border-b-4 border-b-amber-500">
+            <div onclick="showKPIDetails('past', 'Past Due')" class="premium-card p-6 border-b-4 border-b-amber-500 cursor-pointer">
                 <div class="kpi-icon-box bg-amber-50 text-amber-600"><i data-lucide="history" class="w-5 h-5"></i></div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Past Due</p>
                 <h3 id="v_past" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
@@ -276,7 +276,7 @@
             </div>
 
             <!-- 6. Rocket Pay -->
-            <div class="premium-card p-6 border-b-4 border-b-purple-500">
+            <div onclick="showKPIDetails('rock', 'Rocket Pay')" class="premium-card p-6 border-b-4 border-b-purple-500 cursor-pointer">
                 <div class="kpi-icon-box bg-purple-50 text-purple-600"><i data-lucide="rocket" class="w-5 h-5"></i></div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rocket Pay</p>
                 <h3 id="v_rock" class="text-xl font-black text-slate-800 mt-1 truncate">₹ 0</h3>
@@ -287,7 +287,7 @@
             </div>
 
             <!-- 7. Meetings -->
-            <div class="premium-card p-6 border-b-4 border-b-cyan-500">
+            <div onclick="showKPIDetails('meet', 'Group Meeting')" class="premium-card p-6 border-b-4 border-b-cyan-500 cursor-pointer">
                 <div class="kpi-icon-box bg-cyan-50 text-cyan-600"><i data-lucide="users-2" class="w-5 h-5"></i></div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Group Meeting</p>
                 <h3 id="v_meet" class="text-xl font-black text-slate-800 mt-1 truncate">0</h3>
@@ -373,6 +373,7 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec";
         let masterData = [];
         let chartInstance = null;
+        let globalBuckets = {}; // Global storage for Click Action
 
         async function init() {
             lucide.createIcons();
@@ -402,7 +403,6 @@
 
                 masterData = [];
                 
-                // Fetch All Managers Data Simultaneously
                 const fetchTasks = managersList.map(async (manager) => {
                     try {
                         const dataResp = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(manager)}`);
@@ -460,7 +460,6 @@
             const search = document.getElementById('staffSearch').value.toLowerCase();
             const dateStr = document.getElementById('globalDateRange').value;
 
-            // 1. Data Filtering
             const filtered = masterData.filter(d => {
                 const matchM = (mgr === 'all' || d.manager === mgr);
                 const matchS = (staff === 'all' || d.staff === staff);
@@ -473,7 +472,6 @@
                 return matchM && matchS && matchQ && matchD;
             });
 
-            // 2. Metrics Aggregation
             const buckets = {
                 disb: {t:0, a:0}, appr: {t:0, a:0}, od: {t:0, a:0},
                 reg: {t:0, a:0}, past: {t:0, a:0}, rock: {t:0, a:0}, meet: {t:0, a:0}
@@ -490,11 +488,52 @@
                 else if(k.includes('meeting') || k.includes('group')) { buckets.meet.t += d.target; buckets.meet.a += d.achieved; }
             });
 
-            // 3. Update Components
+            globalBuckets = buckets; // Store for global click access
             updateKPIBars(buckets);
             updateAnalyticsChart(buckets);
             updateTopRankings(filtered);
             updateDetailedAuditTable(filtered);
+        }
+
+        // --- NEW CLICKABLE KPI ACTION ---
+        function showKPIDetails(key, label) {
+            const data = globalBuckets[key];
+            if(!data) return;
+
+            const perc = data.t > 0 ? ((data.a / data.t) * 100).toFixed(2) : 0;
+            const isCurrency = key !== 'meet';
+            const sign = isCurrency ? '₹ ' : '';
+
+            Swal.fire({
+                title: `<span class="text-slate-800 font-black uppercase text-xl">${label} Matrix</span>`,
+                html: `
+                    <div class="text-left space-y-4 p-4">
+                        <div class="flex justify-between items-center border-b pb-3">
+                            <span class="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Planned Target</span>
+                            <span class="text-slate-800 font-black text-lg">${sign}${formatINR(data.t)}</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b pb-3">
+                            <span class="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Actual Achieved</span>
+                            <span class="text-emerald-600 font-black text-lg">${sign}${formatINR(data.a)}</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b pb-3">
+                            <span class="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Pending Gap</span>
+                            <span class="text-rose-600 font-black text-lg">${sign}${formatINR(Math.max(0, data.t - data.a))}</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-2">
+                            <span class="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Efficiency Rate</span>
+                            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg font-black">${perc}%</span>
+                        </div>
+                    </div>
+                `,
+                confirmButtonText: 'डेटा बंद करा',
+                confirmButtonColor: '#1e40af',
+                buttonsStyling: true,
+                customClass: {
+                    popup: 'rounded-[28px]',
+                    confirmButton: 'rounded-xl px-8 py-3 text-xs font-bold uppercase tracking-widest'
+                }
+            });
         }
 
         function updateKPIBars(b) {
@@ -614,7 +653,6 @@
             });
         }
 
-        // --- PROFESSIONAL PRINT LOGIC ---
         function generateProfessionalReport() {
             const mgr = document.getElementById('mgrDropdown').value;
             const dateStr = document.getElementById('globalDateRange').value;
