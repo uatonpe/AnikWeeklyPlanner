@@ -1,5 +1,3 @@
---- START OF FILE ANIK_DASHBOARD_V2_FIXED.html ---
-
 <!DOCTYPE html>
 <html lang="mr">
 <head>
@@ -103,11 +101,6 @@
             @page { size: A4; margin: 10mm; }
             .no-print { display: none; }
         }
-
-        /* Hover Tooltips Custom */
-        .kpi-card-active {
-            border-left: 4px solid var(--primary) !important;
-        }
     </style>
 </head>
 <body class="custom-scroll">
@@ -208,7 +201,7 @@
                     </select>
                 </div>
                 <div class="space-y-3">
-                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">स्टाफ निवडा</label>
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">स्टाफ निवडा (Unique)</label>
                     <select id="staffDropdown" onchange="processAndRender()" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-bold text-slate-700 outline-none focus:ring-4 ring-blue-500/10 transition-all appearance-none">
                         <option value="all">सर्व स्टाफ सदस्य</option>
                     </select>
@@ -220,7 +213,7 @@
             </div>
 
             <div class="premium-card p-8 bg-gradient-to-br from-blue-600 to-blue-800 border-none flex flex-col justify-center items-center text-center text-white">
-                <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mb-2 opacity-80">Overall Efficiency</p>
+                <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mb-2 opacity-80">Achievement</p>
                 <h2 id="totalPercentage" class="text-6xl font-black">0%</h2>
             </div>
         </section>
@@ -377,11 +370,10 @@
     </div>
 
     <script>
-        // --- CONSTANTS & STATE ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec";
         let masterData = [];
         let chartInstance = null;
-        let globalAggregates = {}; 
+        let globalBuckets = {}; // Global storage for Click Action
 
         async function init() {
             lucide.createIcons();
@@ -390,14 +382,13 @@
             flatpickr("#globalDateRange", {
                 mode: "range",
                 dateFormat: "Y-m-d",
-                defaultDate: [new Date().setDate(new Date().getDate() - 30), new Date()],
+                defaultDate: [new Date().setDate(new Date().getDate() - 60), new Date()],
                 onChange: () => processAndRender()
             });
 
             await fetchAllData();
         }
 
-        // --- DATA FETCHING & PARSING ---
         async function fetchAllData() {
             document.getElementById('initialOverlay').style.display = 'flex';
             document.getElementById('loadingStatusText').innerText = "Querying Manager Data Layers...";
@@ -423,28 +414,12 @@
                                 const cleanStaffName = rawLabel.includes('||') ? rawLabel.split('||')[0].trim() : rawLabel.trim();
                                 const specificKpi = rawLabel.includes('||') ? rawLabel.split('||')[1].trim() : "Default";
 
-                                // --- BUG FIX: Targeted Extraction ---
-                                // वीकमध्ये जो KPI असेल त्याचेच टार्गेट आणि अचिव्हमेंट घेणे.
-                                // यापूर्वी '||' मुळे चुकीच्या कॉलममधून व्हॅल्यू येत होती.
-                                let targetVal = 0;
-                                let achvVal = 0;
-                                const k = specificKpi.toLowerCase();
-
-                                if(k.includes('disbursement')) { targetVal = item.tDisb; achvVal = item.aDisb; }
-                                else if(k.includes('apprisal')) { targetVal = item.tAppr; achvVal = item.aAppr; }
-                                else if(k.includes('recovery')) { targetVal = item.tOD; achvVal = item.aOD; }
-                                else if(k.includes('regular')) { targetVal = item.tReg; achvVal = item.aReg; }
-                                else if(k.includes('past')) { targetVal = item.tPast; achvVal = item.aPast; }
-                                else if(k.includes('rocket')) { targetVal = item.tRocket; achvVal = item.aRocket; }
-                                else if(k.includes('meeting') || k.includes('group')) { targetVal = item.tGroup; achvVal = item.aGroup; }
-
                                 masterData.push({
-                                    id: `${cleanStaffName}_${specificKpi}_${week.sDate}`, // Unique ID for deduplication if needed
                                     manager: manager,
                                     staff: cleanStaffName,
                                     kpi: specificKpi,
-                                    target: parseFloat(targetVal || 0),
-                                    achieved: parseFloat(achvVal || 0),
+                                    target: parseFloat(item.tDisb || item.tAppr || item.tOD || item.tReg || item.tPast || item.tRocket || item.tGroup || 0),
+                                    achieved: parseFloat(item.aDisb || item.aAppr || item.aOD || item.aReg || item.aPast || item.aRocket || item.aGroup || 0),
                                     startDate: week.sDate,
                                     endDate: week.eDate
                                 });
@@ -479,30 +454,24 @@
             filteredStaff.forEach(s => staffDrop.innerHTML += `<option value="${s}">${s}</option>`);
         }
 
-        // --- PROCESSING & RENDERING ---
         function processAndRender() {
             const mgr = document.getElementById('mgrDropdown').value;
             const staff = document.getElementById('staffDropdown').value;
             const search = document.getElementById('staffSearch').value.toLowerCase();
-            const dateRange = document.getElementById('globalDateRange').value;
-
-            // Date filtering logic
-            let startDate = null; let endDate = null;
-            if (dateRange.includes(' to ')) {
-                [startDate, endDate] = dateRange.split(' to ');
-            } else {
-                startDate = dateRange; endDate = dateRange;
-            }
+            const dateStr = document.getElementById('globalDateRange').value;
 
             const filtered = masterData.filter(d => {
                 const matchM = (mgr === 'all' || d.manager === mgr);
                 const matchS = (staff === 'all' || d.staff === staff);
                 const matchQ = d.staff.toLowerCase().includes(search);
-                const matchD = (startDate && endDate) ? (d.startDate >= startDate && d.startDate <= endDate) : true;
+                let matchD = true;
+                if (dateStr.includes(' to ')) {
+                    const [s, e] = dateStr.split(' to ');
+                    matchD = (d.startDate >= s && d.startDate <= e);
+                }
                 return matchM && matchS && matchQ && matchD;
             });
 
-            // Buckets initialization
             const buckets = {
                 disb: {t:0, a:0}, appr: {t:0, a:0}, od: {t:0, a:0},
                 reg: {t:0, a:0}, past: {t:0, a:0}, rock: {t:0, a:0}, meet: {t:0, a:0}
@@ -519,42 +488,16 @@
                 else if(k.includes('meeting') || k.includes('group')) { buckets.meet.t += d.target; buckets.meet.a += d.achieved; }
             });
 
-            globalAggregates = buckets; 
+            globalBuckets = buckets; // Store for global click access
             updateKPIBars(buckets);
             updateAnalyticsChart(buckets);
             updateTopRankings(filtered);
             updateDetailedAuditTable(filtered);
         }
 
-        function updateKPIBars(b) {
-            const updateUI = (key, data, isCurr) => {
-                const target = data.t;
-                const achieved = data.a;
-                const perc = target > 0 ? ((achieved / target) * 100).toFixed(1) : 0;
-                
-                document.getElementById(`v_${key}`).innerText = isCurr ? `₹ ${formatINR(achieved)}` : achieved;
-                document.getElementById(`p_${key}_txt`).innerText = `${perc}% Done`;
-                document.getElementById(`p_${key}_bar`).style.width = `${Math.min(perc, 100)}%`;
-            };
-
-            updateUI('disb', b.disb, true);
-            updateUI('appr', b.appr, true);
-            updateUI('od', b.od, true);
-            updateUI('reg', b.reg, true);
-            updateUI('past', b.past, true);
-            updateUI('rock', b.rock, true);
-            updateUI('meet', b.meet, false);
-
-            // Calculate overall percentage
-            let totalA = 0, totalT = 0;
-            // Weigh Disbursement and Collection more or simple average
-            Object.values(b).forEach(v => { totalA += v.a; totalT += v.t; });
-            const finalPerc = totalT > 0 ? ((totalA / totalT) * 100).toFixed(0) : 0;
-            document.getElementById('totalPercentage').innerText = `${finalPerc}%`;
-        }
-
+        // --- NEW CLICKABLE KPI ACTION ---
         function showKPIDetails(key, label) {
-            const data = globalAggregates[key];
+            const data = globalBuckets[key];
             if(!data) return;
 
             const perc = data.t > 0 ? ((data.a / data.t) * 100).toFixed(2) : 0;
@@ -562,7 +505,7 @@
             const sign = isCurrency ? '₹ ' : '';
 
             Swal.fire({
-                title: `<span class="text-slate-800 font-black uppercase text-xl">${label} Status</span>`,
+                title: `<span class="text-slate-800 font-black uppercase text-xl">${label} Matrix</span>`,
                 html: `
                     <div class="text-left space-y-4 p-4">
                         <div class="flex justify-between items-center border-b pb-3">
@@ -578,15 +521,40 @@
                             <span class="text-rose-600 font-black text-lg">${sign}${formatINR(Math.max(0, data.t - data.a))}</span>
                         </div>
                         <div class="flex justify-between items-center pt-2">
-                            <span class="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Achievement Rate</span>
-                            <span class="bg-blue-600 text-white px-4 py-1.5 rounded-xl font-black">${perc}%</span>
+                            <span class="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Efficiency Rate</span>
+                            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg font-black">${perc}%</span>
                         </div>
                     </div>
                 `,
                 confirmButtonText: 'डेटा बंद करा',
                 confirmButtonColor: '#1e40af',
-                customClass: { popup: 'rounded-[32px]', confirmButton: 'rounded-xl px-10 py-3 text-xs uppercase font-bold' }
+                buttonsStyling: true,
+                customClass: {
+                    popup: 'rounded-[28px]',
+                    confirmButton: 'rounded-xl px-8 py-3 text-xs font-bold uppercase tracking-widest'
+                }
             });
+        }
+
+        function updateKPIBars(b) {
+            const updateUI = (key, data, isCurr) => {
+                const p = data.t > 0 ? ((data.a / data.t) * 100).toFixed(0) : 0;
+                document.getElementById(`v_${key}`).innerText = isCurr ? `₹ ${formatINR(data.a)}` : data.a;
+                document.getElementById(`p_${key}_txt`).innerText = `${p}% Done`;
+                document.getElementById(`p_${key}_bar`).style.width = `${Math.min(p, 100)}%`;
+            };
+
+            updateUI('disb', b.disb, true);
+            updateUI('appr', b.appr, true);
+            updateUI('od', b.od, true);
+            updateUI('reg', b.reg, true);
+            updateUI('past', b.past, true);
+            updateUI('rock', b.rock, true);
+            updateUI('meet', b.meet, false);
+
+            let totalA = 0, totalT = 0;
+            Object.values(b).forEach(i => { totalA += i.a; totalT += i.t; });
+            document.getElementById('totalPercentage').innerText = `${totalT > 0 ? ((totalA / totalT) * 100).toFixed(0) : 0}%`;
         }
 
         function updateAnalyticsChart(b) {
@@ -598,14 +566,14 @@
                 data: {
                     labels: ['Disbursement', 'Appraisal', 'OD Recovery', 'Regular Coll', 'Past Due', 'Rocket Pay', 'Meeting'],
                     datasets: [
-                        { label: 'Actual', data: [b.disb.a, b.appr.a, b.od.a, b.reg.a, b.past.a, b.rock.a, b.meet.a], backgroundColor: '#1e40af', borderRadius: 8 },
-                        { label: 'Target', data: [b.disb.t, b.appr.t, b.od.t, b.reg.t, b.past.t, b.rock.t, b.meet.t], backgroundColor: '#e2e8f0', borderRadius: 8 }
+                        { label: 'Actual Achievement', data: [b.disb.a, b.appr.a, b.od.a, b.reg.a, b.past.a, b.rock.a, b.meet.a], backgroundColor: '#1e40af', borderRadius: 10, barThickness: 35 },
+                        { label: 'Target Plan', data: [b.disb.t, b.appr.t, b.od.t, b.reg.t, b.past.t, b.rock.t, b.meet.t], backgroundColor: '#e2e8f0', borderRadius: 10, barThickness: 35 }
                     ]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5] } }, x: { grid: { display: false } } }
+                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
                 }
             });
         }
@@ -613,31 +581,32 @@
         function updateTopRankings(data) {
             const container = document.getElementById('rankingsList');
             container.innerHTML = "";
-            const staffMap = {};
+            const staffStats = {};
 
             data.forEach(d => {
-                if(!staffMap[d.staff]) staffMap[d.staff] = { n: d.staff, m: d.manager, a:0, t:0 };
-                staffMap[d.staff].a += d.achieved;
-                staffMap[d.staff].t += d.target;
+                if(!staffStats[d.staff]) staffStats[d.staff] = { n: d.staff, m: d.manager, a:0, t:0 };
+                staffStats[d.staff].a += d.achieved;
+                staffStats[d.staff].t += d.target;
             });
 
-            const sorted = Object.values(staffMap)
-                .filter(s => s.t > 0)
+            const sorted = Object.values(staffStats)
                 .sort((a,b) => (b.a/b.t) - (a.a/a.t))
-                .slice(0, 10);
+                .slice(0, 8);
 
-            sorted.forEach((s, i) => {
-                const p = ((s.a/s.t)*100).toFixed(0);
+            sorted.forEach((s, idx) => {
+                const perc = s.t > 0 ? ((s.a/s.t)*100).toFixed(0) : 0;
                 container.innerHTML += `
-                    <div class="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-transparent hover:border-blue-200 hover:bg-white transition-all">
+                    <div class="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 transition-all hover:bg-white hover:border-blue-200">
                         <div class="flex items-center gap-4">
-                            <div class="w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold text-xs">${i+1}</div>
+                            <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-black">${idx+1}</span>
                             <div>
-                                <h4 class="font-black text-slate-800 text-sm">${s.n}</h4>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase">${s.m}</p>
+                                <h4 class="font-black text-slate-800 text-sm leading-none">${s.n}</h4>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase mt-1 tracking-widest">${s.m}</p>
                             </div>
                         </div>
-                        <span class="text-sm font-black text-blue-600">${p}%</span>
+                        <div class="text-right">
+                            <span class="text-sm font-black text-blue-600">${perc}%</span>
+                        </div>
                     </div>
                 `;
             });
@@ -646,74 +615,72 @@
         function updateDetailedAuditTable(data) {
             const body = document.getElementById('auditTableBody');
             body.innerHTML = "";
-            
-            // Grouping by Staff + Date for the table rows
-            const grouped = {};
+            const groupMatrix = {};
+
             data.forEach(d => {
                 const key = `${d.staff}_${d.startDate}`;
-                if(!grouped[key]) grouped[key] = { n: d.staff, m: d.manager, d: d.startDate, da:0, dt:0, ra:0, rt:0, rck:0 };
-                const k = d.kpi.toLowerCase();
-                if(k.includes('disbursement')) { grouped[key].da += d.achieved; grouped[key].dt += d.target; }
-                if(k.includes('regular')) { grouped[key].ra += d.achieved; grouped[key].rt += d.target; }
-                if(k.includes('rocket')) { grouped[key].rck += d.achieved; }
+                if(!groupMatrix[key]) groupMatrix[key] = { n: d.staff, m: d.manager, d: d.startDate, da:0, dt:0, ra:0, rt:0, rck:0 };
+                const label = d.kpi.toLowerCase();
+                if(label.includes('disbursement')) { groupMatrix[key].da += d.achieved; groupMatrix[key].dt += d.target; }
+                if(label.includes('regular')) { groupMatrix[key].ra += d.achieved; groupMatrix[key].rt += d.target; }
+                if(label.includes('rocket')) { groupMatrix[key].rck += d.achieved; }
             });
 
-            const items = Object.values(grouped);
-            document.getElementById('totalEntriesCount').innerText = `${items.length} Records Found`;
+            const rows = Object.values(groupMatrix);
+            document.getElementById('totalEntriesCount').innerText = `${rows.length} Records Found`;
 
-            items.forEach(r => {
+            rows.forEach(r => {
                 const dp = r.dt > 0 ? ((r.da/r.dt)*100).toFixed(0) : 0;
                 const rp = r.rt > 0 ? ((r.ra/r.rt)*100).toFixed(0) : 0;
-                const score = (parseFloat(dp) + parseFloat(rp)) / 2;
-
-                let badge = "badge-average"; let status = "Moderate";
-                if(score > 85) { badge="badge-elite"; status="Elite"; }
-                else if(score < 50) { badge="badge-critical"; status="Critical"; }
+                const avg = (parseInt(dp)+parseInt(rp))/2;
+                
+                let bCls = "badge-average"; let status = "Moderate";
+                if(avg > 85) { bCls="badge-elite"; status="Elite"; }
+                if(avg < 50) { bCls="badge-critical"; status="Critical"; }
 
                 body.innerHTML += `
-                    <tr class="hover:bg-slate-50/80 transition-all">
+                    <tr class="hover:bg-slate-50 transition-all">
                         <td class="px-10 py-6">
-                            <span class="font-black text-slate-800 text-sm">${r.n}</span><br>
+                            <span class="font-black text-slate-700 text-sm">${r.n}</span><br>
                             <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${r.m} | ${r.d}</span>
                         </td>
                         <td class="px-6 py-6 text-center font-bold text-slate-600">${dp}%</td>
                         <td class="px-6 py-6 text-center font-bold text-slate-600">${rp}%</td>
-                        <td class="px-6 py-6 text-center font-black text-slate-800">₹ ${formatINR(r.rck)}</td>
-                        <td class="px-6 py-6 text-center"><span class="efficiency-badge ${badge}">${status}</span></td>
+                        <td class="px-6 py-6 text-center font-black text-slate-600">₹ ${formatINR(r.rck)}</td>
+                        <td class="px-6 py-6 text-center"><span class="efficiency-badge ${bCls}">${status}</span></td>
                     </tr>
                 `;
             });
-        }
-
-        // --- UTILS & EXPORT ---
-        function formatINR(num) {
-            return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num);
         }
 
         function generateProfessionalReport() {
             const mgr = document.getElementById('mgrDropdown').value;
             const dateStr = document.getElementById('globalDateRange').value;
 
-            document.getElementById('p_mgr_val').innerText = mgr === 'all' ? 'All Area Managers' : mgr;
-            document.getElementById('p_period_val').innerText = dateStr || 'Selected Range';
-            document.getElementById('p_date_val').innerText = new Date().toLocaleString();
-            document.getElementById('p_id').innerText = Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('p_mgr_val').innerText = mgr === 'all' ? 'All System Managers' : mgr;
+            document.getElementById('p_period_val').innerText = dateStr || 'Selected Date Range';
+            document.getElementById('p_date_val').innerText = new Date().toLocaleDateString('en-IN', { dateStyle: 'full' });
+            document.getElementById('p_id').innerText = Math.floor(1000 + Math.random() * 9000);
 
             const printTBody = document.getElementById('print_table_body');
             printTBody.innerHTML = "";
 
-            // Filtering for current view
             const mgrFilter = document.getElementById('mgrDropdown').value;
             const staffFilter = document.getElementById('staffDropdown').value;
-            
-            const reportData = masterData.filter(d => {
+
+            let reportData = masterData.filter(d => {
                 const matchM = (mgrFilter === 'all' || d.manager === mgrFilter);
                 const matchS = (staffFilter === 'all' || d.staff === staffFilter);
-                return matchM && matchS;
+                let matchD = true;
+                if (dateStr.includes(' to ')) {
+                    const [s, e] = dateStr.split(' to ');
+                    matchD = (d.startDate >= s && d.startDate <= e);
+                }
+                return matchM && matchS && matchD;
             });
 
             if(reportData.length === 0) {
-                Swal.fire("No Data", "प्रिंट करण्यासाठी डेटा उपलब्ध नाही.", "warning");
+                Swal.fire("Data Missing", "प्रिंट करण्यासाठी डेटा उपलब्ध नाही.", "warning");
                 return;
             }
 
@@ -722,16 +689,20 @@
                 printTBody.innerHTML += `
                     <tr>
                         <td style="text-align:center;">${i + 1}</td>
-                        <td><strong>${row.staff}</strong><br><small>${row.manager}</small></td>
+                        <td><strong>${row.staff}</strong><br><small style="color:#666">${row.manager}</small></td>
                         <td>${row.kpi}</td>
                         <td style="text-align:right;">${formatINR(row.target)}</td>
                         <td style="text-align:right;">${formatINR(row.achieved)}</td>
-                        <td style="text-align:center; font-weight:bold;">${p}%</td>
+                        <td style="text-align:center; font-weight:bold; color: ${p >= 90 ? '#059669' : (p < 50 ? '#dc2626' : '#000')}">${p}%</td>
                     </tr>
                 `;
             });
 
             window.print();
+        }
+
+        function formatINR(val) {
+            return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(val);
         }
 
         window.onload = init;
