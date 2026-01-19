@@ -441,6 +441,34 @@
                 return matchM && matchS && matchQ && matchD;
             });
 
+            // --- processAndRender मधील buckets मॅचिंग विभाग ---
+filtered.forEach(d => {
+    const k = d.kpiDesc.toLowerCase();
+    
+    if (k.includes('disbursement')) { 
+        buckets.disb.t += d.target; buckets.disb.a += d.achieved; 
+    }
+    else if (k.includes('appraisal')) { 
+        buckets.appr.t += d.target; buckets.appr.a += d.achieved; 
+    }
+    else if (k.includes('od recovery')) { 
+        buckets.od.t += d.target; buckets.od.a += d.achieved; 
+    }
+    else if (k.includes('regular')) { 
+        buckets.reg.t += d.target; buckets.reg.a += d.achieved; 
+    }
+    // "Past Due" साठी हे अधिक मजबूत लॉजिक वापरा
+    else if (k.includes('past due')) { 
+        buckets.past.t += d.target; buckets.past.a += d.achieved; 
+    }
+    else if (k.includes('rocket') || k.includes('auto')) { 
+        buckets.rock.t += d.target; buckets.rock.a += d.achieved; 
+    }
+    else if (k.includes('meeting')) { 
+        buckets.meet.t += d.target; buckets.meet.a += d.achieved; 
+    }
+});
+
             // Aggregate Calculations for 7 Pillars
             const buckets = {
                 disb: {t:0, a:0}, appr: {t:0, a:0}, od: {t:0, a:0},
