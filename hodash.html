@@ -97,7 +97,7 @@
             <p style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #555;">Strategy Achievement & Audit Matrix Report</p>
         </div>
         <div style="display: flex; justify-content: space-between; margin: 30px 0; font-size: 13px; font-weight: bold; border: 1px solid #eee; padding: 15px; border-radius: 10px;">
-            <div> मैनेजर: <span id="p_mgr_name">-</span> </div>
+            <div> मॅनेजर: <span id="p_mgr_name">-</span> </div>
             <div> कालावधी: <span id="p_date_range">-</span> </div>
             <div> रिपोर्ट आयडी: #AF/<span id="p_report_id">000</span> </div>
         </div>
@@ -310,7 +310,7 @@
     <script>
         const CONFIG = {
             API_URL: "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec",
-            REFRESH_INTERVAL: 600000 // 10 mins
+            REFRESH_INTERVAL: 600000 
         };
 
         let masterDataStore = [];
@@ -320,7 +320,6 @@
         async function init() {
             lucide.createIcons();
             
-            // Period Picker
             flatpickr("#globalDateRange", {
                 mode: "range", dateFormat: "Y-m-d",
                 defaultDate: [new Date().setDate(new Date().getDate() - 30), new Date()],
@@ -345,7 +344,7 @@
                 mgrSelect.innerHTML = '<option value="all">सर्व मॅनेजर्स</option>';
                 mgrList.forEach(m => mgrSelect.innerHTML += `<option value="${m}">${m}</option>`);
 
-                status.innerText = "FETCHING 1000+ PERFORMANCE LAYERS...";
+                status.innerText = "FETCHING PERFORMANCE LAYERS...";
                 let allRawRecords = [];
 
                 const fetchTasks = mgrList.map(async (mgr) => {
@@ -357,37 +356,41 @@
                                 allRawRecords.push({ ...item, mgr: mgr, sDate: week.sDate, eDate: week.eDate });
                             });
                         });
-                    } catch (e) { console.warn(`Manager ${mgr} failed to sync.`); }
+                    } catch (e) { console.warn(`Manager ${mgr} sync failed.`); }
                 });
 
                 await Promise.all(fetchTasks);
 
-                status.innerText = "MERGING TARGET & ACHIEVEMENT STREAMS...";
+                status.innerText = "MERGING STREAMS (FIXING TARGETS)...";
                 
-                // --- FIXED MERGING LOGIC ---
+                // --- CRITICAL FIX: STOPPING TARGET DOUBLING ---
                 const mergedMap = {};
+                const cleanVal = (v) => parseFloat(String(v || 0).replace(/[^\d.]/g, '')) || 0;
+
                 allRawRecords.forEach(item => {
+                    // Unique key contains Manager + StaffKPI + Date
                     const uniqueKey = `${item.mgr}_${item.name}_${item.sDate}`;
-                    
-                    // बॅकएंड डेटा क्लीनिंग (नंबर्समधील स्वल्पविराम आणि स्पेस काढणे)
-                    const cleanVal = (v) => parseFloat(String(v || 0).replace(/[^\d.]/g, '')) || 0;
                     
                     if (!mergedMap[uniqueKey]) {
                         mergedMap[uniqueKey] = {
                             mgr: item.mgr,
-                            rawName: item.name,
                             staff: item.name.split('||')[0].trim(),
                             kpiDesc: item.name.split('||')[1] ? item.name.split('||')[1].trim() : "General",
-                            target: cleanVal(item.tDisb),
-                            achieved: cleanVal(item.aDisb),
+                            target: cleanVal(item.tDisb),   // Set target once
+                            achieved: cleanVal(item.aDisb), // Set initial achievement
                             sDate: item.sDate,
                             eDate: item.eDate,
                             remarks: item.pd || ""
                         };
                     } else {
-                        // जर डुप्लिकेट रो आली तर डेटा ॲड करा
-                        mergedMap[uniqueKey].target += cleanVal(item.tDisb);
+                        // ACHIEVED VALUES ARE SUMMED (in case split across rows)
                         mergedMap[uniqueKey].achieved += cleanVal(item.aDisb);
+                        
+                        // TARGET IS NOT SUMMED (DOUBLING FIX)
+                        // If target was 0 but now has value, update it. Otherwise keep existing.
+                        if (mergedMap[uniqueKey].target === 0) {
+                            mergedMap[uniqueKey].target = cleanVal(item.tDisb);
+                        }
                     }
                 });
 
@@ -396,7 +399,7 @@
                 processAndRender();
 
             } catch (err) {
-                Swal.fire("System Error", "HQ डेटाबेस सिंक करताना त्रुटी आली.", "error");
+                Swal.fire("System Error", "HQ डेटाबेस सिंक त्रुटी.", "error");
             } finally {
                 loader.style.opacity = '0';
                 setTimeout(() => loader.style.display = 'none', 500);
@@ -442,7 +445,6 @@
 
             filtered.forEach(d => {
                 const k = d.kpiDesc.toLowerCase();
-                // "Past Due Recovery" साठी अचूक शोध
                 if (k.includes('disbursement')) { buckets.disb.t += d.target; buckets.disb.a += d.achieved; }
                 else if (k.includes('appraisal')) { buckets.appr.t += d.target; buckets.appr.a += d.achieved; }
                 else if (k.includes('od recovery')) { buckets.od.t += d.target; buckets.od.a += d.achieved; }
@@ -494,7 +496,7 @@
             });
 
             const sorted = Object.values(stats)
-                .sort((a,b) => (b.a/b.t) - (a.a/a.t))
+                .sort((a,b) => (b.t > 0 ? b.a/b.t : 0) - (a.t > 0 ? a.a/a.t : 0))
                 .slice(0, 10);
 
             sorted.forEach((s, i) => {
