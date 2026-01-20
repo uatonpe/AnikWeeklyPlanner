@@ -363,12 +363,10 @@
 
                 status.innerText = "MERGING STREAMS (FIXING TARGETS)...";
                 
-                // --- CRITICAL FIX: STOPPING TARGET DOUBLING ---
                 const mergedMap = {};
                 const cleanVal = (v) => parseFloat(String(v || 0).replace(/[^\d.]/g, '')) || 0;
 
                 allRawRecords.forEach(item => {
-                    // Unique key contains Manager + StaffKPI + Date
                     const uniqueKey = `${item.mgr}_${item.name}_${item.sDate}`;
                     
                     if (!mergedMap[uniqueKey]) {
@@ -376,18 +374,14 @@
                             mgr: item.mgr,
                             staff: item.name.split('||')[0].trim(),
                             kpiDesc: item.name.split('||')[1] ? item.name.split('||')[1].trim() : "General",
-                            target: cleanVal(item.tDisb),   // Set target once
-                            achieved: cleanVal(item.aDisb), // Set initial achievement
+                            target: cleanVal(item.tDisb),   
+                            achieved: cleanVal(item.aDisb), 
                             sDate: item.sDate,
                             eDate: item.eDate,
                             remarks: item.pd || ""
                         };
                     } else {
-                        // ACHIEVED VALUES ARE SUMMED (in case split across rows)
                         mergedMap[uniqueKey].achieved += cleanVal(item.aDisb);
-                        
-                        // TARGET IS NOT SUMMED (DOUBLING FIX)
-                        // If target was 0 but now has value, update it. Otherwise keep existing.
                         if (mergedMap[uniqueKey].target === 0) {
                             mergedMap[uniqueKey].target = cleanVal(item.tDisb);
                         }
@@ -596,18 +590,37 @@
             });
         }
 
+        // --- UPDATED PRINT LOGIC WITH FILTER SYNC ---
         function generateAuditReport() {
-            const mgr = document.getElementById('mgrDropdown').value;
-            const period = document.getElementById('globalDateRange').value;
+            const selectedMgr = document.getElementById('mgrDropdown').value;
+            const dateRange = document.getElementById('globalDateRange').value;
             
-            document.getElementById('p_mgr_name').innerText = mgr === 'all' ? 'All Area Managers' : mgr;
-            document.getElementById('p_date_range').innerText = period || 'Current Period';
+            // 1. Filter master data exactly as per selection
+            const filteredForPrint = masterDataStore.filter(d => {
+                const matchM = (selectedMgr === 'all' || d.mgr === selectedMgr);
+                let matchD = true;
+                if (dateRange.includes(' to ')) {
+                    const [s, e] = dateRange.split(' to ');
+                    matchD = (d.sDate >= s && d.sDate <= e);
+                }
+                return matchM && matchD;
+            });
+
+            if(filteredForPrint.length === 0) {
+                Swal.fire("Data Missing", "निवडलेल्या फिल्टर नुसार प्रिंट करण्यासाठी कोणताही डेटा उपलब्ध नाही.", "warning");
+                return;
+            }
+
+            // 2. Set Header Details
+            document.getElementById('p_mgr_name').innerText = selectedMgr === 'all' ? 'सर्व मॅनेजर्स' : selectedMgr;
+            document.getElementById('p_date_range').innerText = dateRange || 'Current Period';
             document.getElementById('p_report_id').innerText = Math.floor(1000 + Math.random() * 9000);
 
+            // 3. Populate Table Body
             const printTBody = document.getElementById('print_table_body');
             printTBody.innerHTML = "";
 
-            masterDataStore.forEach((d, i) => {
+            filteredForPrint.forEach((d, i) => {
                 const perc = d.target > 0 ? ((d.achieved/d.target)*100).toFixed(1) : 0;
                 printTBody.innerHTML += `
                     <tr>
@@ -621,11 +634,8 @@
                 `;
             });
 
-            if(masterDataStore.length === 0) {
-                Swal.fire("Data Missing", "प्रिंट करण्यासाठी कोणताही डेटा उपलब्ध नाही.", "warning");
-            } else {
-                window.print();
-            }
+            // 4. Trigger Print
+            window.print();
         }
 
         function formatINR(val) {
