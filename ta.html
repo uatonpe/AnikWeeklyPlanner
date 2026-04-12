@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TA Executive Sync | Anik Financial Services</title>
+
+    <!-- UI Frameworks -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Updated Lucide CDN to be more reliable -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        /* 
+           PROFESSIONAL DESIGN SYSTEM 
+           Colors: Emerald for success, Slate for professional depth
+        */
+        :root {
+            --primary: #059669;
+            --secondary: #0f172a;
+            --accent: #10b981;
+            --bg-soft: #f8fafc;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-soft);
+            color: #334155;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.03) 0px, transparent 50%);
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism Design Elements */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            border-radius: 28px;
+        }
+
+        .premium-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .premium-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+            border-color: var(--primary);
+        }
+
+        /* Form Styling */
+        .custom-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1.25rem center;
+            background-size: 1.25rem;
+        }
+
+        .input-actual, .input-target { /* Added .input-target */
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .input-actual:focus, .input-target:focus { /* Added .input-target */
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+            outline: none;
+        }
+
+        /* Progress States */
+        .progress-indicator {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Animations */
+        @keyframes pulse-emerald {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .sync-active {
+            animation: pulse-emerald 2s infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .loader-dots div {
+            animation-timing-function: cubic-bezier(0, 1, 1, 0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Professional Top Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-lg border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="bg-emerald-600 p-2 rounded-xl shadow-lg shadow-emerald-200">
+                    <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-6 brightness-0 invert" alt="Anik Logo">
+                </div>
+                <div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
+                <div>
+                    <h1 class="text-lg font-extrabold text-slate-800 tracking-tight leading-none">TA SYSTEM</h1>
+                    <span class="text-[9px] font-black text-emerald-600 uppercase tracking-[0.2em] leading-none">Management Dashboard</span>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex flex-col text-right">
+                <p id="liveTime" class="text-sm font-black text-slate-700">00:00:00</p>
+                <p id="liveDate" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Loading Date...</p>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        
+        <!-- Welcome Section -->
+        <header class="mb-10 animate__animated animate__fadeIn">
+            <h2 class="text-3xl font-black text-slate-800 mb-2 tracking-tight">System Data Entry</h2>
+            <p class="text-slate-500 font-medium">खालील फिल्ड्स निवडून तुमच्या टीमचा साप्ताहिक डेटा अपडेट करा.</p>
+        </header>
+
+        <!-- Main Selection Container -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+            
+            <div class="lg:col-span-8 glass-panel p-8 animate__animated animate__fadeInLeft">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="bg-emerald-100 p-2 rounded-lg">
+                        <i data-lucide="layers" class="w-5 h-5 text-emerald-600"></i>
+                    </div>
+                    <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">डेटा फिल्टर (Data Filters)</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8"> <!-- Changed to grid-cols-3 -->
+                    <!-- Manager Field -->
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">मॅनेजर निवडा (Select Manager)</label>
+                        <select id="mgrSelect" onchange="handleManagerChange()" class="custom-select w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold text-slate-700 focus:bg-white transition-all cursor-pointer">
+                            <option value="">-- निवडा --</option>
+                        </select>
+                    </div>
+
+                    <!-- Weekly Plan Field -->
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">उपलब्ध प्लॅन (Available Plans)</label>
+                        <select id="planSelect" onchange="loadTableData()" class="custom-select w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold text-slate-700 focus:bg-white transition-all cursor-pointer">
+                            <option value="">-- आधी मॅनेजर निवडा --</option>
+                        </select>
+                    </div>
+
+                    <!-- New: Day Selector Field -->
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">दिवस निवडा (Select Day)</label>
+                        <select id="daySelect" onchange="handleDayChange()" class="custom-select w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold text-slate-700 focus:bg-white transition-all cursor-pointer" disabled>
+                            <option value="">-- आधी प्लॅन निवडा --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Stats Cards -->
+            <div class="lg:col-span-4 space-y-4 animate__animated animate__fadeInRight">
+                <div class="glass-panel p-6 bg-slate-900 text-white relative overflow-hidden group">
+                    <div class="relative z-10">
+                        <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Total Plan Target (Weekly)</p>
+                        <h4 id="displayTarget" class="text-3xl font-black">₹ 0.00</h4>
+                    </div>
+                    <i data-lucide="target" class="absolute -right-4 -bottom-4 w-24 h-24 text-white/5 group-hover:scale-110 transition-transform"></i>
+                </div>
+
+                <div class="glass-panel p-6 bg-white relative overflow-hidden group border-emerald-100">
+                    <div class="relative z-10">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Actual Entered (Weekly)</p>
+                        <h4 id="displayActual" class="text-3xl font-black text-emerald-600">₹ 0.00</h4>
+                    </div>
+                    <div id="syncIndicator" class="absolute right-6 top-6 w-3 h-3 bg-slate-200 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div id="tableWrapper" class="hidden space-y-6 animate__animated animate__fadeInUp">
+            <div class="glass-panel overflow-hidden border-emerald-50">
+                <div class="bg-white p-6 border-b border-slate-100 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-blue-50 p-2 rounded-lg text-blue-600">
+                            <i data-lucide="users" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="text-sm font-black text-slate-800 uppercase tracking-tight">स्टाफ अ‍ॅक्चुअल एंट्री (Staff Performance)</h3>
+                    </div>
+                    <div id="weekLabel" class="text-[10px] font-black bg-blue-50 text-blue-600 px-4 py-2 rounded-full uppercase tracking-widest">
+                        Week: --
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <!-- Updated Table Header for multiple metrics based on image -->
+                        <thead class="bg-slate-50/80 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                            <tr>
+                                <th class="p-6" rowspan="2">स्टाफ माहिती</th>
+                                <th class="p-6 text-center" colspan="2">Disbursement (₹)</th>
+                                <th class="p-6 text-center" colspan="2">Appraisal (₹)</th>
+                                <th class="p-6 text-center" colspan="2">OD Recovery (₹)</th>
+                                <th class="p-6 text-center" colspan="2">Regular Collection (₹)</th>
+                                <th class="p-6 text-center" colspan="2">Past Due Recovery (₹)</th>
+                                <th class="p-6 text-center" colspan="2">Rocket Pay / Auto Pay</th>
+                                <th class="p-6 text-center" colspan="2">Group Meetings</th>
+                                <th class="p-6 text-center" rowspan="2">स्टेटस</th>
+                            </tr>
+                            <tr>
+                                <th class="p-3 text-center">टार्गेट</th>
+                                <th class="p-3 text-center">अ‍ॅक्चुअल</th>
+                                <th class="p-3 text-center">टार्गेट</th>
+                                <th class="p-3 text-center">अ‍ॅक्चुअल</th>
+                                <th class="p-3 text-center">टार्गेट</th>
+                                <th class="p-3 text-center">अ‍ॅक्चुअल</th>
+                                <th class="p-3 text-center">टार्गेट</th>
+                                <th class="p-3 text-center">अ‍ॅक्चुअल</th>
+                                <th class="p-3 text-center">टार्गेट</th>
+                                <th class="p-3 text-center">अ‍ॅक्चुअल</th>
+                                <th class="p-3 text-center">टार्गेट</th>
+                                <th class="p-3 text-center">अ‍ॅक्चुअल</th>
+                                <th class="p-3 text-center">टार्गेट</th>
+                                <th class="p-3 text-center">अ‍ॅक्चुअल</th>
+                            </tr>
+                        </thead>
+                        <tbody id="taBody" class="divide-y divide-slate-100 bg-white">
+                            <!-- JS Injection -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Action Footer -->
+                <div class="p-8 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="flex items-center gap-3 text-slate-500">
+                        <i data-lucide="info" class="w-5 h-5"></i>
+                        <p class="text-xs font-semibold">कृपया सर्व आकडे तपासून 'सिंक' बटणावर क्लिक करा.</p>
+                    </div>
+                    <button onclick="submitSync()" class="sync-active group bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-emerald-200 transition-all flex items-center gap-3 active:scale-95">
+                        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                        सिस्टम डेटा सिंक करा
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="placeholder" class="py-32 flex flex-col items-center justify-center text-slate-300 transition-all">
+            <div class="bg-slate-100 p-8 rounded-full mb-6">
+                <i data-lucide="database" class="w-12 h-12"></i>
+            </div>
+            <p class="font-black text-sm uppercase tracking-[0.3em]">मॅनेजर आणि प्लॅन निवडा</p>
+        </div>
+
+    </main>
+
+    <!-- Global Fullscreen Loader -->
+    <div id="globalLoader" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] hidden flex flex-col items-center justify-center">
+        <div class="relative w-24 h-24 mb-6">
+            <div class="absolute inset-0 border-4 border-emerald-500/20 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <p class="text-white font-black tracking-[0.2em] uppercase animate-pulse">डेटा सिंक होत आहे...</p>
+    </div>
+
+    <!-- JavaScript - High Logic -->
+    <script>
+        // CONFIGURATION
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec"; 
+        let globalHistory = [];
+        let currentPlanIdx = null;
+        let selectedDay = null; // New global variable for selected day
+
+        // All metrics to track, matching the image and your description
+        const METRIC_TYPES = [
+            { id: 'disbursement', label: 'Disbursement', unit: '₹' },
+            { id: 'appraisal', label: 'Appraisal', unit: '₹' }, // Changed to ₹ as per image, assuming 'Appraisal Target (₹)'
+            { id: 'od_recovery', label: 'OD Recovery', unit: '₹' },
+            { id: 'regular_collection', label: 'Regular Collection', unit: '₹' },
+            { id: 'past_due_recovery', label: 'Past Due Recovery', unit: '₹' },
+            { id: 'rocket_auto_pay', label: 'Rocket Pay / Auto Pay', unit: 'No.' }, // Assuming 'No.' from value '1'
+            { id: 'group_meetings', label: 'Group Meetings', unit: 'No.' } // Assuming 'No.' from '0.00' common for counts
+        ];
+
+        // 1. Initialize System
+        async function initSystem() {
+            updateLiveDateTime();
+            setInterval(updateLiveDateTime, 1000);
+
+            // Safe Lucide initialization
+            try {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            } catch (e) { console.warn("Lucide load error, icons might not appear."); }
+
+            toggleLoader(true);
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getManagers`);
+                if (!response.ok) throw new Error("Network issue");
+                
+                const managers = await response.json();
+                const sel = document.getElementById('mgrSelect');
+                
+                managers.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.textContent = m;
+                    sel.appendChild(opt);
+                });
+                
+                showToast("सिस्टम कनेक्ट झाली आहे", "success");
+            } catch (err) {
+                console.error("Init Error:", err);
+                Swal.fire("Error", "मॅनेजर लिस्ट लोड होऊ शकली नाही. कृपया पेज रिफ्रेश करा.", "error");
+            } finally {
+                toggleLoader(false);
+            }
+        }
+
+        // 2. Handle Manager Choice
+        async function handleManagerChange() {
+            const mgr = document.getElementById('mgrSelect').value;
+            if (!mgr) { resetUI(); return; }
+
+            toggleLoader(true);
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
+                const data = await response.json();
+                globalHistory = data.history;
+
+                const planSel = document.getElementById('planSelect');
+                planSel.innerHTML = '<option value="">-- आठवडा निवडा --</option>';
+                
+                globalHistory.forEach((plan, i) => {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    // Format dates clearly for the staff
+                    opt.textContent = `कालावधी: ${plan.sDate} ते ${plan.eDate}`;
+                    planSel.appendChild(opt);
+                });
+
+                document.getElementById('daySelect').setAttribute('disabled', 'true');
+                document.getElementById('daySelect').innerHTML = '<option value="">-- आधी प्लॅन निवडा --</option>';
+                showToast("मॅनेजर डेटा प्राप्त झाला");
+            } catch (err) {
+                Swal.fire("Error", "डेटा मिळवताना अडचण आली.", "error");
+            } finally {
+                toggleLoader(false);
+            }
+        }
+
+        // Helper to get all working days (Mon-Sat) within a date range
+        function getWorkingDays(startDateStr, endDateStr) {
+            const dates = [];
+            let currentDate = new Date(startDateStr);
+            const endDate = new Date(endDateStr);
+
+            while (currentDate <= endDate) {
+                const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+                if (dayOfWeek !== 0) { // Exclude Sunday
+                    dates.push(currentDate.toISOString().split('T')[0]); // YYYY-MM-DD
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            return dates;
+        }
+
+        // 3. Render Table
+        function loadTableData() {
+            const idx = document.getElementById('planSelect').value;
+            if (idx === "") {
+                document.getElementById('tableWrapper').classList.add('hidden');
+                document.getElementById('placeholder').classList.remove('hidden');
+                document.getElementById('daySelect').setAttribute('disabled', 'true');
+                document.getElementById('daySelect').innerHTML = '<option value="">-- आधी प्लॅन निवडा --</option>';
+                return;
+            }
+
+            currentPlanIdx = idx;
+            const plan = globalHistory[idx];
+            
+            document.getElementById('weekLabel').innerText = `Week: ${plan.sDate} - ${plan.eDate}`;
+            document.getElementById('tableWrapper').classList.remove('hidden');
+            document.getElementById('placeholder').classList.add('hidden');
+            document.getElementById('daySelect').removeAttribute('disabled');
+
+            // Populate Day Selector
+            const allWorkingDays = getWorkingDays(plan.sDate, plan.eDate);
+            const daySel = document.getElementById('daySelect');
+            daySel.innerHTML = '<option value="">-- दिवस निवडा --</option>';
+            allWorkingDays.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                // Format day for display (e.g., Mon, Oct 23)
+                const dateObj = new Date(d);
+                opt.textContent = dateObj.toLocaleDateString('mr-IN', { weekday: 'short', month: 'short', day: 'numeric' });
+                daySel.appendChild(opt);
+            });
+
+            // Set initial selected day
+            const today = new Date().toISOString().split('T')[0];
+            if (allWorkingDays.includes(today)) {
+                daySel.value = today;
+                selectedDay = today;
+            } else if (allWorkingDays.length > 0) {
+                daySel.value = allWorkingDays[0];
+                selectedDay = allWorkingDays[0];
+            } else {
+                selectedDay = null;
+                daySel.value = "";
+                daySel.setAttribute('disabled', 'true');
+            }
+            
+            // Initialize dailyEntries for each staff if not already present, for all defined metrics
+            plan.details.forEach(item => {
+                if (!item.dailyEntries) {
+                    item.dailyEntries = {};
+                }
+                const numWorkingDays = allWorkingDays.length || 1; // Prevent division by zero
+
+                // Ensure item has weekly target placeholders (if not from backend)
+                // These 't[MetricId]' properties are expected to come from your backend
+                // Default values are set for demonstration if missing
+                item.tDisbursement = item.tDisbursement !== undefined ? parseFloat(item.tDisbursement) : 0;
+                item.tAppraisal = item.tAppraisal !== undefined ? parseFloat(item.tAppraisal) : 0; // Defaulting to 0 for money
+                item.tOdRecovery = item.tOdRecovery !== undefined ? parseFloat(item.tOdRecovery) : 0;
+                item.tRegularCollection = item.tRegularCollection !== undefined ? parseFloat(item.tRegularCollection) : 0;
+                item.tPastDueRecovery = item.tPastDueRecovery !== undefined ? parseFloat(item.tPastDueRecovery) : 0;
+                item.tRocketAutoPay = item.tRocketAutoPay !== undefined ? parseFloat(item.tRocketAutoPay) : 0; // Defaulting to 0 for count
+                item.tGroupMeetings = item.tGroupMeetings !== undefined ? parseFloat(item.tGroupMeetings) : 0; // Defaulting to 0 for count
+
+                const weeklyTargets = {
+                    disbursement: item.tDisbursement,
+                    appraisal: item.tAppraisal,
+                    od_recovery: item.tOdRecovery,
+                    regular_collection: item.tRegularCollection,
+                    past_due_recovery: item.tPastDueRecovery,
+                    rocket_auto_pay: item.tRocketAutoPay,
+                    group_meetings: item.tGroupMeetings
+                };
+
+                allWorkingDays.forEach(dateKey => {
+                    if (!item.dailyEntries[dateKey]) {
+                        item.dailyEntries[dateKey] = {};
+                    }
+
+                    METRIC_TYPES.forEach(metric => {
+                        if (!item.dailyEntries[dateKey][metric.id]) {
+                            item.dailyEntries[dateKey][metric.id] = {
+                                dailyT: (weeklyTargets[metric.id] / numWorkingDays).toFixed(0), // Distribute weekly target
+                                dailyA: "0" // Start daily actuals at 0
+                            };
+                        }
+                    });
+                });
+            });
+            
+            renderTableRows(); // Call a new function to render table specific to selected day
+            recalcOverview();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // New function to handle day change
+        function handleDayChange() {
+            selectedDay = document.getElementById('daySelect').value;
+            if (!selectedDay) {
+                document.getElementById('taBody').innerHTML = ''; // Clear table
+                recalcOverview();
+                return;
+            }
+            renderTableRows();
+            recalcOverview(); // Recalculate based on current data
+        }
+
+        // Renders table rows based on selectedDay
+        function renderTableRows() {
+            const body = document.getElementById('taBody');
+            body.innerHTML = "";
+            const plan = globalHistory[currentPlanIdx];
+
+            if (!plan || !selectedDay) return;
+
+            plan.details.forEach((item, i) => {
+                const currentDayData = item.dailyEntries[selectedDay] || {};
+                
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50/80 transition-all";
+                let metricInputsHtml = '';
+
+                METRIC_TYPES.forEach(metric => {
+                    const metricData = currentDayData[metric.id] || { dailyT: 0, dailyA: 0 };
+                    const dailyTargetVal = parseFloat(metricData.dailyT || 0);
+                    const dailyActualVal = parseFloat(metricData.dailyA || 0);
+
+                    metricInputsHtml += `
+                        <td class="p-6">
+                            <div class="relative max-w-[100px] mx-auto">
+                                <input type="number" 
+                                    class="input-target w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-center font-black text-slate-700 focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                                    value="${dailyTargetVal || ''}"
+                                    placeholder="0"
+                                    data-staff-idx="${i}"
+                                    data-metric-id="${metric.id}"
+                                    data-entry-type="dailyT"
+                                    oninput="updateDailyEntry(this)">
+                            </div>
+                        </td>
+                        <td class="p-6">
+                            <div class="relative max-w-[100px] mx-auto">
+                                <input type="number" 
+                                    class="input-actual w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-center font-black text-slate-700 focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                                    value="${dailyActualVal || ''}"
+                                    placeholder="0"
+                                    data-staff-idx="${i}"
+                                    data-metric-id="${metric.id}"
+                                    data-entry-type="dailyA"
+                                    oninput="updateDailyEntry(this)">
+                            </div>
+                        </td>
+                    `;
+                });
+
+                row.innerHTML = `
+                    <td class="p-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-xs">
+                                ${i + 1}
+                            </div>
+                            <div>
+                                <p class="font-extrabold text-slate-700 tracking-tight">${item.name}</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter italic">Sales Representative</p>
+                            </div>
+                        </div>
+                    </td>
+                    ${metricInputsHtml}
+                    <td class="p-6 text-center">
+                        <div class="status-box text-[10px] font-black uppercase text-slate-300 tracking-widest">
+                            Pending
+                        </div>
+                    </td>
+                `;
+                body.appendChild(row);
+            });
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // New function to update daily entry in globalHistory
+        function updateDailyEntry(inputElement) {
+            const staffIdx = inputElement.getAttribute('data-staff-idx');
+            const metricId = inputElement.getAttribute('data-metric-id'); // e.g., 'disbursement', 'appraisal'
+            const entryType = inputElement.getAttribute('data-entry-type'); // 'dailyT' or 'dailyA'
+            const value = inputElement.value;
+
+            if (currentPlanIdx !== null && selectedDay) {
+                const plan = globalHistory[currentPlanIdx];
+                if (!plan.details[staffIdx].dailyEntries[selectedDay][metricId]) {
+                    plan.details[staffIdx].dailyEntries[selectedDay][metricId] = {};
+                }
+                plan.details[staffIdx].dailyEntries[selectedDay][metricId][entryType] = value;
+            }
+            recalcOverview();
+        }
+
+        // 4. Real-time Calculations
+        function recalcOverview() {
+            const plan = globalHistory[currentPlanIdx];
+            if (!plan) {
+                document.getElementById('displayTarget').innerText = `₹ 0.00`;
+                document.getElementById('displayActual').innerText = `₹ 0.00`;
+                document.getElementById('syncIndicator').className = "absolute right-6 top-6 w-3 h-3 bg-slate-200 rounded-full";
+                return;
+            }
+
+            let totalWeeklyTarget = 0;
+            let totalWeeklyActual = 0;
+
+            // Calculate weekly totals for display cards
+            plan.details.forEach(item => {
+                if (item.dailyEntries) {
+                    for (const day in item.dailyEntries) {
+                        METRIC_TYPES.forEach(metric => {
+                            const metricData = item.dailyEntries[day][metric.id];
+                            if (metricData) {
+                                totalWeeklyTarget += parseFloat(metricData.dailyT || 0);
+                                totalWeeklyActual += parseFloat(metricData.dailyA || 0);
+                            }
+                        });
+                    }
+                }
+            });
+
+            document.getElementById('displayTarget').innerText = `₹ ${formatNumber(totalWeeklyTarget)}`;
+            document.getElementById('displayActual').innerText = `₹ ${formatNumber(totalWeeklyActual)}`;
+            
+            // Update status for currently visible table rows (for the selected day)
+            if (selectedDay) {
+                const rows = document.getElementById('taBody').querySelectorAll('tr');
+                rows.forEach((row, idx) => {
+                    const item = plan.details[idx];
+                    const currentDayData = item.dailyEntries[selectedDay] || {};
+                    
+                    let allTargetsMet = true;
+                    let hasAnyActuals = false;
+                    let hasAnyTargets = false;
+
+                    METRIC_TYPES.forEach(metric => {
+                        const metricData = currentDayData[metric.id] || { dailyT: 0, dailyA: 0 };
+                        const dailyTarget = parseFloat(metricData.dailyT || 0);
+                        const dailyActual = parseFloat(metricData.dailyA || 0);
+
+                        if (dailyTarget > 0) hasAnyTargets = true;
+                        if (dailyActual > 0) hasAnyActuals = true;
+
+                        if (dailyTarget > 0 && dailyActual < dailyTarget) {
+                            allTargetsMet = false;
+                        }
+                    });
+                    
+                    const statusBox = row.querySelector('.status-box');
+                    if (hasAnyActuals) {
+                        if (allTargetsMet) {
+                            statusBox.innerHTML = '<span class="text-emerald-600">Done ✅</span>';
+                        } else {
+                            statusBox.innerHTML = '<span class="text-amber-500">Low 📉</span>';
+                        }
+                    } else if (hasAnyTargets) { // If there are targets but no actuals
+                         statusBox.innerHTML = '<span class="text-slate-400">Pending</span>';
+                    } else { // No targets, no actuals
+                        statusBox.innerText = "N/A";
+                        statusBox.className = "status-box text-[10px] font-black uppercase text-slate-300 tracking-widest";
+                    }
+                });
+            }
+
+            // Sync status pulse
+            const indicator = document.getElementById('syncIndicator');
+            if(totalWeeklyActual > 0) {
+                indicator.className = "absolute right-6 top-6 w-3 h-3 bg-emerald-500 rounded-full animate-pulse";
+            } else {
+                indicator.className = "absolute right-6 top-6 w-3 h-3 bg-slate-200 rounded-full";
+            }
+        }
+
+        // 5. Final Data Submission
+        async function submitSync() {
+            const plan = globalHistory[currentPlanIdx];
+            if (!plan) {
+                Swal.fire("माहिती नाही", "कृपया मॅनेजर आणि प्लॅन निवडा.", "info");
+                return;
+            }
+
+            // Check for empty values for the selected plan's entire week
+            let emptyDailyFields = 0;
+            plan.details.forEach(item => {
+                if (item.dailyEntries) {
+                    for (const day in item.dailyEntries) {
+                        METRIC_TYPES.forEach(metric => {
+                            const metricData = item.dailyEntries[day][metric.id];
+                            if (metricData && (metricData.dailyT === "" || metricData.dailyA === "")) {
+                                emptyDailyFields++;
+                            }
+                        });
+                    }
+                }
+            });
+            
+            if(emptyDailyFields > 0) {
+                const confirm = await Swal.fire({
+                    title: 'काही रकाने रिकामे आहेत',
+                    text: `${emptyDailyFields} दैनंदिन डेटा पॉइंट्स भरलेले नाहीत. तरीही सिंक करायचे का?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'हो, सिंक करा',
+                    cancelButtonText: 'रद्द करा'
+                });
+                if(!confirm.isConfirmed) return;
+            }
+
+            toggleLoader(true);
+
+            // Construct payload with the new dailyEntries structure
+            const payloadDetails = plan.details.map(item => ({
+                name: item.name,
+                tDisbursement: item.tDisbursement,
+                tAppraisal: item.tAppraisal,
+                tOdRecovery: item.tOdRecovery,
+                tRegularCollection: item.tRegularCollection,
+                tPastDueRecovery: item.tPastDueRecovery,
+                tRocketAutoPay: item.tRocketAutoPay,
+                tGroupMeetings: item.tGroupMeetings,
+                dailyEntries: item.dailyEntries 
+            }));
+
+            const payload = {
+                manager: document.getElementById('mgrSelect').value,
+                sDate: plan.sDate,
+                eDate: plan.eDate,
+                fxDetails: payloadDetails
+            };
+
+            try {
+                // Sending to Google Apps Script
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Standard for GAS POST requests
+                    headers: {
+                        'Content-Type': 'application/json' // Important for POST with body
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                Swal.fire({
+                    title: 'यशस्वी सिंक!',
+                    text: 'डेटा सिस्टिममध्ये अपडेट झाला आहे.',
+                    icon: 'success',
+                    timer: 3000,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload();
+                });
+
+            } catch (err) {
+                console.error("Sync Error:", err);
+                Swal.fire("Error", "सिंक अयशस्वी. इंटरनेट तपासा किंवा चुकीचा डेटा. तपशील कन्सोलमध्ये पहा.", "error");
+            } finally {
+                toggleLoader(false);
+            }
+        }
+
+        // --- Utility Functions ---
+        function toggleLoader(show) {
+            document.getElementById('globalLoader').classList.toggle('hidden', !show);
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num);
+        }
+
+        function updateLiveDateTime() {
+            const now = new Date();
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            
+            document.getElementById('liveDate').innerText = now.toLocaleDateString('mr-IN', dateOptions);
+            document.getElementById('liveTime').innerText = now.toLocaleTimeString('en-US', timeOptions);
+        }
+
+        function showToast(msg, icon = "success") {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+            Toast.fire({ icon: icon, title: msg });
+        }
+
+        function resetUI() {
+            document.getElementById('planSelect').innerHTML = '<option value="">-- आधी मॅनेजर निवडा --</option>';
+            document.getElementById('daySelect').innerHTML = '<option value="">-- आधी प्लॅन निवडा --</option>';
+            document.getElementById('daySelect').setAttribute('disabled', 'true');
+            document.getElementById('tableWrapper').classList.add('hidden');
+            document.getElementById('placeholder').classList.remove('hidden');
+            document.getElementById('displayTarget').innerText = "₹ 0.00";
+            document.getElementById('displayActual').innerText = "₹ 0.00";
+            document.getElementById('taBody').innerHTML = ''; // Clear table body
+            globalHistory = [];
+            currentPlanIdx = null;
+            selectedDay = null;
+        }
+
+        // Start App
+        window.onload = initSystem;
+    </script>
+</body>
+</html>
