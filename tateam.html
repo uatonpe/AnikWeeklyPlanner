@@ -66,13 +66,13 @@
             background-size: 1.25rem;
         }
 
-        .input-actual {
+        .input-actual, .input-target { /* Added .input-target */
             background: #ffffff;
             border: 2px solid #e2e8f0;
             transition: all 0.3s ease;
         }
 
-        .input-actual:focus {
+        .input-actual:focus, .input-target:focus { /* Added .input-target */
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
             outline: none;
@@ -150,7 +150,7 @@
                     <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">डेटा फिल्टर (Data Filters)</h3>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8"> <!-- Changed to grid-cols-3 -->
                     <!-- Manager Field -->
                     <div class="space-y-3">
                         <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">मॅनेजर निवडा (Select Manager)</label>
@@ -166,6 +166,14 @@
                             <option value="">-- आधी मॅनेजर निवडा --</option>
                         </select>
                     </div>
+
+                    <!-- New: Day Selector Field -->
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">दिवस निवडा (Select Day)</label>
+                        <select id="daySelect" onchange="handleDayChange()" class="custom-select w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold text-slate-700 focus:bg-white transition-all cursor-pointer" disabled>
+                            <option value="">-- आधी प्लॅन निवडा --</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -173,7 +181,7 @@
             <div class="lg:col-span-4 space-y-4 animate__animated animate__fadeInRight">
                 <div class="glass-panel p-6 bg-slate-900 text-white relative overflow-hidden group">
                     <div class="relative z-10">
-                        <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Total Plan Target</p>
+                        <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Total Plan Target (Weekly)</p>
                         <h4 id="displayTarget" class="text-3xl font-black">₹ 0.00</h4>
                     </div>
                     <i data-lucide="target" class="absolute -right-4 -bottom-4 w-24 h-24 text-white/5 group-hover:scale-110 transition-transform"></i>
@@ -181,7 +189,7 @@
 
                 <div class="glass-panel p-6 bg-white relative overflow-hidden group border-emerald-100">
                     <div class="relative z-10">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Actual Entered</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Actual Entered (Weekly)</p>
                         <h4 id="displayActual" class="text-3xl font-black text-emerald-600">₹ 0.00</h4>
                     </div>
                     <div id="syncIndicator" class="absolute right-6 top-6 w-3 h-3 bg-slate-200 rounded-full"></div>
@@ -209,8 +217,8 @@
                         <thead class="bg-slate-50/80 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                             <tr>
                                 <th class="p-6">स्टाफ माहिती</th>
-                                <th class="p-6 text-center">टार्गेट (₹)</th>
-                                <th class="p-6 text-center">सिस्टम अ‍ॅक्चुअल (₹)</th>
+                                <th class="p-6 text-center">टार्गेट (₹)</th> <!-- This will be DAILY target -->
+                                <th class="p-6 text-center">अ‍ॅक्चुअल (₹)</th> <!-- This will be DAILY actual -->
                                 <th class="p-6 text-center">स्टेटस</th>
                             </tr>
                         </thead>
@@ -259,6 +267,7 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec"; 
         let globalHistory = [];
         let currentPlanIdx = null;
+        let selectedDay = null; // New global variable for selected day
 
         // 1. Initialize System
         async function initSystem() {
@@ -318,6 +327,8 @@
                     planSel.appendChild(opt);
                 });
 
+                document.getElementById('daySelect').setAttribute('disabled', 'true');
+                document.getElementById('daySelect').innerHTML = '<option value="">-- आधी प्लॅन निवडा --</option>';
                 showToast("मॅनेजर डेटा प्राप्त झाला");
             } catch (err) {
                 Swal.fire("Error", "डेटा मिळवताना अडचण आली.", "error");
@@ -326,29 +337,113 @@
             }
         }
 
+        // Helper to get all working days (Mon-Sat) within a date range
+        function getWorkingDays(startDateStr, endDateStr) {
+            const dates = [];
+            let currentDate = new Date(startDateStr);
+            const endDate = new Date(endDateStr);
+
+            while (currentDate <= endDate) {
+                const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+                if (dayOfWeek !== 0) { // Exclude Sunday
+                    dates.push(currentDate.toISOString().split('T')[0]); // YYYY-MM-DD
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            return dates;
+        }
+
         // 3. Render Table
         function loadTableData() {
             const idx = document.getElementById('planSelect').value;
             if (idx === "") {
                 document.getElementById('tableWrapper').classList.add('hidden');
                 document.getElementById('placeholder').classList.remove('hidden');
+                document.getElementById('daySelect').setAttribute('disabled', 'true');
+                document.getElementById('daySelect').innerHTML = '<option value="">-- आधी प्लॅन निवडा --</option>';
                 return;
             }
 
             currentPlanIdx = idx;
             const plan = globalHistory[idx];
-            const body = document.getElementById('taBody');
             
             document.getElementById('weekLabel').innerText = `Week: ${plan.sDate} - ${plan.eDate}`;
             document.getElementById('tableWrapper').classList.remove('hidden');
             document.getElementById('placeholder').classList.add('hidden');
+            document.getElementById('daySelect').removeAttribute('disabled');
+
+            // Populate Day Selector
+            const allWorkingDays = getWorkingDays(plan.sDate, plan.eDate);
+            const daySel = document.getElementById('daySelect');
+            daySel.innerHTML = '<option value="">-- दिवस निवडा --</option>';
+            allWorkingDays.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                // Format day for display (e.g., Mon, Oct 23)
+                const dateObj = new Date(d);
+                opt.textContent = dateObj.toLocaleDateString('mr-IN', { weekday: 'short', month: 'short', day: 'numeric' });
+                daySel.appendChild(opt);
+            });
+
+            // Set initial selected day
+            const today = new Date().toISOString().split('T')[0];
+            if (allWorkingDays.includes(today)) {
+                daySel.value = today;
+                selectedDay = today;
+            } else if (allWorkingDays.length > 0) {
+                daySel.value = allWorkingDays[0];
+                selectedDay = allWorkingDays[0];
+            } else {
+                selectedDay = null;
+                daySel.value = "";
+                daySel.setAttribute('disabled', 'true');
+            }
             
+            // Initialize dailyEntries for each staff if not already present
+            plan.details.forEach(item => {
+                if (!item.dailyEntries) {
+                    item.dailyEntries = {};
+                    const numWorkingDays = allWorkingDays.length || 1; // Prevent division by zero
+                    const initialDailyTarget = parseFloat(item.tDisb || 0) / numWorkingDays;
+
+                    allWorkingDays.forEach(dateKey => {
+                        item.dailyEntries[dateKey] = {
+                            dailyT: initialDailyTarget.toFixed(0), // Distribute weekly target
+                            dailyA: "0" // Start daily actuals at 0
+                        };
+                    });
+                }
+            });
+            
+            renderTableRows(); // Call a new function to render table specific to selected day
+            recalcOverview();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // New function to handle day change
+        function handleDayChange() {
+            selectedDay = document.getElementById('daySelect').value;
+            if (!selectedDay) {
+                document.getElementById('taBody').innerHTML = ''; // Clear table
+                recalcOverview();
+                return;
+            }
+            renderTableRows();
+            recalcOverview(); // Recalculate based on current data
+        }
+
+        // Renders table rows based on selectedDay
+        function renderTableRows() {
+            const body = document.getElementById('taBody');
             body.innerHTML = "";
-            let totalT = 0;
+            const plan = globalHistory[currentPlanIdx];
+
+            if (!plan || !selectedDay) return;
 
             plan.details.forEach((item, i) => {
-                const targetVal = parseFloat(item.tDisb || 0);
-                totalT += targetVal;
+                const currentDayData = item.dailyEntries[selectedDay] || { dailyT: 0, dailyA: 0 };
+                const dailyTargetVal = parseFloat(currentDayData.dailyT || 0);
+                const dailyActualVal = parseFloat(currentDayData.dailyA || 0);
                 
                 const row = document.createElement('tr');
                 row.className = "hover:bg-slate-50/80 transition-all";
@@ -364,16 +459,26 @@
                             </div>
                         </div>
                     </td>
-                    <td class="p-6 text-center">
-                        <span class="text-sm font-black text-slate-600">₹ ${formatNumber(targetVal)}</span>
+                    <td class="p-6">
+                        <div class="relative max-w-[120px] mx-auto">
+                            <input type="number" 
+                                class="input-target w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-center font-black text-slate-700 focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                                value="${dailyTargetVal || ''}"
+                                placeholder="0.00"
+                                data-staff-idx="${i}"
+                                data-entry-type="dailyT"
+                                oninput="updateDailyEntry(this)">
+                        </div>
                     </td>
                     <td class="p-6">
-                        <div class="relative max-w-[160px] mx-auto">
+                        <div class="relative max-w-[120px] mx-auto">
                             <input type="number" 
-                                class="actual-input w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-center font-black text-slate-700 focus:border-emerald-500 focus:bg-white transition-all outline-none"
-                                value="${item.aDisb || ''}"
+                                class="input-actual w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-center font-black text-slate-700 focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                                value="${dailyActualVal || ''}"
                                 placeholder="0.00"
-                                oninput="recalcOverview()">
+                                data-staff-idx="${i}"
+                                data-entry-type="dailyA"
+                                oninput="updateDailyEntry(this)">
                         </div>
                     </td>
                     <td class="p-6 text-center">
@@ -384,42 +489,75 @@
                 `;
                 body.appendChild(row);
             });
-
-            document.getElementById('displayTarget').innerText = `₹ ${formatNumber(totalT)}`;
-            recalcOverview();
             if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // New function to update daily entry in globalHistory
+        function updateDailyEntry(inputElement) {
+            const staffIdx = inputElement.getAttribute('data-staff-idx');
+            const entryType = inputElement.getAttribute('data-entry-type'); // 'dailyT' or 'dailyA'
+            const value = inputElement.value;
+
+            if (currentPlanIdx !== null && selectedDay) {
+                const plan = globalHistory[currentPlanIdx];
+                plan.details[staffIdx].dailyEntries[selectedDay][entryType] = value;
+            }
+            recalcOverview();
         }
 
         // 4. Real-time Calculations
         function recalcOverview() {
-            const inputs = document.querySelectorAll('.actual-input');
-            let totalActual = 0;
             const plan = globalHistory[currentPlanIdx];
+            if (!plan) {
+                document.getElementById('displayTarget').innerText = `₹ 0.00`;
+                document.getElementById('displayActual').innerText = `₹ 0.00`;
+                document.getElementById('syncIndicator').className = "absolute right-6 top-6 w-3 h-3 bg-slate-200 rounded-full";
+                return;
+            }
 
-            inputs.forEach((inp, idx) => {
-                const val = parseFloat(inp.value) || 0;
-                const target = parseFloat(plan.details[idx].tDisb) || 0;
-                totalActual += val;
+            let totalWeeklyTarget = 0;
+            let totalWeeklyActual = 0;
 
-                const statusBox = inp.closest('tr').querySelector('.status-box');
-                
-                if (val > 0) {
-                    if (val >= target) {
-                        statusBox.innerHTML = '<span class="text-emerald-600">Done ✅</span>';
-                    } else {
-                        statusBox.innerHTML = '<span class="text-amber-500">Low 📉</span>';
+            // Calculate weekly totals for display cards
+            plan.details.forEach(item => {
+                if (item.dailyEntries) {
+                    for (const day in item.dailyEntries) {
+                        totalWeeklyTarget += parseFloat(item.dailyEntries[day].dailyT || 0);
+                        totalWeeklyActual += parseFloat(item.dailyEntries[day].dailyA || 0);
                     }
-                } else {
-                    statusBox.innerText = "Pending";
-                    statusBox.className = "status-box text-[10px] font-black uppercase text-slate-300 tracking-widest";
                 }
             });
 
-            document.getElementById('displayActual').innerText = `₹ ${formatNumber(totalActual)}`;
+            document.getElementById('displayTarget').innerText = `₹ ${formatNumber(totalWeeklyTarget)}`;
+            document.getElementById('displayActual').innerText = `₹ ${formatNumber(totalWeeklyActual)}`;
             
+            // Update status for currently visible table rows (for the selected day)
+            if (selectedDay) {
+                const rows = document.getElementById('taBody').querySelectorAll('tr');
+                rows.forEach((row, idx) => {
+                    const item = plan.details[idx];
+                    const currentDayData = item.dailyEntries[selectedDay] || { dailyT: 0, dailyA: 0 };
+                    const dailyTarget = parseFloat(currentDayData.dailyT || 0);
+                    const dailyActual = parseFloat(currentDayData.dailyA || 0);
+                    
+                    const statusBox = row.querySelector('.status-box');
+                    
+                    if (dailyActual > 0) {
+                        if (dailyActual >= dailyTarget) {
+                            statusBox.innerHTML = '<span class="text-emerald-600">Done ✅</span>';
+                        } else {
+                            statusBox.innerHTML = '<span class="text-amber-500">Low 📉</span>';
+                        }
+                    } else {
+                        statusBox.innerText = "Pending";
+                        statusBox.className = "status-box text-[10px] font-black uppercase text-slate-300 tracking-widest";
+                    }
+                });
+            }
+
             // Sync status pulse
             const indicator = document.getElementById('syncIndicator');
-            if(totalActual > 0) {
+            if(totalWeeklyActual > 0) {
                 indicator.className = "absolute right-6 top-6 w-3 h-3 bg-emerald-500 rounded-full animate-pulse";
             } else {
                 indicator.className = "absolute right-6 top-6 w-3 h-3 bg-slate-200 rounded-full";
@@ -429,16 +567,27 @@
         // 5. Final Data Submission
         async function submitSync() {
             const plan = globalHistory[currentPlanIdx];
-            const inputs = document.querySelectorAll('.actual-input');
+            if (!plan) {
+                Swal.fire("माहिती नाही", "कृपया मॅनेजर आणि प्लॅन निवडा.", "info");
+                return;
+            }
+
+            // Check for empty values for the selected plan's entire week
+            let emptyDailyFields = 0;
+            plan.details.forEach(item => {
+                if (item.dailyEntries) {
+                    for (const day in item.dailyEntries) {
+                        if (item.dailyEntries[day].dailyT === "" || item.dailyEntries[day].dailyA === "") {
+                            emptyDailyFields++;
+                        }
+                    }
+                }
+            });
             
-            // Check for empty values
-            let emptyFields = 0;
-            inputs.forEach(i => { if(i.value === "") emptyFields++; });
-            
-            if(emptyFields > 0) {
+            if(emptyDailyFields > 0) {
                 const confirm = await Swal.fire({
                     title: 'काही रकाने रिकामे आहेत',
-                    text: `${emptyFields} स्टाफचा डेटा भरलेला नाही. तरीही सिंक करायचे का?`,
+                    text: `${emptyDailyFields} दैनंदिन डेटा पॉइंट्स भरलेले नाहीत. तरीही सिंक करायचे का?`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'हो, सिंक करा',
@@ -449,16 +598,20 @@
 
             toggleLoader(true);
 
-            const finalDetails = plan.details.map((item, i) => ({
-                ...item,
-                aDisb: inputs[i].value || 0
+            // Construct payload with the new dailyEntries structure
+            const payloadDetails = plan.details.map(item => ({
+                name: item.name,
+                // Include original weekly tDisb, or new aggregated weekly target if required by backend
+                tDisb: item.tDisb, 
+                // The backend will now need to process item.dailyEntries
+                dailyEntries: item.dailyEntries 
             }));
 
             const payload = {
                 manager: document.getElementById('mgrSelect').value,
                 sDate: plan.sDate,
                 eDate: plan.eDate,
-                fxDetails: finalDetails
+                fxDetails: payloadDetails
             };
 
             try {
@@ -466,6 +619,9 @@
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors', // Standard for GAS POST requests
+                    headers: {
+                        'Content-Type': 'application/json' // Important for POST with body
+                    },
                     body: JSON.stringify(payload)
                 });
 
@@ -480,7 +636,8 @@
                 });
 
             } catch (err) {
-                Swal.fire("Error", "सिंक अयशस्वी. इंटरनेट तपासा.", "error");
+                console.error("Sync Error:", err);
+                Swal.fire("Error", "सिंक अयशस्वी. इंटरनेट तपासा किंवा चुकीचा डेटा. तपशील कन्सोलमध्ये पहा.", "error");
             } finally {
                 toggleLoader(false);
             }
@@ -517,10 +674,16 @@
 
         function resetUI() {
             document.getElementById('planSelect').innerHTML = '<option value="">-- आधी मॅनेजर निवडा --</option>';
+            document.getElementById('daySelect').innerHTML = '<option value="">-- आधी प्लॅन निवडा --</option>';
+            document.getElementById('daySelect').setAttribute('disabled', 'true');
             document.getElementById('tableWrapper').classList.add('hidden');
             document.getElementById('placeholder').classList.remove('hidden');
             document.getElementById('displayTarget').innerText = "₹ 0.00";
             document.getElementById('displayActual').innerText = "₹ 0.00";
+            document.getElementById('taBody').innerHTML = ''; // Clear table body
+            globalHistory = [];
+            currentPlanIdx = null;
+            selectedDay = null;
         }
 
         // Start App
