@@ -1,509 +1,427 @@
+
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anik Strategic Planner | Professional Edition</title>
-    
-    <!-- External Assets -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --anik-blue: #1e40af;
-            --anik-dark: #0f172a;
-            --anik-light: #f8fafc;
-            --anik-accent: #3b82f6;
-            --anik-border: #e2e8f0;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f1f5f9;
-            color: var(--anik-dark);
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Glassmorphism Navigation */
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        /* Premium Card Design */
-        .staff-card {
-            background: white;
-            border-radius: 24px;
-            border: 1px solid var(--anik-border);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            transition: all 0.4s ease;
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-
-        .staff-card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            border-color: var(--anik-accent);
-        }
-
-        /* Input Styling */
-        .premium-input {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            border: 2px solid #f1f5f9;
-            background: #f8fafc;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-
-        .premium-input:focus {
-            border-color: var(--anik-accent);
-            background: white;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-fade {
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        /* Loader Overlay */
-        #submissionOverlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(10px);
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        /* Print Specific Styling - Highly Detailed */
-        @media print {
-            body { background: white; padding: 0; margin: 0; }
-            .glass-nav, #footerAction, .no-print, #placeholder, #welcomeZone input {
-                display: none !important;
-            }
-            
-            .print-container {
-                display: block !important;
-                padding: 20px;
-                width: 100%;
-            }
-
-            .staff-card {
-                box-shadow: none !important;
-                border: 1px solid #000 !important;
-                break-inside: avoid;
-                margin-bottom: 30px;
-                border-radius: 0;
-            }
-
-            .premium-input {
-                border: none !important;
-                background: transparent !important;
-                padding: 0 !important;
-                font-weight: bold;
-            }
-
-            .kpi-row {
-                border-bottom: 1px solid #eee !important;
-                display: grid !important;
-                grid-template-columns: 2fr 1fr 1.5fr !important;
-            }
-
-            .print-header {
-                display: flex !important;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 3px solid #1e40af;
-                padding-bottom: 10px;
-                margin-bottom: 20px;
-            }
-
-            @page {
-                size: A4;
-                margin: 1.5cm;
-            }
-            
-            /* Show text values instead of inputs in print */
-            .input-val-display { display: block !important; font-weight: 700; color: #000; }
-            input { display: none !important; }
-        }
-
-        .input-val-display { display: none; }
-
-        /* KPI Row Styling */
-        .kpi-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1.5fr;
-            gap: 1rem;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        @media (max-width: 768px) {
-            .kpi-row { grid-template-columns: 1fr; gap: 0.5rem; }
-        }
-
-        /* Floating Print Button */
-        .print-fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #059669;
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 25px rgba(5, 150, 105, 0.4);
-            cursor: pointer;
-            z-index: 500;
-            transition: transform 0.3s ease;
-        }
-
-        .print-fab:hover { transform: scale(1.1); }
-    </style>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANIK Weekly Planner - All in One</title>
+  <style>
+    :root{
+      --blue:#1e40af; --blue2:#2563eb; --green:#059669; --red:#dc2626; --yellow:#d97706;
+      --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --soft:#f8fafc; --bg:#f1f5f9; --white:#fff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,'Noto Sans Devanagari','Nirmala UI',sans-serif;font-size:14px}
+    .top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .wrap{max-width:1450px;margin:auto;padding:14px 18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{height:34px;max-width:120px;object-fit:contain;background:#0b2b64;border-radius:12px;padding:5px}
+    .title{font-weight:900;font-size:18px;letter-spacing:-.3px}.sub{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.14em}
+    .nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button,.btn{border:0;border-radius:14px;padding:12px 16px;font-weight:900;cursor:pointer;background:#e2e8f0;color:#0f172a;transition:.15s;white-space:nowrap}
+    button:hover,.btn:hover{transform:translateY(-1px);filter:brightness(.98)}
+    button.active{background:var(--blue);color:#fff;box-shadow:0 10px 20px rgba(37,99,235,.18)}
+    button.green{background:var(--green);color:#fff} button.blue{background:var(--blue);color:#fff} button.dark{background:#0f172a;color:#fff} button.red{background:var(--red);color:#fff}
+    .main{max-width:1450px;margin:auto;padding:20px 18px 60px}.page{display:none}.page.active{display:block}
+    .grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g7{grid-template-columns:repeat(7,minmax(0,1fr))}
+    .card{background:var(--white);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 4px 8px rgba(15,23,42,.03)}
+    .hero{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:16px}.h1{font-size:26px;font-weight:900;letter-spacing:-.6px}.hint{color:var(--muted);font-weight:700;line-height:1.6}.pill{display:inline-flex;align-items:center;gap:8px;background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:900}
+    label{display:block;font-size:11px;color:#475569;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin:0 0 6px 2px}
+    input,select,textarea{width:100%;border:1px solid var(--line);background:var(--soft);border-radius:14px;padding:12px 13px;font-weight:800;outline:none;color:#1e293b;font-family:inherit}
+    textarea{min-height:42px;resize:vertical} input:focus,select:focus,textarea:focus{border-color:var(--blue2);box-shadow:0 0 0 4px rgba(37,99,235,.10);background:#fff}
+    .tablebox{overflow:auto;border:1px solid var(--line);border-radius:18px;background:#fff;max-height:70vh}.tablebox.small{max-height:54vh}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:850px}th{position:sticky;top:0;background:#f8fafc;z-index:2;text-align:left;color:#475569;font-size:11px;text-transform:uppercase;letter-spacing:.07em;padding:12px;border-bottom:1px solid var(--line)}td{padding:10px 12px;border-bottom:1px solid #edf2f7;vertical-align:middle}tr:hover td{background:#f8fafc}.num{text-align:right}.center{text-align:center}.muted{color:var(--muted)}.bold{font-weight:900}.tiny{font-size:11px}.hide{display:none!important}
+    .kpi{padding:16px;border-radius:20px;background:#fff;border:1px solid var(--line);min-height:130px}.kpi .name{font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.08em}.kpi .val{font-size:22px;font-weight:900;margin:8px 0;color:#0f172a}.bar{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden}.fill{height:100%;background:var(--blue);width:0}.status{display:inline-block;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:900}.greenTag{background:#dcfce7;color:#15803d}.yellowTag{background:#fef3c7;color:#b45309}.redTag{background:#fee2e2;color:#b91c1c}
+    .toast{position:fixed;right:18px;bottom:18px;background:#0f172a;color:#fff;padding:14px 16px;border-radius:16px;font-weight:900;box-shadow:0 12px 30px rgba(0,0,0,.25);z-index:50;display:none}.loader{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);z-index:60;display:none;align-items:center;justify-content:center;color:#fff;flex-direction:column;font-weight:900}.spin{width:54px;height:54px;border:5px solid rgba(255,255,255,.28);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}@keyframes spin{to{transform:rotate(360deg)}}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.right{margin-left:auto}.sectionTitle{font-size:18px;font-weight:900;margin:0 0 12px}.warn{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:16px;padding:12px;font-weight:800}.summaryLine{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9}.miniChart{display:flex;gap:8px;align-items:end;height:170px;padding:18px;border:1px solid var(--line);border-radius:18px;background:#fff}.col{flex:1;background:#dbeafe;border-radius:10px 10px 0 0;min-height:3px;position:relative}.col span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:10px;font-weight:900;color:#475569;white-space:nowrap;margin-bottom:5px}.col label{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:8px;font-size:10px;text-align:center;color:#64748b}
+    @media(max-width:900px){.g2,.g3,.g4,.g7{grid-template-columns:1fr}.hero{display:block}.right{margin-left:0}.wrap,.main{padding-left:12px;padding-right:12px}.h1{font-size:22px}.top .wrap{padding-bottom:10px}button{flex:1}.nav button{padding:11px 10px}.card{padding:14px}}
+    @media print{.top,.noPrint,.toast,.loader{display:none!important}body{background:#fff}.main{max-width:none;padding:0}.page{display:none!important}#dashboardPage{display:block!important}.card,.kpi{box-shadow:none;border:1px solid #111;border-radius:0}.tablebox{max-height:none;overflow:visible;border-radius:0}th{position:static}button{display:none}}
+  </style>
 </head>
 <body>
-
-    <!-- Submission Loader -->
-    <div id="submissionOverlay">
-        <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
-        <h3 class="text-2xl font-bold">प्लॅन लॉक होत आहे...</h3>
-        <p class="text-slate-400 mt-2 text-center px-6">तुमचा डेटा सुरक्षितपणे सर्व्हरवर सेव्ह केला जात आहे.<br>कृपया विंडो बंद करू नका.</p>
+  <div class="top noPrint">
+    <div class="wrap">
+      <div class="brand">
+        <img class="logo" src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" alt="ANIK">
+        <div>
+          <div class="title">ANIK Weekly Planner - All in One</div>
+          <div class="sub">Planner + TA Team + Dashboard</div>
+        </div>
+      </div>
+      <div class="nav">
+        <button id="btnPlan" class="active" onclick="showPage('plan')">Weekly Plan</button>
+        <button id="btnTA" onclick="showPage('ta')">TA Team</button>
+        <button id="btnDashboard" onclick="showPage('dashboard')">Dashboard</button>
+        <button class="dark right" onclick="reloadBase()">Sheet Sync</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Hidden Print Header (Only visible in PDF) -->
-    <div class="print-container hidden">
-        <div class="print-header">
-            <div>
-                <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" style="height: 50px;">
-                <h2 class="text-xl font-black mt-2 text-blue-800">WEEKLY STRATEGIC PLAN</h2>
-            </div>
-            <div class="text-right text-sm">
-                <p class="font-bold">मॅनेजर: <span id="print-mgr-name">---</span></p>
-                <p>कालावधी: <span id="print-date-range">---</span></p>
-                <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest">Report Generated on: <span id="report-gen-time"></span></p>
-            </div>
+  <div class="main">
+    <section id="planPage" class="page active">
+      <div class="hero">
+        <div>
+          <div class="pill">Manager Dashboard</div>
+          <div class="h1">साप्ताहिक टार्गेट प्लॅन</div>
+          <div class="hint">Manager / FX / KPI बदलायचे असल्यास Google Sheet मधील <b>Managers_List</b>, <b>FX_Mapping</b>, <b>Sheet5</b> update करा आणि इथे <b>Sheet Sync</b> करा.</div>
         </div>
-    </div>
+        <div class="actions noPrint"><button class="blue" onclick="savePlan()">Plan Save / Update</button><button onclick="window.print()">Print</button></div>
+      </div>
 
-    <!-- Navigation -->
-    <nav class="glass-nav px-6 py-4">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <div class="bg-blue-900 p-2 rounded-xl shadow-lg">
-                    <img src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" class="h-6 brightness-0 invert" alt="Anik Logo">
-                </div>
-                <div>
-                    <h1 class="text-lg font-black text-slate-800 tracking-tight leading-tight">Anik Planner <span class="text-blue-600">3.0</span></h1>
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Growth Analytics Division</span>
-                </div>
-            </div>
+      <div class="card grid g4">
+        <div><label>Manager</label><select id="planManager" onchange="loadPlanTeam()"></select></div>
+        <div><label>Week Start</label><input type="date" id="planStart"></div>
+        <div><label>Week End</label><input type="date" id="planEnd"></div>
+        <div style="display:flex;align-items:end"><button class="blue" style="width:100%" onclick="loadPlanTeam()">Team Load</button></div>
+      </div>
 
-            <div class="flex items-center gap-3 w-full md:w-auto">
-                <div class="relative flex-1 md:w-64">
-                    <i class="fa-solid fa-user-shield absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <select id="mgrSelect" class="premium-input pl-11 pr-10 appearance-none cursor-pointer" onchange="fetchStaffData()">
-                        <option value="">-- मॅनेजर निवडा --</option>
-                    </select>
-                </div>
-                <button onclick="window.print()" class="no-print bg-slate-100 hover:bg-slate-200 p-3.5 rounded-xl text-slate-600 transition-all">
-                    <i class="fa-solid fa-print"></i>
-                </button>
-            </div>
+      <div class="card" style="margin-top:14px">
+        <div class="actions" style="margin-bottom:10px">
+          <h3 class="sectionTitle" style="margin-right:auto">Target Entry</h3>
+          <span id="planCount" class="pill">0 Rows</span>
         </div>
-    </nav>
-
-    <!-- Main Content -->
-    <header class="max-w-7xl mx-auto px-6 pt-8 pb-4">
-        <div id="welcomeZone" class="hidden animate-fade">
-            <div class="bg-white rounded-[32px] p-8 border border-slate-200 shadow-sm relative overflow-hidden">
-                <div class="relative z-10 grid md:grid-cols-2 gap-8 items-center">
-                    <div>
-                        <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-xs font-extrabold uppercase tracking-wider mb-3 inline-block">Manager Dashboard</span>
-                        <h2 class="text-3xl md:text-4xl font-black text-slate-800">नमस्कार, <span id="mgrTitle" class="text-blue-600">मॅनेजर</span></h2>
-                        <p class="text-slate-500 font-medium mt-2">खालील टीमचे साप्ताहिक टार्गेट्स सेट करा आणि प्रिंट काढून ग्रुपवर शेअर करा.</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Start Date</label>
-                            <input type="date" id="sDate" oninput="syncPrintData()" class="bg-transparent font-bold text-slate-800 outline-none w-full">
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">End Date</label>
-                            <input type="date" id="eDate" oninput="syncPrintData()" class="bg-transparent font-bold text-slate-800 outline-none w-full">
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div id="planEmpty" class="warn">मॅनेजर आणि तारीख निवडून Team Load करा.</div>
+        <div id="planTableBox" class="tablebox hide">
+          <table>
+            <thead><tr><th style="width:45px">Sr</th><th>FX Staff</th><th>KPI</th><th class="num">Weekly Target</th><th>Remark / Strategy</th></tr></thead>
+            <tbody id="planBody"></tbody>
+          </table>
         </div>
+      </div>
+    </section>
 
-        <!-- Empty State -->
-        <div id="placeholder" class="py-24 text-center bg-white rounded-[40px] border-4 border-dashed border-slate-100 mt-6 transition-all">
-            <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i class="fa-solid fa-users-viewfinder text-blue-200 text-4xl"></i>
-            </div>
-            <h3 class="text-xl font-extrabold text-slate-300 uppercase tracking-widest">सुरू करण्यासाठी मॅनेजर निवडा</h3>
+    <section id="taPage" class="page">
+      <div class="hero">
+        <div>
+          <div class="pill" style="background:#dcfce7;color:#15803d">TA Team</div>
+          <div class="h1">Daily Actual Sync</div>
+          <div class="hint">मॅनेजरचा प्लॅन निवडा, दिवस निवडा आणि actual भरून save करा.</div>
         </div>
-    </header>
+        <div class="actions noPrint"><button class="green" onclick="saveTA()">Daily Actual Save</button></div>
+      </div>
 
-    <main class="max-w-7xl mx-auto px-6 pb-20">
-        <div id="plannerBox">
-            <!-- Cards will be dynamically injected here -->
+      <div class="card grid g4">
+        <div><label>Manager</label><select id="taManager" onchange="loadTAPlans()"></select></div>
+        <div><label>Weekly Plan</label><select id="taPlan" onchange="loadTAPlanDetails()"><option value="">-- आधी Manager निवडा --</option></select></div>
+        <div><label>Day</label><select id="taDay" onchange="renderTARows()"><option value="">-- Plan निवडा --</option></select></div>
+        <div style="display:flex;align-items:end"><button class="green" style="width:100%" onclick="saveTA()">Sync Save</button></div>
+      </div>
+
+      <div class="grid g2" style="margin-top:14px">
+        <div class="card"><div class="summaryLine"><span class="bold">Daily Target</span><span id="taTotalTarget" class="bold">0</span></div><div class="summaryLine"><span class="bold">Daily Actual</span><span id="taTotalActual" class="bold">0</span></div></div>
+        <div class="card warn">Daily Target गरज असल्यास इथे बदलू शकता. Save केल्यावर Master_Data मध्ये update होईल.</div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div id="taEmpty" class="warn">Manager, Plan आणि Day निवडा.</div>
+        <div id="taTableBox" class="tablebox small hide">
+          <table>
+            <thead><tr><th style="width:45px">Sr</th><th>FX Staff</th><th>KPI</th><th class="num">Daily Target</th><th class="num">Actual</th><th>Status</th></tr></thead>
+            <tbody id="taBody"></tbody>
+          </table>
         </div>
+      </div>
+    </section>
 
-        <div id="footerAction" class="hidden text-center mt-12 py-10 border-t border-slate-200">
-            <div class="bg-amber-50 text-amber-800 px-6 py-4 rounded-2xl border border-amber-100 inline-block mb-8">
-                <p class="font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                    एकदा 'लॉक' केल्यावर डेटा बदलता येणार नाही. कृपया सर्व माहिती तपासा.
-                </p>
-            </div>
-            
-            <div class="flex flex-col md:flex-row justify-center gap-4">
-                <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-5 rounded-2xl font-black text-lg transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-3">
-                    <i class="fa-solid fa-file-pdf"></i>
-                    PDF / प्रिंट काढा
-                </button>
-                
-                <button id="lockBtn" onclick="finalSubmit()" class="bg-blue-700 hover:bg-blue-800 text-white px-10 py-5 rounded-2xl font-black text-lg transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-3">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    डेटा लॉक करा
-                </button>
-            </div>
+    <section id="dashboardPage" class="page">
+      <div class="hero">
+        <div>
+          <div class="pill">HO Dashboard</div>
+          <div class="h1">Plan vs Achievement</div>
+          <div class="hint">Fast server-side dashboard. Data source: <b>Master_Data</b>.</div>
         </div>
-    </main>
+        <div class="actions noPrint"><button class="blue" onclick="loadDashboard()">Refresh Dashboard</button><button onclick="window.print()">Print</button></div>
+      </div>
 
-    <!-- Floating Print Button (Always visible after data loads) -->
-    <div onclick="window.print()" id="fabPrint" class="print-fab hidden no-print">
-        <i class="fa-solid fa-print text-xl"></i>
-    </div>
+      <div class="card grid g4 noPrint">
+        <div><label>From</label><input type="date" id="dashStart"></div>
+        <div><label>To</label><input type="date" id="dashEnd"></div>
+        <div><label>Manager</label><select id="dashManager" onchange="syncDashStaff(); loadDashboard()"></select></div>
+        <div><label>Staff</label><select id="dashStaff" onchange="loadDashboard()"></select></div>
+        <div style="grid-column:1/-1"><label>Search</label><input id="dashSearch" placeholder="Staff / KPI शोधा..." oninput="delayDashboard()"></div>
+      </div>
 
-    <!-- Scripting Logic -->
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrsdH0yjhKLl6mQi7pnq6l__J3M3BZvmqseBxYDamv18zi6o8BfRcPcYIK06Boy6Ma/exec";
-        
-        const KPI_LIST = [
-            { name: "Disbursement Target (₹)", icon: "fa-money-bill-trend-up", color: "text-green-600" },
-            { name: "Appraisal Target (₹)", icon: "fa-magnifying-glass-chart", color: "text-blue-600" },
-            { name: "OD Recovery Target (₹)", icon: "fa-rotate-left", color: "text-red-600" },
-            { name: "Regular Collection (₹)", icon: "fa-calendar-check", color: "text-emerald-600" },
-            { name: "Past Due Recovery (₹)", icon: "fa-hand-holding-dollar", color: "text-orange-600" },
-            { name: "Rocket Pay / Auto Pay", icon: "fa-bolt", color: "text-purple-600" },
-            { name: "Group Meetings", icon: "fa-users-rectangle", color: "text-slate-600" }
-        ];
+      <div class="grid g4" style="margin-top:14px">
+        <div class="card" style="background:linear-gradient(135deg,#1e40af,#0f172a);color:white"><div class="tiny bold">Overall Efficiency</div><div id="overallPct" style="font-size:46px;font-weight:900;margin-top:10px">0%</div><div id="overallSub" class="tiny">Target 0 | Actual 0</div></div>
+        <div class="card"><div class="tiny bold muted">Records</div><div id="rowCount" style="font-size:32px;font-weight:900;margin-top:10px">0</div><div class="tiny muted">Processed Rows</div></div>
+        <div class="card"><div class="tiny bold muted">Last Updated</div><div id="lastUpdated" style="font-size:20px;font-weight:900;margin-top:10px">-</div></div>
+        <div class="card"><div class="tiny bold muted">Selected Period</div><div id="periodText" style="font-size:20px;font-weight:900;margin-top:10px">-</div></div>
+      </div>
 
-        let currentStaff = [];
-        let isSubmitting = false;
+      <div id="kpiCards" class="grid g7" style="margin-top:14px"></div>
 
-        // 1. Initialize
-        async function init() {
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=getManagers`);
-                const managers = await res.json();
-                const sel = document.getElementById('mgrSelect');
-                managers.forEach(m => {
-                    const opt = document.createElement('option');
-                    opt.value = m;
-                    opt.textContent = m;
-                    sel.appendChild(opt);
-                });
-            } catch (err) {
-                console.error("Init failed:", err);
-            }
-        }
+      <div class="grid g2" style="margin-top:14px">
+        <div class="card">
+          <h3 class="sectionTitle">KPI Chart</h3>
+          <div id="miniChart" class="miniChart"></div>
+        </div>
+        <div class="card">
+          <h3 class="sectionTitle">Top Performers</h3>
+          <div id="leaderboard"></div>
+        </div>
+      </div>
 
-        // 2. Fetch Data
-        async function fetchStaffData() {
-            const mgr = document.getElementById('mgrSelect').value;
-            if(!mgr) return;
+      <div class="card" style="margin-top:14px">
+        <h3 class="sectionTitle">Staff Matrix</h3>
+        <div class="tablebox small">
+          <table>
+            <thead><tr><th>Staff</th><th>Manager</th><th class="num">Target</th><th class="num">Actual</th><th class="center">%</th><th class="center">Zone</th></tr></thead>
+            <tbody id="matrixBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
 
-            document.getElementById('placeholder').innerHTML = `
-                <div class="flex flex-col items-center py-10">
-                    <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p class="font-black text-slate-500 tracking-widest uppercase">स्टाफ डेटा लोड होत आहे...</p>
-                </div>
-            `;
+  <div id="loader" class="loader"><div class="spin"></div><div id="loaderText">लोड होत आहे...</div></div>
+  <div id="toast" class="toast"></div>
 
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=getManagerData&manager=${encodeURIComponent(mgr)}`);
-                const data = await res.json();
-                currentStaff = data.fxList;
-                renderUI(mgr);
-                syncPrintData();
-            } catch (err) {
-                alert("डेटा लोड करताना एरर आली. कृपया रिफ्रेश करा.");
-            }
-        }
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7n0r3ccpimf_WTeThvOZVjPU-mPZ2ClarE4Kbdy3Evs8yZUsnfrhdHYbR_-HhSKtt/exec";
 
-        // 3. Render Cards
-        function renderUI(mgr) {
-            document.getElementById('mgrTitle').innerText = mgr;
-            document.getElementById('print-mgr-name').innerText = mgr;
-            document.getElementById('report-gen-time').innerText = new Date().toLocaleString('en-IN');
-            
-            document.getElementById('welcomeZone').classList.remove('hidden');
-            document.getElementById('placeholder').classList.add('hidden');
-            document.getElementById('footerAction').classList.remove('hidden');
-            document.getElementById('fabPrint').classList.remove('hidden');
+  let APPDATA = { managers: [], fxMap: {}, kpis: [] };
+  let planRows = [];
+  let taPlan = null;
+  let dashTimer = null;
 
-            const container = document.getElementById('plannerBox');
-            container.innerHTML = "";
+  const KPI_BUCKETS = [
+    ['disb','Disbursement'], ['appr','Appraisal'], ['od','OD Recovery'], ['reg','Regular Collection'], ['past','Past Due'], ['rock','Rocket Pay'], ['meet','Meetings']
+  ];
 
-            currentStaff.forEach((staff, sIdx) => {
-                const card = document.createElement('div');
-                card.className = "staff-card animate-fade";
-                card.style.animationDelay = (sIdx * 0.1) + "s";
+  function gs(fn, ...args){
+    // Apps Script मध्ये paste केल्यावर हा native fast mode वापरेल.
+    if (window.google && google.script && google.script.run) {
+      return new Promise((resolve, reject) => {
+        google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[fn](...args);
+      });
+    }
 
-                let rowsHtml = KPI_LIST.map((kpi, kIdx) => `
-                    <div class="kpi-row hover:bg-slate-50/50 transition-colors">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center ${kpi.color} border border-slate-100">
-                                <i class="fa-solid ${kpi.icon} text-sm"></i>
-                            </div>
-                            <span class="font-bold text-slate-700 text-sm tracking-tight">${kpi.name}</span>
-                        </div>
-                        <div class="relative">
-                            <input type="number" 
-                                   oninput="updateValDisplay(this)"
-                                   data-staff="${staff}" 
-                                   data-kpi="${kpi.name}" 
-                                   class="t-val premium-input" 
-                                   placeholder="0.00">
-                            <span class="input-val-display text-sm font-bold"></span>
-                        </div>
-                        <div class="relative">
-                            <input type="text" 
-                                   oninput="updateValDisplay(this)"
-                                   data-staff="${staff}" 
-                                   data-kpi="${kpi.name}" 
-                                   class="t-note premium-input" 
-                                   placeholder="रणनीती लिहा...">
-                            <span class="input-val-display text-xs text-slate-600"></span>
-                        </div>
-                    </div>
-                `).join('');
+    // External HTML / normal browser mode: वर दिलेला Web App URL वापरेल.
+    // यासाठी Code.gs मध्ये doPost/doGet API router असणे आवश्यक आहे.
+    return fetch(SCRIPT_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: fn, args: args })
+    })
+    .then(r => r.text())
+    .then(t => {
+      let data;
+      try { data = JSON.parse(t); }
+      catch (e) { throw new Error('Server response JSON नाही. Code.gs API router तपासा.'); }
+      if (data && data.ok === false) throw new Error(data.error || 'Server error');
+      return (data && Object.prototype.hasOwnProperty.call(data, 'result')) ? data.result : data;
+    });
+  }
+  function showLoader(txt){document.getElementById('loaderText').innerText=txt||'लोड होत आहे...';document.getElementById('loader').style.display='flex'}
+  function hideLoader(){document.getElementById('loader').style.display='none'}
+  function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2600)}
+  function fmt(n){return new Intl.NumberFormat('en-IN',{maximumFractionDigits:0}).format(Number(n||0))}
+  function val(id){return document.getElementById(id).value}
+  function setSelect(id, arr, first){
+    const el=document.getElementById(id); el.innerHTML='';
+    if(first!==undefined){const o=document.createElement('option');o.value=first.value;o.textContent=first.text;el.appendChild(o)}
+    arr.forEach(x=>{const o=document.createElement('option');o.value=x.value!==undefined?x.value:x;o.textContent=x.text!==undefined?x.text:x;el.appendChild(o)});
+  }
 
-                card.innerHTML = `
-                    <div class="px-6 py-4 bg-slate-50 border-b flex justify-between items-center">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-blue-700 text-white flex items-center justify-center font-black">
-                                ${staff.charAt(0)}
-                            </div>
-                            <h4 class="text-lg font-black text-slate-800">${staff}</h4>
-                        </div>
-                        <div class="text-[10px] font-black bg-blue-100 text-blue-700 px-3 py-1 rounded-full uppercase">Team Member</div>
-                    </div>
-                    <div class="p-2 md:p-4">
-                        <div class="hidden md:grid grid-cols-12 gap-4 mb-2 px-4">
-                            <div class="col-span-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Key Performance Indicator</div>
-                            <div class="col-span-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">Amount/Target</div>
-                            <div class="col-span-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">Strategy Note</div>
-                        </div>
-                        ${rowsHtml}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
+  async function reloadBase(){
+    showLoader('Google Sheet डेटा Sync होत आहे...');
+    try{
+      APPDATA = await gs('getAppData');
+      const managers = APPDATA.managers || [];
+      setSelect('planManager', managers, {value:'', text:'-- Manager निवडा --'});
+      setSelect('taManager', managers, {value:'', text:'-- Manager निवडा --'});
+      setSelect('dashManager', [{value:'all',text:'सर्व Managers'}].concat(managers.map(m=>({value:m,text:m}))));
+      document.getElementById('planStart').value = APPDATA.today;
+      document.getElementById('planEnd').value = APPDATA.today;
+      document.getElementById('dashStart').value = APPDATA.monthStart;
+      document.getElementById('dashEnd').value = APPDATA.today;
+      syncDashStaff();
+      await loadDashboard(false);
+      toast('Sheet Sync पूर्ण झाला');
+    }catch(e){alert('डेटा लोड होत नाही: '+e.message)} finally{hideLoader()}
+  }
 
-        // 4. Live Sync for Print
-        function updateValDisplay(el) {
-            const displaySpan = el.nextElementSibling;
-            if (displaySpan && displaySpan.classList.contains('input-val-display')) {
-                displaySpan.innerText = el.value || "---";
-            }
-        }
+  function showPage(name){
+    ['plan','ta','dashboard'].forEach(p=>{
+      document.getElementById(p+'Page').classList.toggle('active',p===name);
+      const btn = p==='dashboard'?'btnDashboard':(p==='ta'?'btnTA':'btnPlan');
+      document.getElementById(btn).classList.toggle('active',p===name);
+    });
+    if(name==='dashboard') loadDashboard(false);
+  }
 
-        function syncPrintData() {
-            const sd = document.getElementById('sDate').value;
-            const ed = document.getElementById('eDate').value;
-            document.getElementById('print-date-range').innerText = (sd && ed) ? `${sd} To ${ed}` : "तारीख निवडली नाही";
-        }
+  async function loadPlanTeam(){
+    const manager=val('planManager'), s=val('planStart'), e=val('planEnd');
+    if(!manager || !s || !e) return;
+    showLoader('Team Load होत आहे...');
+    try{
+      const res = await gs('getTeam', manager);
+      const staff = res.staff || [], kpis = res.kpis || [];
+      planRows = [];
+      staff.forEach(st => kpis.forEach(k => planRows.push({staff:st,kpi:k.name,type:k.type,weeklyTarget:'',remark:''})));
+      renderPlanRows();
+      toast(staff.length+' staff loaded');
+    }catch(err){alert('Team load error: '+err.message)} finally{hideLoader()}
+  }
 
-        // 5. Submit Logic
-        async function finalSubmit() {
-            if(isSubmitting) return;
+  function renderPlanRows(){
+    const body=document.getElementById('planBody'); body.innerHTML='';
+    document.getElementById('planEmpty').classList.toggle('hide', planRows.length>0);
+    document.getElementById('planTableBox').classList.toggle('hide', planRows.length===0);
+    document.getElementById('planCount').innerText = planRows.length+' Rows';
+    const frag=document.createDocumentFragment();
+    planRows.forEach((r,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${i+1}</td><td class="bold">${escapeHtml(r.staff)}</td><td>${escapeHtml(r.kpi)}</td>
+        <td class="num"><input type="number" min="0" data-i="${i}" data-f="weeklyTarget" oninput="updatePlanRow(this)" placeholder="0"></td>
+        <td><input data-i="${i}" data-f="remark" oninput="updatePlanRow(this)" placeholder="Strategy / remark"></td>`;
+      frag.appendChild(tr);
+    });
+    body.appendChild(frag);
+  }
+  function updatePlanRow(el){planRows[Number(el.dataset.i)][el.dataset.f]=el.value}
 
-            const mgr = document.getElementById('mgrSelect').value;
-            const sDate = document.getElementById('sDate').value;
-            const eDate = document.getElementById('eDate').value;
+  async function savePlan(){
+    const manager=val('planManager'), sDate=val('planStart'), eDate=val('planEnd');
+    if(!manager || !sDate || !eDate){alert('Manager आणि date निवडा.');return}
+    const filled = planRows.some(r => Number(r.weeklyTarget||0)>0 || String(r.remark||'').trim());
+    if(!filled){alert('किमान एक target किंवा remark भरा.');return}
+    const rows = planRows.map(r=>({staff:r.staff,kpi:r.kpi,weeklyTarget:Number(r.weeklyTarget||0),remark:r.remark||''}));
+    if(!confirm('हा Weekly Plan save/update करायचा आहे का?')) return;
+    showLoader('Weekly Plan save होत आहे...');
+    try{
+      const res = await gs('saveWeeklyPlan', {manager,sDate,eDate,rows});
+      toast('Plan saved: '+res.savedRows+' day rows');
+      await loadTAPlans();
+      await loadDashboard(false);
+    }catch(e){alert('Save error: '+e.message)} finally{hideLoader()}
+  }
 
-            if(!sDate || !eDate) {
-                alert("कृपया प्लॅनची सुरुवात आणि शेवटची तारीख निवडा.");
-                return;
-            }
+  async function loadTAPlans(){
+    const manager=val('taManager');
+    const sel=document.getElementById('taPlan');
+    sel.innerHTML='<option value="">-- Plan निवडा --</option>';
+    document.getElementById('taDay').innerHTML='<option value="">-- Plan निवडा --</option>';
+    taPlan=null; renderTARows();
+    if(!manager) return;
+    showLoader('Plans Load होत आहेत...');
+    try{
+      const plans = await gs('getPlansForManager', manager);
+      plans.forEach(p=>{const o=document.createElement('option');o.value=p.key;o.textContent=`${p.sDate} ते ${p.eDate} | Target ${fmt(p.totalTarget)} | Staff ${p.staffCount}`;sel.appendChild(o)});
+    }catch(e){alert('Plan load error: '+e.message)} finally{hideLoader()}
+  }
 
-            if(!confirm("तुम्ही हा साप्ताहिक प्लॅन लॉक करू इच्छिता का? एकदा लॉक केल्यावर बदलता येणार नाही.")) return;
+  async function loadTAPlanDetails(){
+    const manager=val('taManager'), key=val('taPlan');
+    taPlan=null; renderTARows();
+    if(!manager || !key) return;
+    showLoader('Daily data load होत आहे...');
+    try{
+      taPlan = await gs('getPlanForTA', manager, key);
+      setSelect('taDay', (taPlan.days||[]).map(d=>({value:d,text:formatDay(d)})), {value:'', text:'-- दिवस निवडा --'});
+      const today = new Date().toISOString().slice(0,10);
+      if((taPlan.days||[]).includes(today)) document.getElementById('taDay').value=today;
+      else if((taPlan.days||[]).length) document.getElementById('taDay').value=taPlan.days[0];
+      renderTARows();
+    }catch(e){alert('Daily data error: '+e.message)} finally{hideLoader()}
+  }
 
-            isSubmitting = true;
-            document.getElementById('submissionOverlay').style.display = 'flex';
-            document.getElementById('lockBtn').disabled = true;
+  function renderTARows(){
+    const day=val('taDay'), body=document.getElementById('taBody'); body.innerHTML='';
+    if(!taPlan || !day){document.getElementById('taEmpty').classList.remove('hide');document.getElementById('taTableBox').classList.add('hide');document.getElementById('taTotalTarget').innerText='0';document.getElementById('taTotalActual').innerText='0';return}
+    document.getElementById('taEmpty').classList.add('hide');document.getElementById('taTableBox').classList.remove('hide');
+    let totalT=0,totalA=0; const frag=document.createDocumentFragment();
+    (taPlan.rows||[]).forEach((r,i)=>{
+      const d=(r.dailyEntries||{})[day]||{dailyT:0,dailyA:0};
+      const t=Number(d.dailyT||0), a=Number(d.dailyA||0); totalT+=t; totalA+=a;
+      const pct=t>0?Math.round(a/t*100):0; const tag=a<=0?'Pending':(pct>=100?'Done':(pct>=60?'Low':'Poor'));
+      const cls=a<=0?'':(pct>=100?'greenTag':(pct>=60?'yellowTag':'redTag'));
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${i+1}</td><td class="bold">${escapeHtml(r.staff)}</td><td>${escapeHtml(r.kpi)}</td>
+        <td class="num"><input type="number" data-i="${i}" data-f="dailyT" oninput="updateTARow(this)" value="${t||''}"></td>
+        <td class="num"><input type="number" data-i="${i}" data-f="dailyA" oninput="updateTARow(this)" value="${a||''}"></td>
+        <td class="center"><span class="status ${cls}">${tag}</span></td>`;
+      frag.appendChild(tr);
+    });
+    body.appendChild(frag);
+    document.getElementById('taTotalTarget').innerText=fmt(totalT);
+    document.getElementById('taTotalActual').innerText=fmt(totalA);
+  }
 
-            const payloadDetails = [];
-            const vals = document.querySelectorAll('.t-val');
-            const notes = document.querySelectorAll('.t-note');
+  function updateTARow(el){
+    const i=Number(el.dataset.i), f=el.dataset.f, day=val('taDay');
+    if(!taPlan.rows[i].dailyEntries) taPlan.rows[i].dailyEntries={};
+    if(!taPlan.rows[i].dailyEntries[day]) taPlan.rows[i].dailyEntries[day]={dailyT:0,dailyA:0};
+    taPlan.rows[i].dailyEntries[day][f]=Number(el.value||0);
+    renderTARows();
+  }
 
-            vals.forEach((v, i) => {
-                payloadDetails.push({
-                    name: v.dataset.staff + " || " + v.dataset.kpi,
-                    tDisb: v.value || 0,
-                    aDisb: 0,
-                    pd: notes[i].value || "Strategic focus on growth"
-                });
-            });
+  async function saveTA(){
+    if(!taPlan || !val('taDay')){alert('Manager, Plan आणि Day निवडा.');return}
+    const day=val('taDay');
+    const entries=(taPlan.rows||[]).map(r=>{
+      const d=(r.dailyEntries||{})[day]||{};
+      return {staff:r.staff,kpi:r.kpi,weeklyTarget:r.weeklyTarget||0,dailyTarget:Number(d.dailyT||0),actual:Number(d.dailyA||0),remark:d.remark||r.remark||''};
+    });
+    showLoader('Daily actual save होत आहे...');
+    try{
+      const res=await gs('saveDailyActual',{manager:taPlan.manager,sDate:taPlan.sDate,eDate:taPlan.eDate,dayDate:day,entries});
+      toast('Daily data saved: '+res.savedRows+' rows');
+      await loadDashboard(false);
+    }catch(e){alert('TA save error: '+e.message)} finally{hideLoader()}
+  }
 
-            const data = {
-                manager: mgr,
-                sDate: sDate,
-                eDate: eDate,
-                fxDetails: payloadDetails
-            };
+  function syncDashStaff(){
+    const m=val('dashManager');
+    let staff=[];
+    if(m==='all' || !m){Object.values(APPDATA.fxMap||{}).forEach(a=>staff=staff.concat(a||[]));}
+    else staff=(APPDATA.fxMap||{})[m]||[];
+    staff=[...new Set(staff)].sort();
+    setSelect('dashStaff', [{value:'all',text:'सर्व Staff'}].concat(staff.map(s=>({value:s,text:s}))));
+  }
+  function delayDashboard(){clearTimeout(dashTimer);dashTimer=setTimeout(()=>loadDashboard(false),450)}
 
-            try {
-                // Post request to GAS
-                await fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify(data),
-                    mode: 'no-cors' 
-                });
+  async function loadDashboard(withLoader=true){
+    if(withLoader) showLoader('Dashboard refresh होत आहे...');
+    try{
+      const f={sDate:val('dashStart'),eDate:val('dashEnd'),manager:val('dashManager')||'all',staff:val('dashStaff')||'all',search:val('dashSearch')||''};
+      const d=await gs('getDashboardData', f);
+      renderDashboard(d);
+    }catch(e){console.error(e); if(withLoader) alert('Dashboard error: '+e.message)} finally{if(withLoader) hideLoader()}
+  }
 
-                setTimeout(() => {
-                    alert("अभिनंदन! तुमचा साप्ताहिक प्लॅन यशस्वीरित्या लॉक झाला आहे.");
-                    window.location.reload();
-                }, 2000);
+  function renderDashboard(d){
+    document.getElementById('overallPct').innerText=(d.overall.percent||0)+'%';
+    document.getElementById('overallSub').innerText='Target '+fmt(d.overall.target)+' | Actual '+fmt(d.overall.actual);
+    document.getElementById('rowCount').innerText=fmt(d.rowCount);
+    document.getElementById('lastUpdated').innerText=d.lastUpdated||'-';
+    document.getElementById('periodText').innerText=(d.filters.sDate||'')+' ते '+(d.filters.eDate||'');
 
-            } catch (err) {
-                alert("डेटा सेव्ह करताना तांत्रिक अडचण आली.");
-                isSubmitting = false;
-                document.getElementById('submissionOverlay').style.display = 'none';
-                document.getElementById('lockBtn').disabled = false;
-            }
-        }
+    const box=document.getElementById('kpiCards'); box.innerHTML='';
+    KPI_BUCKETS.forEach(([key,label])=>{
+      const x=d.cards[key]||{actual:0,target:0,percent:0};
+      const div=document.createElement('div'); div.className='kpi';
+      div.innerHTML=`<div class="name">${label}</div><div class="val">${(key==='rock'||key==='meet')?'': '₹ '}${fmt(x.actual)}</div><div class="bar"><div class="fill" style="width:${Math.min(x.percent||0,100)}%"></div></div><div class="tiny bold muted" style="margin-top:8px">${x.percent||0}% | T ${fmt(x.target)}</div>`;
+      box.appendChild(div);
+    });
 
-        window.onload = init;
-    </script>
+    const chart=document.getElementById('miniChart'); chart.innerHTML='';
+    const max=Math.max(1,...KPI_BUCKETS.map(([k])=>(d.cards[k]||{}).actual||0));
+    KPI_BUCKETS.forEach(([key,label])=>{const x=d.cards[key]||{actual:0}; const c=document.createElement('div'); c.className='col'; c.style.height=(Math.max(3, x.actual/max*135))+'px'; c.innerHTML=`<span>${fmt(x.actual)}</span><label>${label.split(' ')[0]}</label>`; chart.appendChild(c);});
+
+    const lb=document.getElementById('leaderboard'); lb.innerHTML='';
+    (d.leaderboard||[]).forEach((x,i)=>{const div=document.createElement('div');div.className='summaryLine';div.innerHTML=`<span><b>${i+1}. ${escapeHtml(x.staff)}</b><br><span class="tiny muted">${escapeHtml(x.manager)}</span></span><span class="bold">${x.percent}%</span>`;lb.appendChild(div)});
+    if(!(d.leaderboard||[]).length) lb.innerHTML='<div class="muted bold">No data</div>';
+
+    const mb=document.getElementById('matrixBody'); mb.innerHTML='';
+    (d.matrix||[]).forEach(x=>{const cls=x.status==='Green'?'greenTag':(x.status==='Yellow'?'yellowTag':'redTag');const tr=document.createElement('tr');tr.innerHTML=`<td class="bold">${escapeHtml(x.staff)}</td><td>${escapeHtml(x.manager)}</td><td class="num">${fmt(x.target)}</td><td class="num">${fmt(x.actual)}</td><td class="center bold">${x.percent}%</td><td class="center"><span class="status ${cls}">${x.status}</span></td>`;mb.appendChild(tr)});
+  }
+
+  function formatDay(d){const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('mr-IN',{weekday:'short',day:'2-digit',month:'short'})+' ('+d+')'}
+  function escapeHtml(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+  window.addEventListener('load', reloadBase);
+</script>
 </body>
 </html>
