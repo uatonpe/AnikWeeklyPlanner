@@ -5,38 +5,77 @@
   <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ANIK Weekly Planner - All in One</title>
+  <title>ANIK Performance Control Room</title>
   <style>
     :root{
-      --blue:#1e40af; --blue2:#2563eb; --green:#059669; --red:#dc2626; --yellow:#d97706;
-      --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --soft:#f8fafc; --bg:#f1f5f9; --white:#fff;
+      --blue:#1e40af; --blue2:#2563eb; --blue3:#60a5fa;
+      --green:#059669; --green2:#10b981; --red:#dc2626; --yellow:#d97706;
+      --ink:#0f172a; --text:#1e293b; --muted:#64748b; --line:#e2e8f0;
+      --soft:#f8fafc; --bg:#eef4ff; --white:#fff; --dark:#071733;
+      --shadow:0 18px 45px rgba(15,23,42,.10); --shadow2:0 8px 22px rgba(30,64,175,.13);
+      --radius:24px;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,'Noto Sans Devanagari','Nirmala UI',sans-serif;font-size:14px}
-    .top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-    .wrap{max-width:1450px;margin:auto;padding:14px 18px}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{height:34px;max-width:120px;object-fit:contain;background:#0b2b64;border-radius:12px;padding:5px}
-    .title{font-weight:900;font-size:18px;letter-spacing:-.3px}.sub{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.14em}
-    .nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    button,.btn{border:0;border-radius:14px;padding:12px 16px;font-weight:900;cursor:pointer;background:#e2e8f0;color:#0f172a;transition:.15s;white-space:nowrap}
-    button:hover,.btn:hover{transform:translateY(-1px);filter:brightness(.98)}
-    button.active{background:var(--blue);color:#fff;box-shadow:0 10px 20px rgba(37,99,235,.18)}
-    button.green{background:var(--green);color:#fff} button.blue{background:var(--blue);color:#fff} button.dark{background:#0f172a;color:#fff} button.red{background:var(--red);color:#fff}
-    .main{max-width:1450px;margin:auto;padding:20px 18px 60px}.page{display:none}.page.active{display:block}
-    .grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g7{grid-template-columns:repeat(7,minmax(0,1fr))}
-    .card{background:var(--white);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 4px 8px rgba(15,23,42,.03)}
-    .hero{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:16px}.h1{font-size:26px;font-weight:900;letter-spacing:-.6px}.hint{color:var(--muted);font-weight:700;line-height:1.6}.pill{display:inline-flex;align-items:center;gap:8px;background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:900}
-    label{display:block;font-size:11px;color:#475569;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin:0 0 6px 2px}
-    input,select,textarea{width:100%;border:1px solid var(--line);background:var(--soft);border-radius:14px;padding:12px 13px;font-weight:800;outline:none;color:#1e293b;font-family:inherit}
-    textarea{min-height:42px;resize:vertical} input:focus,select:focus,textarea:focus{border-color:var(--blue2);box-shadow:0 0 0 4px rgba(37,99,235,.10);background:#fff}
-    .tablebox{overflow:auto;border:1px solid var(--line);border-radius:18px;background:#fff;max-height:70vh}.tablebox.small{max-height:54vh}
-    table{width:100%;border-collapse:separate;border-spacing:0;min-width:850px}th{position:sticky;top:0;background:#f8fafc;z-index:2;text-align:left;color:#475569;font-size:11px;text-transform:uppercase;letter-spacing:.07em;padding:12px;border-bottom:1px solid var(--line)}td{padding:10px 12px;border-bottom:1px solid #edf2f7;vertical-align:middle}tr:hover td{background:#f8fafc}.num{text-align:right}.center{text-align:center}.muted{color:var(--muted)}.bold{font-weight:900}.tiny{font-size:11px}.hide{display:none!important}
-    .kpi{padding:16px;border-radius:20px;background:#fff;border:1px solid var(--line);min-height:130px}.kpi .name{font-size:11px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.08em}.kpi .val{font-size:22px;font-weight:900;margin:8px 0;color:#0f172a}.bar{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden}.fill{height:100%;background:var(--blue);width:0}.status{display:inline-block;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:900}.greenTag{background:#dcfce7;color:#15803d}.yellowTag{background:#fef3c7;color:#b45309}.redTag{background:#fee2e2;color:#b91c1c}
-    .toast{position:fixed;right:18px;bottom:18px;background:#0f172a;color:#fff;padding:14px 16px;border-radius:16px;font-weight:900;box-shadow:0 12px 30px rgba(0,0,0,.25);z-index:50;display:none}.loader{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);z-index:60;display:none;align-items:center;justify-content:center;color:#fff;flex-direction:column;font-weight:900}.spin{width:54px;height:54px;border:5px solid rgba(255,255,255,.28);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}@keyframes spin{to{transform:rotate(360deg)}}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.right{margin-left:auto}.sectionTitle{font-size:18px;font-weight:900;margin:0 0 12px}.warn{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:16px;padding:12px;font-weight:800}.summaryLine{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9}.miniChart{display:flex;gap:8px;align-items:end;height:170px;padding:18px;border:1px solid var(--line);border-radius:18px;background:#fff}.col{flex:1;background:#dbeafe;border-radius:10px 10px 0 0;min-height:3px;position:relative}.col span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:10px;font-weight:900;color:#475569;white-space:nowrap;margin-bottom:5px}.col label{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:8px;font-size:10px;text-align:center;color:#64748b}
-    @media(max-width:900px){.g2,.g3,.g4,.g7{grid-template-columns:1fr}.hero{display:block}.right{margin-left:0}.wrap,.main{padding-left:12px;padding-right:12px}.h1{font-size:22px}.top .wrap{padding-bottom:10px}button{flex:1}.nav button{padding:11px 10px}.card{padding:14px}}
-    @media print{.top,.noPrint,.toast,.loader{display:none!important}body{background:#fff}.main{max-width:none;padding:0}.page{display:none!important}#dashboardPage{display:block!important}.card,.kpi{box-shadow:none;border:1px solid #111;border-radius:0}.tablebox{max-height:none;overflow:visible;border-radius:0}th{position:static}button{display:none}}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;color:var(--text);
+      font-family:'Nirmala UI','Noto Sans Devanagari',Arial,sans-serif;font-size:14px;
+      background:
+        radial-gradient(900px 420px at 8% -10%, rgba(37,99,235,.18), transparent 60%),
+        radial-gradient(820px 360px at 100% 0%, rgba(16,185,129,.13), transparent 58%),
+        linear-gradient(180deg,#f8fbff 0%,#eef4ff 46%,#f8fafc 100%);
+      min-height:100vh;-webkit-font-smoothing:antialiased;
+    }
+    .top{
+      position:sticky;top:0;z-index:20;
+      background:linear-gradient(135deg,rgba(7,23,51,.98),rgba(30,64,175,.96));
+      border-bottom:1px solid rgba(255,255,255,.12);box-shadow:0 16px 35px rgba(2,6,23,.20);
+    }
+    .top:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(96,165,250,.7),transparent)}
+    .wrap{max-width:1450px;margin:auto;padding:14px 18px;position:relative}
+    .brand{display:flex;align-items:center;gap:14px;color:#fff}
+    .logo{height:38px;max-width:128px;object-fit:contain;background:#fff;border-radius:14px;padding:6px;box-shadow:0 10px 25px rgba(0,0,0,.18)}
+    .title{font-weight:950;font-size:19px;letter-spacing:-.35px;line-height:1.1}.sub{font-size:10px;color:#bfdbfe;font-weight:900;text-transform:uppercase;letter-spacing:.18em;margin-top:3px}
+    .nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+    button,.btn{
+      border:0;border-radius:16px;padding:12px 16px;font-weight:950;cursor:pointer;
+      background:rgba(255,255,255,.13);color:#eaf2ff;border:1px solid rgba(255,255,255,.16);
+      transition:transform .15s ease,box-shadow .15s ease,background .15s ease,filter .15s ease;
+      white-space:nowrap;letter-spacing:.01em;font-family:inherit;
+    }
+    button:hover,.btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(2,6,23,.18);filter:brightness(1.03)}
+    button.active{background:#fff;color:var(--blue);box-shadow:0 12px 28px rgba(255,255,255,.16)}
+    button.green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;border-color:transparent;box-shadow:0 12px 25px rgba(5,150,105,.22)}
+    button.blue{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border-color:transparent;box-shadow:0 12px 25px rgba(37,99,235,.22)}
+    button.dark{background:#020617;color:#fff;border-color:rgba(255,255,255,.10)} button.red{background:var(--red);color:#fff;border-color:transparent}
+    .main{max-width:1450px;margin:auto;padding:24px 18px 60px}.page{display:none}.page.active{display:block;animation:fadeUp .25s ease both}@keyframes fadeUp{from{opacity:.35;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g7{grid-template-columns:repeat(7,minmax(0,1fr))}
+    .card{
+      background:rgba(255,255,255,.92);border:1px solid rgba(226,232,240,.85);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow2);
+      backdrop-filter:blur(8px);position:relative;overflow:hidden;
+    }
+    .card:before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--green));opacity:.75}.card>*{position:relative;z-index:1}
+    .card:hover{box-shadow:var(--shadow);border-color:#bfdbfe}
+    .hero{
+      display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px;
+      padding:20px;border:1px solid rgba(191,219,254,.75);border-radius:28px;background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(239,246,255,.92));box-shadow:var(--shadow2)
+    }
+    .h1{font-size:30px;font-weight:950;letter-spacing:-.75px;color:#0f172a;line-height:1.1;margin-top:8px}.hint{color:var(--muted);font-weight:750;line-height:1.65;margin-top:7px;max-width:780px}.hint b{color:var(--blue)}
+    .pill{display:inline-flex;align-items:center;gap:8px;background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:950;box-shadow:0 5px 15px rgba(37,99,235,.09)}
+    label{display:block;font-size:10px;color:#475569;font-weight:950;text-transform:uppercase;letter-spacing:.11em;margin:0 0 7px 2px}
+    input,select,textarea{
+      width:100%;border:1px solid #dbe4ef;background:#f8fafc;border-radius:16px;padding:13px 14px;font-weight:850;outline:none;color:#1e293b;font-family:inherit;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);transition:border .15s ease,box-shadow .15s ease,background .15s ease;
+    }
+    textarea{min-height:44px;resize:vertical}input:hover,select:hover,textarea:hover{background:#fff} input:focus,select:focus,textarea:focus{border-color:var(--blue2);box-shadow:0 0 0 4px rgba(37,99,235,.11);background:#fff}
+    .tablebox{overflow:auto;border:1px solid var(--line);border-radius:22px;background:#fff;max-height:70vh;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}.tablebox.small{max-height:54vh}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:850px}th{position:sticky;top:0;background:linear-gradient(180deg,#f8fafc,#eef4ff);z-index:2;text-align:left;color:#334155;font-size:10px;text-transform:uppercase;letter-spacing:.09em;padding:13px;border-bottom:1px solid var(--line)}td{padding:11px 13px;border-bottom:1px solid #edf2f7;vertical-align:middle}tr:hover td{background:#f8fbff}.num{text-align:right}.center{text-align:center}.muted{color:var(--muted)}.bold{font-weight:950}.tiny{font-size:11px}.hide{display:none!important}
+    .kpi{padding:18px;border-radius:22px;background:#fff;border:1px solid var(--line);min-height:136px;box-shadow:var(--shadow2);position:relative;overflow:hidden}.kpi:after{content:"";position:absolute;right:-22px;top:-22px;width:70px;height:70px;border-radius:50%;background:rgba(37,99,235,.08)}.kpi .name{font-size:10px;font-weight:950;color:#64748b;text-transform:uppercase;letter-spacing:.09em}.kpi .val{font-size:23px;font-weight:950;margin:10px 0;color:#0f172a}.bar{height:9px;background:#e2e8f0;border-radius:99px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));width:0}.status{display:inline-block;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:950}.greenTag{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}.yellowTag{background:#fef3c7;color:#b45309;border:1px solid #fde68a}.redTag{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
+    .toast{position:fixed;right:18px;bottom:18px;background:#071733;color:#fff;padding:14px 16px;border-radius:18px;font-weight:950;box-shadow:0 16px 38px rgba(0,0,0,.30);z-index:50;display:none}.loader{position:fixed;inset:0;background:rgba(7,23,51,.66);backdrop-filter:blur(8px);z-index:60;display:none;align-items:center;justify-content:center;color:#fff;flex-direction:column;font-weight:950}.spin{width:56px;height:56px;border:5px solid rgba(255,255,255,.28);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}@keyframes spin{to{transform:rotate(360deg)}}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.right{margin-left:auto}.sectionTitle{font-size:19px;font-weight:950;margin:0 0 12px;color:#0f172a}.warn{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:18px;padding:13px;font-weight:850}.summaryLine{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #f1f5f9}.miniChart{display:flex;gap:8px;align-items:end;height:178px;padding:18px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,#fff,#f8fafc)}.col{flex:1;background:linear-gradient(180deg,#2563eb,#93c5fd);border-radius:11px 11px 0 0;min-height:3px;position:relative;box-shadow:0 8px 18px rgba(37,99,235,.16)}.col span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:10px;font-weight:950;color:#475569;white-space:nowrap;margin-bottom:5px}.col label{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:8px;font-size:10px;text-align:center;color:#64748b}
+    #overallPct{letter-spacing:-1.5px}#kpiCards .kpi:nth-child(2n) .fill{background:linear-gradient(90deg,#4f46e5,#60a5fa)}#kpiCards .kpi:nth-child(3n) .fill{background:linear-gradient(90deg,#059669,#34d399)}
+    @media(max-width:900px){.g2,.g3,.g4,.g7{grid-template-columns:1fr}.hero{display:block;padding:16px}.right{margin-left:0}.wrap,.main{padding-left:12px;padding-right:12px}.h1{font-size:24px}.top .wrap{padding-bottom:10px}button{flex:1}.nav button{padding:11px 10px}.card{padding:15px}.title{font-size:17px}.logo{height:34px}}
+    @media print{.top,.noPrint,.toast,.loader{display:none!important}body{background:#fff}.main{max-width:none;padding:0}.page{display:none!important}#dashboardPage{display:block!important}.card,.kpi{box-shadow:none;border:1px solid #111;border-radius:0}.card:before{display:none}.tablebox{max-height:none;overflow:visible;border-radius:0}th{position:static}button{display:none}}
   </style>
 </head>
 <body>
@@ -45,15 +84,15 @@
       <div class="brand">
         <img class="logo" src="https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png" alt="ANIK">
         <div>
-          <div class="title">ANIK Weekly Planner - All in One</div>
-          <div class="sub">Planner + TA Team + Dashboard</div>
+          <div class="title">ANIK Performance Control Room</div>
+          <div class="sub">Weekly Plan • TA Team • Live Dashboard</div>
         </div>
       </div>
       <div class="nav">
-        <button id="btnPlan" class="active" onclick="showPage('plan')">Weekly Plan</button>
-        <button id="btnTA" onclick="showPage('ta')">TA Team</button>
-        <button id="btnDashboard" onclick="showPage('dashboard')">Dashboard</button>
-        <button class="dark right" onclick="reloadBase()">Sheet Sync</button>
+        <button id="btnPlan" class="active" onclick="showPage('plan')">📌 Weekly Plan</button>
+        <button id="btnTA" onclick="showPage('ta')">✅ TA Team</button>
+        <button id="btnDashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
+        <button class="dark right" onclick="reloadBase()">⚡ Sheet Sync</button>
       </div>
     </div>
   </div>
@@ -62,7 +101,7 @@
     <section id="planPage" class="page active">
       <div class="hero">
         <div>
-          <div class="pill">Manager Dashboard</div>
+          <div class="pill">📌 Manager Dashboard</div>
           <div class="h1">साप्ताहिक टार्गेट प्लॅन</div>
           <div class="hint">Manager / FX / KPI बदलायचे असल्यास Google Sheet मधील <b>Managers_List</b>, <b>FX_Mapping</b>, <b>Sheet5</b> update करा आणि इथे <b>Sheet Sync</b> करा.</div>
         </div>
@@ -94,7 +133,7 @@
     <section id="taPage" class="page">
       <div class="hero">
         <div>
-          <div class="pill" style="background:#dcfce7;color:#15803d">TA Team</div>
+          <div class="pill" style="background:#dcfce7;color:#15803d;border-color:#bbf7d0">✅ TA Team</div>
           <div class="h1">Daily Actual Sync</div>
           <div class="hint">मॅनेजरचा प्लॅन निवडा, दिवस निवडा आणि actual भरून save करा.</div>
         </div>
@@ -127,7 +166,7 @@
     <section id="dashboardPage" class="page">
       <div class="hero">
         <div>
-          <div class="pill">HO Dashboard</div>
+          <div class="pill">📊 HO Dashboard</div>
           <div class="h1">Plan vs Achievement</div>
           <div class="hint">Fast server-side dashboard. Data source: <b>Master_Data</b>.</div>
         </div>
@@ -178,42 +217,78 @@
   <div id="toast" class="toast"></div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkHC2SMLLanjvdEvQG09B6jA-ZWPjEe8xVoA2gfv_c3_VCic0FkQ8Q9573_IWPRf4z/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAnvnwhMsox3ljB2QEJdH1zekDXg6lmFOIWLRKg7gbqEbjYC5PagIBqusu0p6tUdy7/exec";
 
   let APPDATA = { managers: [], fxMap: {}, kpis: [] };
   let planRows = [];
   let taPlan = null;
   let dashTimer = null;
+  let taTotalTimer = null;
+  let dashboardLoaded = false;
+  let dashboardDirty = true;
 
   const KPI_BUCKETS = [
     ['disb','Disbursement'], ['appr','Appraisal'], ['od','OD Recovery'], ['reg','Regular Collection'], ['past','Past Due'], ['rock','Rocket Pay'], ['meet','Meetings']
   ];
+  const READ_ACTIONS = new Set(['getAppData','getManagers','getKpis','getTeam','getPlansForManager','getPlanForTA','getDashboardData']);
 
   function gs(fn, ...args){
-    // Apps Script मध्ये paste केल्यावर हा native fast mode वापरेल.
     if (window.google && google.script && google.script.run) {
       return new Promise((resolve, reject) => {
         google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[fn](...args);
       });
     }
+    if (READ_ACTIONS.has(fn)) return gsJsonp(fn, args);
+    return gsWrite(fn, args);
+  }
 
-    // External HTML / normal browser mode: वर दिलेला Web App URL वापरेल.
-    // यासाठी Code.gs मध्ये doPost/doGet API router असणे आवश्यक आहे.
-    return fetch(SCRIPT_URL, {
-      method: 'POST',
-      redirect: 'follow',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: fn, args: args })
-    })
-    .then(r => r.text())
-    .then(t => {
-      let data;
-      try { data = JSON.parse(t); }
-      catch (e) { throw new Error('Server response JSON नाही. Code.gs API router तपासा.'); }
-      if (data && data.ok === false) throw new Error(data.error || 'Server error');
-      return (data && Object.prototype.hasOwnProperty.call(data, 'result')) ? data.result : data;
+  function gsJsonp(fn, args){
+    return new Promise((resolve, reject) => {
+      const cb = '__anik_cb_' + Date.now() + '_' + Math.floor(Math.random()*100000);
+      const script = document.createElement('script');
+      const timeout = setTimeout(() => cleanup(new Error('Server timeout. Apps Script deployment तपासा.')), 35000);
+      function cleanup(err, data){
+        clearTimeout(timeout);
+        try { delete window[cb]; } catch(e) { window[cb] = undefined; }
+        if (script.parentNode) script.parentNode.removeChild(script);
+        if (err) reject(err);
+        else {
+          if (data && data.ok === false) reject(new Error(data.error || 'Server error'));
+          else resolve((data && Object.prototype.hasOwnProperty.call(data,'result')) ? data.result : data);
+        }
+      }
+      window[cb] = data => cleanup(null, data);
+      script.onerror = () => cleanup(new Error('API load failed. Web App URL / access तपासा.'));
+      script.src = SCRIPT_URL + '?action=' + encodeURIComponent(fn) + '&args=' + encodeURIComponent(JSON.stringify(args || [])) + '&callback=' + encodeURIComponent(cb) + '&_=' + Date.now();
+      document.body.appendChild(script);
     });
   }
+
+  async function gsWrite(fn, args){
+    const payload = JSON.stringify({ action: fn, args: args });
+    try {
+      const r = await fetch(SCRIPT_URL, {
+        method: 'POST', redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: payload
+      });
+      const t = await r.text();
+      const data = JSON.parse(t);
+      if (data && data.ok === false) throw new Error(data.error || 'Server error');
+      return (data && Object.prototype.hasOwnProperty.call(data,'result')) ? data.result : data;
+    } catch (e) {
+      // GitHub Pages वर browser CORS मुळे response वाचू देत नसेल, तरी request save साठी पाठवतो.
+      await fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors', redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: payload
+      });
+      await sleep(1800);
+      return { ok:true, fireAndForget:true, message:'Save request sent' };
+    }
+  }
+
+  function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
   function showLoader(txt){document.getElementById('loaderText').innerText=txt||'लोड होत आहे...';document.getElementById('loader').style.display='flex'}
   function hideLoader(){document.getElementById('loader').style.display='none'}
   function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2600)}
@@ -226,9 +301,9 @@
   }
 
   async function reloadBase(){
-    showLoader('Google Sheet डेटा Sync होत आहे...');
+    showLoader('Google Sheet डेटा fast sync होत आहे...');
     try{
-      APPDATA = await gs('getAppData');
+      APPDATA = await gs('getAppData', true);
       const managers = APPDATA.managers || [];
       setSelect('planManager', managers, {value:'', text:'-- Manager निवडा --'});
       setSelect('taManager', managers, {value:'', text:'-- Manager निवडा --'});
@@ -238,7 +313,8 @@
       document.getElementById('dashStart').value = APPDATA.monthStart;
       document.getElementById('dashEnd').value = APPDATA.today;
       syncDashStaff();
-      await loadDashboard(false);
+      dashboardLoaded = false;
+      dashboardDirty = true;
       toast('Sheet Sync पूर्ण झाला');
     }catch(e){alert('डेटा लोड होत नाही: '+e.message)} finally{hideLoader()}
   }
@@ -249,13 +325,13 @@
       const btn = p==='dashboard'?'btnDashboard':(p==='ta'?'btnTA':'btnPlan');
       document.getElementById(btn).classList.toggle('active',p===name);
     });
-    if(name==='dashboard') loadDashboard(false);
+    if(name==='dashboard' && (!dashboardLoaded || dashboardDirty)) loadDashboard(true);
   }
 
   async function loadPlanTeam(){
     const manager=val('planManager'), s=val('planStart'), e=val('planEnd');
     if(!manager || !s || !e) return;
-    showLoader('Team Load होत आहे...');
+    showLoader('Team fast load होत आहे...');
     try{
       const res = await gs('getTeam', manager);
       const staff = res.staff || [], kpis = res.kpis || [];
@@ -286,16 +362,17 @@
   async function savePlan(){
     const manager=val('planManager'), sDate=val('planStart'), eDate=val('planEnd');
     if(!manager || !sDate || !eDate){alert('Manager आणि date निवडा.');return}
-    const filled = planRows.some(r => Number(r.weeklyTarget||0)>0 || String(r.remark||'').trim());
-    if(!filled){alert('किमान एक target किंवा remark भरा.');return}
-    const rows = planRows.map(r=>({staff:r.staff,kpi:r.kpi,weeklyTarget:Number(r.weeklyTarget||0),remark:r.remark||''}));
+    const rows = planRows
+      .filter(r => Number(r.weeklyTarget||0)>0 || String(r.remark||'').trim())
+      .map(r=>({staff:r.staff,kpi:r.kpi,weeklyTarget:Number(r.weeklyTarget||0),remark:r.remark||''}));
+    if(!rows.length){alert('किमान एक target किंवा remark भरा.');return}
     if(!confirm('हा Weekly Plan save/update करायचा आहे का?')) return;
-    showLoader('Weekly Plan save होत आहे...');
+    showLoader('Weekly Plan fast save होत आहे...');
     try{
       const res = await gs('saveWeeklyPlan', {manager,sDate,eDate,rows});
-      toast('Plan saved: '+res.savedRows+' day rows');
-      await loadTAPlans();
-      await loadDashboard(false);
+      dashboardDirty = true;
+      toast(res.fireAndForget ? 'Plan save request पाठवली' : ('Plan saved: '+res.savedRows+' rows'));
+      if(val('taManager')===manager) setTimeout(loadTAPlans, 700);
     }catch(e){alert('Save error: '+e.message)} finally{hideLoader()}
   }
 
@@ -306,10 +383,11 @@
     document.getElementById('taDay').innerHTML='<option value="">-- Plan निवडा --</option>';
     taPlan=null; renderTARows();
     if(!manager) return;
-    showLoader('Plans Load होत आहेत...');
+    showLoader('Plans fast load होत आहेत...');
     try{
       const plans = await gs('getPlansForManager', manager);
       plans.forEach(p=>{const o=document.createElement('option');o.value=p.key;o.textContent=`${p.sDate} ते ${p.eDate} | Target ${fmt(p.totalTarget)} | Staff ${p.staffCount}`;sel.appendChild(o)});
+      toast(plans.length+' plans loaded');
     }catch(e){alert('Plan load error: '+e.message)} finally{hideLoader()}
   }
 
@@ -317,7 +395,7 @@
     const manager=val('taManager'), key=val('taPlan');
     taPlan=null; renderTARows();
     if(!manager || !key) return;
-    showLoader('Daily data load होत आहे...');
+    showLoader('Daily plan fast load होत आहे...');
     try{
       taPlan = await gs('getPlanForTA', manager, key);
       setSelect('taDay', (taPlan.days||[]).map(d=>({value:d,text:formatDay(d)})), {value:'', text:'-- दिवस निवडा --'});
@@ -330,24 +408,28 @@
 
   function renderTARows(){
     const day=val('taDay'), body=document.getElementById('taBody'); body.innerHTML='';
-    if(!taPlan || !day){document.getElementById('taEmpty').classList.remove('hide');document.getElementById('taTableBox').classList.add('hide');document.getElementById('taTotalTarget').innerText='0';document.getElementById('taTotalActual').innerText='0';return}
-    document.getElementById('taEmpty').classList.add('hide');document.getElementById('taTableBox').classList.remove('hide');
-    let totalT=0,totalA=0; const frag=document.createDocumentFragment();
+    if(!taPlan || !day){
+      document.getElementById('taEmpty').classList.remove('hide');
+      document.getElementById('taTableBox').classList.add('hide');
+      document.getElementById('taTotalTarget').innerText='0';
+      document.getElementById('taTotalActual').innerText='0';
+      return;
+    }
+    document.getElementById('taEmpty').classList.add('hide');
+    document.getElementById('taTableBox').classList.remove('hide');
+    const frag=document.createDocumentFragment();
     (taPlan.rows||[]).forEach((r,i)=>{
       const d=(r.dailyEntries||{})[day]||{dailyT:0,dailyA:0};
-      const t=Number(d.dailyT||0), a=Number(d.dailyA||0); totalT+=t; totalA+=a;
-      const pct=t>0?Math.round(a/t*100):0; const tag=a<=0?'Pending':(pct>=100?'Done':(pct>=60?'Low':'Poor'));
-      const cls=a<=0?'':(pct>=100?'greenTag':(pct>=60?'yellowTag':'redTag'));
+      const t=Number(d.dailyT||0), a=Number(d.dailyA||0);
       const tr=document.createElement('tr');
       tr.innerHTML=`<td>${i+1}</td><td class="bold">${escapeHtml(r.staff)}</td><td>${escapeHtml(r.kpi)}</td>
         <td class="num"><input type="number" data-i="${i}" data-f="dailyT" oninput="updateTARow(this)" value="${t||''}"></td>
         <td class="num"><input type="number" data-i="${i}" data-f="dailyA" oninput="updateTARow(this)" value="${a||''}"></td>
-        <td class="center"><span class="status ${cls}">${tag}</span></td>`;
+        <td class="center"><span id="taStatus_${i}" class="status"></span></td>`;
       frag.appendChild(tr);
     });
     body.appendChild(frag);
-    document.getElementById('taTotalTarget').innerText=fmt(totalT);
-    document.getElementById('taTotalActual').innerText=fmt(totalA);
+    recalcTATotals(true);
   }
 
   function updateTARow(el){
@@ -355,7 +437,31 @@
     if(!taPlan.rows[i].dailyEntries) taPlan.rows[i].dailyEntries={};
     if(!taPlan.rows[i].dailyEntries[day]) taPlan.rows[i].dailyEntries[day]={dailyT:0,dailyA:0};
     taPlan.rows[i].dailyEntries[day][f]=Number(el.value||0);
-    renderTARows();
+    updateTAStatus(i);
+    clearTimeout(taTotalTimer);
+    taTotalTimer=setTimeout(()=>recalcTATotals(false), 100);
+  }
+
+  function updateTAStatus(i){
+    const day=val('taDay'), r=taPlan.rows[i], d=(r.dailyEntries||{})[day]||{};
+    const t=Number(d.dailyT||0), a=Number(d.dailyA||0);
+    const pct=t>0?Math.round(a/t*100):0;
+    const tag=a<=0?'Pending':(pct>=100?'Done':(pct>=60?'Low':'Poor'));
+    const cls=a<=0?'':(pct>=100?'greenTag':(pct>=60?'yellowTag':'redTag'));
+    const el=document.getElementById('taStatus_'+i);
+    if(el){el.className='status '+cls; el.textContent=tag;}
+  }
+
+  function recalcTATotals(updateAllStatus){
+    const day=val('taDay'); if(!taPlan || !day) return;
+    let totalT=0,totalA=0;
+    (taPlan.rows||[]).forEach((r,i)=>{
+      const d=(r.dailyEntries||{})[day]||{};
+      totalT+=Number(d.dailyT||0); totalA+=Number(d.dailyA||0);
+      if(updateAllStatus) updateTAStatus(i);
+    });
+    document.getElementById('taTotalTarget').innerText=fmt(totalT);
+    document.getElementById('taTotalActual').innerText=fmt(totalA);
   }
 
   async function saveTA(){
@@ -365,11 +471,11 @@
       const d=(r.dailyEntries||{})[day]||{};
       return {staff:r.staff,kpi:r.kpi,weeklyTarget:r.weeklyTarget||0,dailyTarget:Number(d.dailyT||0),actual:Number(d.dailyA||0),remark:d.remark||r.remark||''};
     });
-    showLoader('Daily actual save होत आहे...');
+    showLoader('Daily actual fast save होत आहे...');
     try{
       const res=await gs('saveDailyActual',{manager:taPlan.manager,sDate:taPlan.sDate,eDate:taPlan.eDate,dayDate:day,entries});
-      toast('Daily data saved: '+res.savedRows+' rows');
-      await loadDashboard(false);
+      dashboardDirty = true;
+      toast(res.fireAndForget ? 'Daily save request पाठवली' : ('Daily data saved: '+res.savedRows+' rows'));
     }catch(e){alert('TA save error: '+e.message)} finally{hideLoader()}
   }
 
@@ -381,14 +487,16 @@
     staff=[...new Set(staff)].sort();
     setSelect('dashStaff', [{value:'all',text:'सर्व Staff'}].concat(staff.map(s=>({value:s,text:s}))));
   }
-  function delayDashboard(){clearTimeout(dashTimer);dashTimer=setTimeout(()=>loadDashboard(false),450)}
+  function delayDashboard(){clearTimeout(dashTimer);dashTimer=setTimeout(()=>loadDashboard(false),650)}
 
   async function loadDashboard(withLoader=true){
-    if(withLoader) showLoader('Dashboard refresh होत आहे...');
+    if(withLoader) showLoader('Dashboard fast refresh होत आहे...');
     try{
       const f={sDate:val('dashStart'),eDate:val('dashEnd'),manager:val('dashManager')||'all',staff:val('dashStaff')||'all',search:val('dashSearch')||''};
       const d=await gs('getDashboardData', f);
       renderDashboard(d);
+      dashboardLoaded = true;
+      dashboardDirty = false;
     }catch(e){console.error(e); if(withLoader) alert('Dashboard error: '+e.message)} finally{if(withLoader) hideLoader()}
   }
 
@@ -400,12 +508,14 @@
     document.getElementById('periodText').innerText=(d.filters.sDate||'')+' ते '+(d.filters.eDate||'');
 
     const box=document.getElementById('kpiCards'); box.innerHTML='';
+    const frag=document.createDocumentFragment();
     KPI_BUCKETS.forEach(([key,label])=>{
       const x=d.cards[key]||{actual:0,target:0,percent:0};
       const div=document.createElement('div'); div.className='kpi';
       div.innerHTML=`<div class="name">${label}</div><div class="val">${(key==='rock'||key==='meet')?'': '₹ '}${fmt(x.actual)}</div><div class="bar"><div class="fill" style="width:${Math.min(x.percent||0,100)}%"></div></div><div class="tiny bold muted" style="margin-top:8px">${x.percent||0}% | T ${fmt(x.target)}</div>`;
-      box.appendChild(div);
+      frag.appendChild(div);
     });
+    box.appendChild(frag);
 
     const chart=document.getElementById('miniChart'); chart.innerHTML='';
     const max=Math.max(1,...KPI_BUCKETS.map(([k])=>(d.cards[k]||{}).actual||0));
@@ -416,7 +526,9 @@
     if(!(d.leaderboard||[]).length) lb.innerHTML='<div class="muted bold">No data</div>';
 
     const mb=document.getElementById('matrixBody'); mb.innerHTML='';
-    (d.matrix||[]).forEach(x=>{const cls=x.status==='Green'?'greenTag':(x.status==='Yellow'?'yellowTag':'redTag');const tr=document.createElement('tr');tr.innerHTML=`<td class="bold">${escapeHtml(x.staff)}</td><td>${escapeHtml(x.manager)}</td><td class="num">${fmt(x.target)}</td><td class="num">${fmt(x.actual)}</td><td class="center bold">${x.percent}%</td><td class="center"><span class="status ${cls}">${x.status}</span></td>`;mb.appendChild(tr)});
+    const mfrag=document.createDocumentFragment();
+    (d.matrix||[]).forEach(x=>{const cls=x.status==='Green'?'greenTag':(x.status==='Yellow'?'yellowTag':'redTag');const tr=document.createElement('tr');tr.innerHTML=`<td class="bold">${escapeHtml(x.staff)}</td><td>${escapeHtml(x.manager)}</td><td class="num">${fmt(x.target)}</td><td class="num">${fmt(x.actual)}</td><td class="center bold">${x.percent}%</td><td class="center"><span class="status ${cls}">${x.status}</span></td>`;mfrag.appendChild(tr)});
+    mb.appendChild(mfrag);
   }
 
   function formatDay(d){const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('mr-IN',{weekday:'short',day:'2-digit',month:'short'})+' ('+d+')'}
