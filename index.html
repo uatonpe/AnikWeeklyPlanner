@@ -131,6 +131,15 @@
     @media(max-width:900px){.staffKpiCards,.detailKpiGrid,.simpleKpiGrid{grid-template-columns:1fr}.glanceTable{min-width:760px}.glanceCell{min-width:120px}.managerOverview,.teamStats{grid-template-columns:1fr}.kpiWiseTable{min-width:560px}}
     @media print{.adminAtGlance,.teamPanel{box-shadow:none;border:1px solid #111}.glanceTableWrap{max-height:none;overflow:visible}.glanceCell{break-inside:avoid}}
 
+
+    .fastNote{display:inline-flex;gap:6px;align-items:center;border:1px solid #bbf7d0;background:#ecfdf5;color:#047857;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:950}
+    .kpiTabBar{display:flex;gap:8px;overflow:auto;padding:12px 14px;border-bottom:1px solid #dbeafe;background:#fff;scrollbar-width:thin}
+    .kpiTabBtn{flex:0 0 auto;background:#f8fafc!important;color:#334155!important;border:1px solid #dbe4ef!important;border-radius:999px!important;padding:9px 12px!important;font-size:11px!important;box-shadow:none!important}
+    .kpiTabBtn.active{background:#1e40af!important;color:#fff!important;border-color:#1e40af!important}
+    .singleKpiTableBox{padding:0;background:#fff}.singleKpiTableBox .kpiWiseBox{border:0;border-radius:0;box-shadow:none}.singleKpiTableBox .kpiWiseHead{position:sticky;top:0;z-index:2}
+    .staffKpiDetail .warn{margin:12px}
+    .fastSkeleton{border:1px dashed #bfdbfe;background:#eff6ff;color:#1e40af;border-radius:18px;padding:14px;font-weight:950;margin-top:14px}
+
     .adminMatrix{display:none}.adminMatrix.show{display:block}
     .softBtn{background:#fff;color:#1e40af;border:1px solid #bfdbfe}.softBtn:hover{background:#eff6ff}
 
@@ -229,32 +238,32 @@
       <div class="hero">
         <div>
           <div class="pill" style="background:#dcfce7;color:#15803d;border-color:#bbf7d0">✅ TA Team</div>
-          <div class="h1">Monthly Target Update</div>
-          <div class="hint">TA Team साठी CA-wise कार्ड view आहे. Manager आणि month निवडा; प्रत्येक CA खाली KPI, target, achieved, balance आणि new update लगेच दिसेल. Month मध्ये 2-3 वेळा update केले तरी latest achievement पुढे continue होईल.</div>
+          <div class="h1">Monthly KPI Achievement Update</div>
+          <div class="hint">TA Team साठी CA-wise monthly card view आहे. Manager आणि month निवडा; प्रत्येक CA खाली प्रत्येक KPI चा monthly target, achievement, balance आणि update स्वतंत्र दिसेल. Amount आणि number KPI एकत्र total केलेले नाहीत.</div>
         </div>
-        <div class="actions noPrint"><button class="green" onclick="saveMonthlyTA()">Monthly Update Save</button></div>
+        <div class="actions noPrint"><button class="green" onclick="saveMonthlyTA()">Monthly Achievement Save</button></div>
       </div>
 
       <div class="card grid g4">
         <div><label>Manager</label><select id="taManager" onchange="loadTAMonthly()"></select></div>
-        <div><label>Target Month</label><input type="month" id="taMonth" onchange="loadTAMonthly()"></div>
-        <div><label>Search Staff / KPI</label><input id="taSearch" placeholder="नाव / KPI शोधा..." oninput="renderTAMonthRows()"></div>
-        <div style="display:flex;align-items:end"><button class="green" style="width:100%" onclick="saveMonthlyTA()">Save Update</button></div>
+        <div><label>Month</label><input type="month" id="taMonth" onchange="loadTAMonthly()"></div>
+        <div><label>Search CA / KPI</label><input id="taSearch" placeholder="नाव / KPI शोधा..." oninput="renderTAMonthRows()"></div>
+        <div style="display:flex;align-items:end"><button class="green" style="width:100%" onclick="saveMonthlyTA()">Save Monthly Update</button></div>
       </div>
 
       <div class="grid g4" style="margin-top:14px">
-        <div class="card"><div class="tiny bold muted">Monthly Target</div><div id="taMonthlyTarget" style="font-size:30px;font-weight:950;margin-top:10px">0</div></div>
-        <div class="card"><div class="tiny bold muted">Achieved Till Now</div><div id="taMonthlyAchieved" style="font-size:30px;font-weight:950;margin-top:10px;color:#059669">0</div></div>
-        <div class="card"><div class="tiny bold muted">Balance Target</div><div id="taMonthlyBalance" style="font-size:30px;font-weight:950;margin-top:10px;color:#dc2626">0</div></div>
-        <div class="card"><div class="tiny bold muted">Achievement</div><div id="taMonthlyPct" style="font-size:30px;font-weight:950;margin-top:10px;color:#1e40af">0%</div><div id="taMonthlyLast" class="tiny muted" style="margin-top:8px">Last update: -</div></div>
+        <div class="card"><div class="tiny bold muted">KPI Entries</div><div id="taMonthlyTarget" style="font-size:30px;font-weight:950;margin-top:10px">0</div><div class="tiny muted" style="margin-top:8px">Monthly KPI rows</div></div>
+        <div class="card"><div class="tiny bold muted">Updated Now</div><div id="taMonthlyAchieved" style="font-size:30px;font-weight:950;margin-top:10px;color:#059669">0</div><div class="tiny muted" style="margin-top:8px">Rows with monthly update</div></div>
+        <div class="card"><div class="tiny bold muted">Focus KPI</div><div id="taMonthlyBalance" style="font-size:30px;font-weight:950;margin-top:10px;color:#dc2626">0</div><div class="tiny muted" style="margin-top:8px">Below 60% rows</div></div>
+        <div class="card"><div class="tiny bold muted">Avg Success</div><div id="taMonthlyPct" style="font-size:30px;font-weight:950;margin-top:10px;color:#1e40af">0%</div><div id="taMonthlyLast" class="tiny muted" style="margin-top:8px">Last update: -</div></div>
       </div>
 
       <div class="card" style="margin-top:14px">
         <div class="actions" style="margin-bottom:10px">
-          <h3 class="sectionTitle" style="margin-right:auto">Monthly Entry Matrix</h3>
+          <h3 class="sectionTitle" style="margin-right:auto">Monthly KPI Entry</h3>
           <span id="taMonthLabel" class="pill">Month: -</span>
         </div>
-        <div id="taEmpty" class="warn">Manager आणि month निवडा. CA नाव एकदाच दिसेल आणि खाली सर्व KPI/Questions सोप्या कार्डमध्ये भरता येतील.</div>
+        <div id="taEmpty" class="warn">Manager आणि month निवडा. CA नाव एकदाच दिसेल; खाली प्रत्येक KPI चा monthly target व achievement स्वतंत्र भरता येईल.</div>
         <div id="taTableBox" class="groupedBox hide">
           <div id="taBody"></div>
         </div>
@@ -359,8 +368,16 @@
   let teamCache = {};
   let lastDashboardData = null;
   let selectedDashManager = '';
+  let managerMonthlyCache = {};
+  let managerPlanListCache = {};
+  let managerPlanDetailCache = {};
+  let matrixRendered = false;
+  let dashboardReqToken = 0;
+  let activeKpiKeyByManager = {};
   let dashboardLoaded = false;
   let dashboardDirty = true;
+  const FAST_CACHE_TTL = 5 * 60 * 1000;
+  const PLAN_CACHE_TTL = 15 * 60 * 1000;
 
   const KPI_BUCKETS = [
     ['disb','Disbursement Target (₹)','amount'],
@@ -444,24 +461,60 @@
     arr.forEach(x=>{const o=document.createElement('option');o.value=x.value!==undefined?x.value:x;o.textContent=x.text!==undefined?x.text:x;el.appendChild(o)});
   }
 
-  async function reloadBase(){
-    showLoader('System data fast sync होत आहे...');
+  function safeGetCache(key, maxAge){
     try{
-      APPDATA = await gs('getAppData', true);
-      const managers = APPDATA.managers || [];
-      setSelect('planManager', managers, {value:'', text:'-- Manager निवडा --'});
-      setSelect('taManager', managers, {value:'', text:'-- Manager निवडा --'});
-      setSelect('dashManager', [{value:'all',text:'सर्व Managers'}].concat(managers.map(m=>({value:m,text:m}))));
-      document.getElementById('planStart').value = APPDATA.today;
-      document.getElementById('planEnd').value = APPDATA.today;
-      document.getElementById('dashStart').value = APPDATA.monthStart;
-      document.getElementById('dashEnd').value = APPDATA.today;
-      if(document.getElementById('taMonth')) document.getElementById('taMonth').value = (APPDATA.today || new Date().toISOString().slice(0,10)).slice(0,7);
-      syncDashStaff();
+      const raw=localStorage.getItem(key); if(!raw) return null;
+      const obj=JSON.parse(raw); if(!obj || !obj.t) return null;
+      if(maxAge && Date.now()-obj.t>maxAge) return null;
+      return obj.v;
+    }catch(e){return null;}
+  }
+  function safeSetCache(key, value){
+    try{localStorage.setItem(key, JSON.stringify({t:Date.now(), v:value}));}catch(e){}
+  }
+  function applyAppData(data){
+    if(!data) return;
+    APPDATA=data;
+    const managers = APPDATA.managers || [];
+    setSelect('planManager', managers, {value:'', text:'-- Manager निवडा --'});
+    setSelect('taManager', managers, {value:'', text:'-- Manager निवडा --'});
+    setSelect('dashManager', [{value:'all',text:'सर्व Managers'}].concat(managers.map(m=>({value:m,text:m}))));
+    document.getElementById('planStart').value = APPDATA.today || document.getElementById('planStart').value;
+    document.getElementById('planEnd').value = APPDATA.today || document.getElementById('planEnd').value;
+    document.getElementById('dashStart').value = APPDATA.monthStart || document.getElementById('dashStart').value;
+    document.getElementById('dashEnd').value = APPDATA.today || document.getElementById('dashEnd').value;
+    if(document.getElementById('taMonth')) document.getElementById('taMonth').value = (APPDATA.today || new Date().toISOString().slice(0,10)).slice(0,7);
+    syncDashStaff();
+  }
+
+  async function fastBoot(){
+    const cached=safeGetCache('ANIK_APPDATA_FAST', 24*60*60*1000);
+    if(cached){
+      applyAppData(cached);
+      toast('Fast mode: saved system data loaded');
+      reloadBase(true);
+    }else{
+      await reloadBase(false);
+    }
+  }
+
+  async function reloadBase(silent){
+    if(!silent) showLoader('System data fast sync होत आहे...');
+    try{
+      const fresh = await gs('getAppData', true);
+      applyAppData(fresh);
+      safeSetCache('ANIK_APPDATA_FAST', fresh);
+      managerMonthlyCache = {};
+      managerPlanListCache = {};
+      managerPlanDetailCache = {};
+      selectedDashManager = '';
+      matrixRendered = false;
       dashboardLoaded = false;
       dashboardDirty = true;
-      toast('System Sync पूर्ण झाला');
-    }catch(e){alert('डेटा लोड होत नाही: '+e.message)} finally{hideLoader()}
+      if(!silent) toast('System Sync पूर्ण झाला');
+    }catch(e){
+      if(!silent) alert('डेटा लोड होत नाही: '+e.message);
+    } finally{if(!silent) hideLoader()}
   }
 
   function showPage(name){
@@ -470,7 +523,7 @@
       const btn = p==='dashboard'?'btnDashboard':(p==='ta'?'btnTA':'btnPlan');
       document.getElementById(btn).classList.toggle('active',p===name);
     });
-    if(name==='dashboard' && (!dashboardLoaded || dashboardDirty)) loadDashboard(true);
+    if(name==='dashboard' && (!dashboardLoaded || dashboardDirty)) loadDashboard(false);
   }
 
   async function loadPlanTeam(){
@@ -573,27 +626,37 @@
     const mb=monthBounds(ym);
     showLoader('Monthly target fast load होत आहे...');
     try{
-      const allPlans = await gs('getPlansForManager', manager);
+      const allPlans = await getManagerPlanList(manager);
       const monthPlans = (allPlans||[]).filter(p=>planOverlaps(p, mb.start, mb.end));
       if(!monthPlans.length){
         taMonthly={manager, month:ym, start:mb.start, end:mb.end, plans:[], rows:[], saveDate:getSaveDateForMonth(mb)};
         renderTAMonthRows(); toast('या month साठी target plan नाही'); return;
       }
-      const details = await Promise.all(monthPlans.map(p => gs('getPlanForTA', manager, p.key).then(d=>Object.assign({planKey:p.key, planMeta:p}, d)).catch(e=>null)));
+      const details = await getManagerPlanDetails(manager, monthPlans);
       const map={};
       const todaySave = getSaveDateForMonth(mb);
       details.filter(Boolean).forEach(plan=>{
         (plan.rows||[]).forEach(r=>{
           const key=r.staff+'||'+r.kpi;
-          if(!map[key]) map[key]={staff:r.staff,kpi:r.kpi,monthlyTarget:0,achieved:0,todayActual:0,plans:[],addActual:0};
+          if(!map[key]) map[key]={staff:r.staff,kpi:r.kpi,monthlyTarget:0,achieved:0,todayActual:0,plans:[],addActual:0,targetOnce:{}};
           map[key].plans.push(plan);
           const entries=r.dailyEntries||{};
+          let planAchievementFromEntries = 0;
           Object.keys(entries).forEach(day=>{
             if(!inRange(day, mb.start, mb.end)) return;
-            map[key].monthlyTarget += Number(entries[day].dailyT||0);
-            map[key].achieved += Number(entries[day].dailyA||0);
-            if(day===todaySave) map[key].todayActual += Number(entries[day].dailyA||0);
+            planAchievementFromEntries += Number(entries[day].dailyA||entries[day].actual||entries[day].achieved||0);
+            if(day===todaySave) map[key].todayActual += Number(entries[day].dailyA||entries[day].actual||entries[day].achieved||0);
           });
+          // IMPORTANT: target is weekly/monthly plan target, not day-wise total.
+          // Sheet may contain same target repeated against many dates. Take it only once per plan row.
+          const rowTargetFallback = getSinglePlanTarget(r, entries, mb.start, mb.end);
+          const rowAchievementFallback = Number(r.achieved || r.actual || r.achievement || 0);
+          const onceKey = (plan.planKey || plan.key || ((plan.sDate||'')+'|'+(plan.eDate||''))) + '||' + key;
+          if(!map[key].targetOnce[onceKey]){
+            map[key].monthlyTarget += rowTargetFallback;
+            map[key].targetOnce[onceKey] = true;
+          }
+          map[key].achieved += planAchievementFromEntries > 0 ? planAchievementFromEntries : rowAchievementFallback;
         });
       });
       const rows=Object.values(map).sort((a,b)=>(a.staff+a.kpi).localeCompare(b.staff+b.kpi));
@@ -631,13 +694,18 @@
     let html='';
     Object.keys(grouped).sort().forEach(st=>{
       const items=grouped[st];
-      let stTarget=0, stAch=0, stAdd=0;
-      items.forEach(x=>{stTarget+=Number(x.row.monthlyTarget||0); stAch+=Number(x.row.achieved||0); stAdd+=Number(x.row.addActual||0);});
-      const stPct=stTarget>0?Math.round((stAch+stAdd)/stTarget*100):0;
+      const pcts=items.map(x=>{
+        const r=x.row;
+        const after=Number(r.achieved||0)+Number(r.addActual||0);
+        return Number(r.monthlyTarget||0)>0 ? Math.round(after/Number(r.monthlyTarget||0)*100) : 0;
+      });
+      const avg=pcts.length?Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length):0;
+      const focus=pcts.filter(p=>p<60).length;
+      const changed=items.filter(x=>Number(x.row.addActual||0)>0).length;
       html += `<div class="staffGroup">
         <div class="staffHead">
-          <div><div class="staffName">👤 ${escapeHtml(st)}</div><div class="tiny muted bold">Target ${fmt(stTarget)} | Achieved ${fmt(stAch+stAdd)} | Balance ${fmt(Math.max(0,stTarget-stAch-stAdd))}</div></div>
-          <div class="staffMeta">${items.length} KPI • ${stPct}%</div>
+          <div><div class="staffName">👤 ${escapeHtml(st)}</div><div class="tiny muted bold">${items.length} KPI • ${changed} monthly updates filled • ${focus} focus KPI</div></div>
+          <div class="staffMeta">Avg Success ${avg}%</div>
         </div>
         <div class="questionList">`;
       items.forEach((x,idx)=>{
@@ -649,18 +717,18 @@
         const status=pct>=100?'Done':(pct>=60?'Running':'Focus');
         html += `<div class="qRow taQRow">
           <div class="qNo">${idx+1}</div>
-          <div><div class="qLabel">KPI / Question</div><div class="qTitle">${escapeHtml(r.kpi)}</div></div>
+          <div><div class="qLabel">Monthly KPI</div><div class="qTitle">${escapeHtml(r.kpi)}</div></div>
           <div><div class="qLabel">Monthly Target</div><div class="qValue">${fmt(r.monthlyTarget)}</div></div>
-          <div><div class="qLabel">Achieved</div><div class="qValue" style="color:#059669">${fmt(r.achieved)}</div></div>
+          <div><div class="qLabel">Achievement Till Now</div><div class="qValue" style="color:#059669">${fmt(r.achieved)}</div></div>
           <div><div class="qLabel">Balance</div><div class="qValue" style="color:#dc2626">${fmt(balance)}</div></div>
-          <div><div class="qLabel">New Update</div><input class="quickInput" type="number" min="0" data-i="${i}" oninput="updateTAMonthInput(this)" placeholder="0" value="${escapeHtml(r.addActual||'')}"></div>
-          <div><div class="qLabel">After Save</div><div class="qValue" id="taAfter_${i}">${fmt(after)}</div><span class="status ${cls}" id="taMonthStatus_${i}" style="margin-top:5px">${status} ${pct}%</span></div>
+          <div><div class="qLabel">Monthly Update</div><input class="quickInput" type="number" min="0" data-i="${i}" oninput="updateTAMonthInput(this)" placeholder="0" value="${escapeHtml(r.addActual||'')}"></div>
+          <div><div class="qLabel">Month Total After Update</div><div class="qValue" id="taAfter_${i}">${fmt(after)}</div><span class="status ${cls}" id="taMonthStatus_${i}" style="margin-top:5px">${status} ${pct}%</span></div>
         </div>`;
       });
       html += `</div></div>`;
     });
     body.innerHTML=html;
-    document.getElementById('taMonthLabel').innerText='Month: '+taMonthly.month+' | Save date: '+taMonthly.saveDate;
+    document.getElementById('taMonthLabel').innerText='Month: '+taMonthly.month+' | Monthly KPI update';
     updateTAMonthTotals();
   }
 
@@ -678,12 +746,21 @@
   }
 
   function updateTAMonthTotals(){
-    let t=0,a=0,add=0;
-    if(taMonthly && taMonthly.rows){taMonthly.rows.forEach(r=>{t+=Number(r.monthlyTarget||0);a+=Number(r.achieved||0);add+=Number(r.addActual||0);});}
-    document.getElementById('taMonthlyTarget').innerText=fmt(t);
-    document.getElementById('taMonthlyAchieved').innerText=fmt(a+add);
-    document.getElementById('taMonthlyBalance').innerText=fmt(Math.max(0,t-a-add));
-    document.getElementById('taMonthlyPct').innerText=(t>0?Math.round((a+add)/t*100):0)+'%';
+    let rows=0, changed=0, focus=0, pctSum=0;
+    if(taMonthly && taMonthly.rows){
+      taMonthly.rows.forEach(r=>{
+        rows++;
+        const after=Number(r.achieved||0)+Number(r.addActual||0);
+        const pct=Number(r.monthlyTarget||0)>0 ? Math.round(after/Number(r.monthlyTarget||0)*100) : 0;
+        pctSum+=pct;
+        if(Number(r.addActual||0)>0) changed++;
+        if(pct<60) focus++;
+      });
+    }
+    document.getElementById('taMonthlyTarget').innerText=fmt(rows);
+    document.getElementById('taMonthlyAchieved').innerText=fmt(changed);
+    document.getElementById('taMonthlyBalance').innerText=fmt(focus);
+    document.getElementById('taMonthlyPct').innerText=(rows?Math.round(pctSum/rows):0)+'%';
     const key = taMonthly ? ('ANIK_TA_LAST_'+taMonthly.manager+'_'+taMonthly.month) : '';
     document.getElementById('taMonthlyLast').innerText='Last update: '+(key && localStorage.getItem(key) ? localStorage.getItem(key) : '-');
     if(!taMonthly) document.getElementById('taMonthLabel').innerText='Month: -';
@@ -698,7 +775,7 @@
   async function saveMonthlyTA(){
     if(!taMonthly){alert('Manager आणि month निवडा.');return}
     const changed=(taMonthly.rows||[]).filter(r=>Number(r.addActual||0)>0);
-    if(!changed.length){alert('New Update मध्ये किमान एक amount/count भरा.');return}
+    if(!changed.length){alert('Monthly Update मध्ये किमान एक amount/count भरा.');return}
     const sigRows=changed.map(r=>r.staff+'|'+r.kpi+'|'+r.addActual).join('~');
     const sig=taMonthly.manager+'|'+taMonthly.month+'|'+taMonthly.saveDate+'|'+sigRows;
     const old=localStorage.getItem('ANIK_LAST_TA_SIG');
@@ -707,8 +784,8 @@
       alert('हीच update अलीकडे save झालेली दिसते. Duplicate टाळण्यासाठी पुन्हा save थांबवले आहे. नवीन आकडे असतील तर बदल करून save करा.');
       return;
     }
-    if(!confirm('Monthly update save करायची आहे का? Existing achievement मध्ये ही new update add होईल.')) return;
-    showLoader('Monthly update save होत आहे...');
+    if(!confirm('Monthly achievement update save करायची आहे का? Existing monthly achievement मध्ये ही update add होईल.')) return;
+    showLoader('Monthly achievement update save होत आहे...');
     try{
       const byPlan={};
       changed.forEach(r=>{
@@ -725,7 +802,7 @@
       localStorage.setItem('ANIK_LAST_TA_SIG_AT', String(Date.now()));
       localStorage.setItem('ANIK_TA_LAST_'+taMonthly.manager+'_'+taMonthly.month, new Date().toLocaleString('en-IN'));
       dashboardDirty=true;
-      toast('Monthly update saved');
+      toast('Monthly achievement update saved');
       await loadTAMonthly();
     }catch(e){alert('Monthly save error: '+e.message)} finally{hideLoader()}
   }
@@ -738,18 +815,46 @@
     staff=[...new Set(staff)].sort();
     setSelect('dashStaff', [{value:'all',text:'सर्व Staff'}].concat(staff.map(s=>({value:s,text:s}))));
   }
-  function delayDashboard(){clearTimeout(dashTimer);dashTimer=setTimeout(()=>loadDashboard(false),650)}
+  function delayDashboard(){clearTimeout(dashTimer);dashTimer=setTimeout(()=>loadDashboard(false),450)}
 
-  async function loadDashboard(withLoader=true){
-    if(withLoader) showLoader('Dashboard fast refresh होत आहे...');
+  function dashboardCacheKey(){return 'ANIK_DASH_FAST_'+[val('dashStart')||'',val('dashEnd')||'',val('dashManager')||'all',val('dashStaff')||'all',val('dashSearch')||''].join('||')}
+
+  async function loadDashboard(withLoader=true, forceLive=false){
+    const ck=dashboardCacheKey();
+    if(!forceLive){
+      const cached=safeGetCache(ck, FAST_CACHE_TTL);
+      if(cached && (cached.matrix || cached.overall || cached.cards)){
+        renderDashboard(cached);
+        dashboardLoaded = true;
+        dashboardDirty = false;
+        // Background refresh without blocking UI.
+        setTimeout(()=>refreshDashboardLive(false, ck), 60);
+        return;
+      }
+    }
+    return refreshDashboardLive(withLoader, ck);
+  }
+
+  async function refreshDashboardLive(withLoader=true, ck){
+    const token=++dashboardReqToken;
+    if(withLoader) showLoader('Dashboard data load होत आहे...');
+    else showQuickDashboardLoader();
     try{
       const f={sDate:val('dashStart'),eDate:val('dashEnd'),manager:val('dashManager')||'all',staff:val('dashStaff')||'all',search:val('dashSearch')||''};
       const d=await gs('getDashboardData', f);
+      if(token!==dashboardReqToken) return;
+      safeSetCache(ck || dashboardCacheKey(), d);
       renderDashboard(d);
       dashboardLoaded = true;
       dashboardDirty = false;
-    }catch(e){console.error(e); if(withLoader) alert('Dashboard error: '+e.message)} finally{if(withLoader) hideLoader()}
+    }catch(e){console.error(e); if(withLoader) alert('Dashboard error: '+e.message)} finally{if(withLoader) hideLoader(); hideQuickDashboardLoader();}
   }
+
+  function showQuickDashboardLoader(){
+    const box=document.getElementById('managerCards');
+    if(box && !dashboardLoaded) box.innerHTML='<div class="fastSkeleton">⚡ Dashboard fast load होत आहे... cached data असेल तर लगेच दिसेल.</div>';
+  }
+  function hideQuickDashboardLoader(){}
 
   function zoneClassFromPct(pct){return pct>=90?'greenTag':(pct>=60?'yellowTag':'redTag')}
   function zoneNameFromPct(pct){return pct>=90?'Green':(pct>=60?'Yellow':'Red')}
@@ -784,6 +889,7 @@
 
   function renderDashboard(d){
     lastDashboardData = d || {overall:{},matrix:[],cards:{},leaderboard:[],filters:{}};
+    matrixRendered = false;
     const staffRows=(lastDashboardData.matrix||[]).filter(x=>x.staff);
     const avg=avgPercent(staffRows);
     const green=staffRows.filter(x=>Number(x.percent||0)>=90 || x.status==='Green').length;
@@ -796,7 +902,7 @@
     document.getElementById('dashBalance').innerText=fmt(red);
     document.getElementById('rowCount').innerText=fmt(lastDashboardData.rowCount || staffRows.length);
     document.getElementById('lastUpdated').innerText=lastDashboardData.lastUpdated||'-';
-    document.getElementById('periodText').innerText=((lastDashboardData.filters||{}).sDate||'')+' ते '+((lastDashboardData.filters||{}).eDate||'');
+    document.getElementById('periodText').innerText=((lastDashboardData.filters||{}).sDate||val('dashStart')||'')+' ते '+((lastDashboardData.filters||{}).eDate||val('dashEnd')||'');
 
     const mgrArr=buildManagerStats(lastDashboardData);
     const best=mgrArr[0], low=mgrArr.slice().sort((a,b)=>a.percent-b.percent || b.redCount-a.redCount)[0];
@@ -807,32 +913,49 @@
 
     renderKpiCards(lastDashboardData);
     renderSimpleKpiChart(lastDashboardData);
-    if(!selectedDashManager || !mgrArr.some(x=>x.manager===selectedDashManager)) selectedDashManager = mgrArr[0] ? mgrArr[0].manager : '';
+    selectedDashManager = '';
     renderManagerCards(mgrArr);
 
-    if(selectedDashManager) renderManagerDetail(selectedDashManager);
-    else document.getElementById('managerDetailPanel').classList.add('hide');
+    const detailPanel=document.getElementById('managerDetailPanel');
+    if(detailPanel){
+      detailPanel.classList.remove('hide');
+      detailPanel.innerHTML='<div class="warn" style="margin:14px">⚡ Fast dashboard loaded. Manager card वर click करा. Target detail फक्त selected manager साठी load होईल.</div>';
+    }
 
     renderLeaderboardAndReading(lastDashboardData, best, low);
-    renderMatrix(lastDashboardData);
+    const mb=document.getElementById('matrixBody');
+    if(mb) mb.innerHTML='<tr><td colspan="4" class="center muted bold">Staff Matrix Show / Hide click केल्यावर matrix render होईल.</td></tr>';
+    const adminBox=document.getElementById('adminMatrixBox'); if(adminBox) adminBox.classList.remove('show');
   }
 
   function renderKpiCards(d){
     const box=document.getElementById('kpiCards'); box.innerHTML='';
-    const totals=getGlobalKpiTotals(d);
+    const totals=getLightGlobalKpiTotals(d);
     const frag=document.createDocumentFragment();
     KPI_BUCKETS.forEach(([key,label])=>{
       const x=totals[key]||{actual:0,target:0,percent:0};
       const div=document.createElement('div'); div.className='kpi';
-      div.innerHTML=`<div class="name">${escapeHtml(label)}</div><div class="val">${Number(x.percent||0)}%</div><div class="bar"><div class="fill" style="width:${Math.min(x.percent||0,100)}%"></div></div><div class="tiny bold muted" style="margin-top:8px">T ${fmtMetric(key,x.target)} | A ${fmtMetric(key,x.actual)}</div>`;
+      div.innerHTML=`<div class="name">${escapeHtml(label)}</div><div class="val">${Number(x.percent||0)}%</div><div class="bar"><div class="fill" style="width:${Math.min(x.percent||0,100)}%"></div></div><div class="tiny bold muted" style="margin-top:8px">Quick KPI %</div>`;
       frag.appendChild(div);
     });
     box.appendChild(frag);
   }
 
+  function getLightGlobalKpiTotals(d){
+    const totals={}; KPI_BUCKETS.forEach(([k])=>totals[k]={key:k,label:kpiLabelFromKey(k),target:0,actual:0,percent:0});
+    const cards=(d||{}).cards||{};
+    Object.keys(cards).forEach(k=>{
+      const key=KPI_BUCKETS.some(([x])=>x===k)?k:kpiKeyFromName(k);
+      if(!totals[key]) totals[key]={key,label:kpiLabelFromKey(key,k),target:0,actual:0,percent:0};
+      totals[key].target+=Number(cards[k].target||0); totals[key].actual+=Number(cards[k].actual||0);
+    });
+    Object.values(totals).forEach(x=>x.percent=pctVal(x.actual,x.target));
+    return totals;
+  }
+
   function renderSimpleKpiChart(d){
     const chart=document.getElementById('miniChart'); chart.innerHTML='';
-    const totals=getGlobalKpiTotals(d);
+    const totals=getLightGlobalKpiTotals(d);
     const max=Math.max(1,...KPI_BUCKETS.map(([k])=>Number((totals[k]||{}).percent||0)));
     KPI_BUCKETS.forEach(([key,label])=>{
       const x=totals[key]||{percent:0};
@@ -871,13 +994,168 @@
     box.appendChild(frag);
   }
 
-  function selectManagerView(manager){
+  async function selectManagerView(manager){
     selectedDashManager = manager;
     const mgrArr=buildManagerStats(lastDashboardData || {matrix:[]});
     renderManagerCards(mgrArr);
-    renderManagerDetail(manager);
     const panel=document.getElementById('managerDetailPanel');
-    if(panel) panel.scrollIntoView({behavior:'smooth', block:'start'});
+    if(panel){
+      panel.classList.remove('hide');
+      panel.innerHTML=`<div class="card" style="margin-top:14px"><div class="actions"><div class="spin" style="width:32px;height:32px;border-width:4px;margin:0 10px 0 0"></div><div><h3 class="sectionTitle" style="margin:0">${escapeHtml(manager)} weekly/monthly target fast load होत आहे...</h3><div class="tiny muted bold">फक्त selected manager चा data load होतो, त्यामुळे dashboard fast राहतो.</div></div></div></div>`;
+      panel.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    try{
+      await ensureManagerMonthlyData(manager);
+      renderManagerDetail(manager);
+    }catch(e){
+      if(panel) panel.innerHTML='<div class="warn" style="margin:14px">Manager target load error: '+escapeHtml(e.message)+'</div>';
+    }
+  }
+
+  function dashCacheKey(manager){
+    return [manager || '', val('dashStart') || '', val('dashEnd') || ''].join('||');
+  }
+
+  function initKpiBucketMap(){
+    const kpis={};
+    KPI_BUCKETS.forEach(([key,label])=>{kpis[key]={key,label,target:0,actual:0,percent:0,rows:[]};});
+    return kpis;
+  }
+
+  function normalizePlanDate(p, fieldA, fieldB){
+    return String((p && (p[fieldA] || p[fieldB])) || '').slice(0,10);
+  }
+
+  function planOverlapsDash(p,s,e){
+    const ps=normalizePlanDate(p,'sDate','start') || normalizePlanDate(p,'weekStart','from');
+    const pe=normalizePlanDate(p,'eDate','end') || normalizePlanDate(p,'weekEnd','to') || ps;
+    if(!s || !e) return true;
+    return ps<=e && pe>=s;
+  }
+
+  function cleanNum(v){
+    if(v===undefined || v===null || v==='') return 0;
+    return Number(String(v).replace(/[,₹\s]/g,'')) || 0;
+  }
+
+  function getSinglePlanTarget(row, entries, sDate, eDate){
+    // Plan form stores the entered value as weeklyTarget. This is the real target.
+    // If backend also created one row per date with the same value, those are only copies; do not add them.
+    const direct = cleanNum(row.monthlyTarget) || cleanNum(row.MonthlyTarget) || cleanNum(row['Monthly Target']) || cleanNum(row.weeklyTarget) || cleanNum(row['Weekly Target']) || cleanNum(row.target) || cleanNum(row.Target);
+    if(direct>0) return direct;
+    const vals=[];
+    Object.keys(entries||{}).forEach(day=>{
+      if(sDate && eDate && !inRange(day, sDate, eDate)) return;
+      const v = cleanNum(entries[day].dailyT) || cleanNum(entries[day].target) || cleanNum(entries[day].Target);
+      if(v>0) vals.push(v);
+    });
+    if(!vals.length) return 0;
+    // Same target may be repeated for each date. Use one value; when edited unevenly, use the latest non-zero value.
+    return vals[vals.length-1] || vals[0] || 0;
+  }
+
+  async function getManagerPlanList(manager){
+    const ck='ANIK_PLAN_LIST_'+(manager || '');
+    if(managerPlanListCache[ck]) return managerPlanListCache[ck];
+    const local=safeGetCache(ck, PLAN_CACHE_TTL);
+    if(local){managerPlanListCache[ck]=local; return local;}
+    const plans = await gs('getPlansForManager', manager);
+    const clean=dedupePlans(plans || []);
+    managerPlanListCache[ck] = clean;
+    safeSetCache(ck, clean);
+    return clean;
+  }
+
+  function dedupePlans(plans){
+    const seen={};
+    (plans||[]).forEach(p=>{
+      const key=String(p.key || p.planKey || p.id || [p.sDate||p.start||'',p.eDate||p.end||'',p.manager||''].join('|'));
+      if(!seen[key]) seen[key]=p;
+    });
+    return Object.values(seen);
+  }
+
+  async function getManagerPlanDetails(manager, plans){
+    const list = dedupePlans(plans || []);
+    return Promise.all(list.map(async p=>{
+      const key=(manager||'')+'||'+(p.key||p.planKey||p.id||'');
+      if(managerPlanDetailCache[key]) return managerPlanDetailCache[key];
+      const local=safeGetCache('ANIK_PLAN_DETAIL_'+key, PLAN_CACHE_TTL);
+      if(local){managerPlanDetailCache[key]=local; return local;}
+      const d=await gs('getPlanForTA', manager, p.key);
+      const final=Object.assign({planKey:p.key, planMeta:p}, d||{});
+      managerPlanDetailCache[key]=final;
+      // detail may be large; ignore if browser storage is full.
+      safeSetCache('ANIK_PLAN_DETAIL_'+key, final);
+      return final;
+    }).map(pr=>pr.catch ? pr.catch(e=>null) : pr));
+  }
+
+
+  async function ensureManagerMonthlyData(manager){
+    const ck=dashCacheKey(manager);
+    if(managerMonthlyCache[ck]) return managerMonthlyCache[ck];
+    const local=safeGetCache('ANIK_MANAGER_SUMMARY_'+ck, PLAN_CACHE_TTL);
+    if(local && local.summary){managerMonthlyCache[ck]=local; return local;}
+
+    const sDate=val('dashStart'), eDate=val('dashEnd');
+    const staffList=getManagerStaffNames(manager);
+    const summary={};
+    staffList.forEach(st=>{summary[st]={staff:st, manager, basePercent:0, percent:0, kpis:initKpiBucketMap()};});
+
+    const allPlans = await getManagerPlanList(manager);
+    const monthPlans = (allPlans||[]).filter(p=>planOverlapsDash(p, sDate, eDate));
+    const details = await getManagerPlanDetails(manager, monthPlans);
+
+    const targetAdded = {};
+    details.filter(Boolean).forEach(plan=>{
+      (plan.rows||[]).forEach(r=>{
+        const st=fieldVal(r,['staff','Staff','fxStaff','FX Staff','ca','CA','staffName']);
+        const kpi=fieldVal(r,['kpi','KPI','kpiName','KPI Name','question','Question'],'Overall');
+        if(!st) return;
+        if(!summary[st]) summary[st]={staff:st, manager, basePercent:0, percent:0, kpis:initKpiBucketMap()};
+        const key=kpiKeyFromName(kpi);
+        if(!summary[st].kpis[key]) summary[st].kpis[key]={key,label:kpiLabelFromKey(key,kpi),target:0,actual:0,percent:0,rows:[]};
+
+        const entries=r.dailyEntries||{};
+        let actualFromEntries=0;
+        Object.keys(entries).forEach(day=>{
+          if(!inRange(day, sDate, eDate)) return;
+          actualFromEntries += Number(entries[day].dailyA || entries[day].actual || entries[day].Actual || entries[day].achieved || 0);
+        });
+
+        // IMPORTANT: use weekly/monthly plan target once. Do not total repeated date-wise target.
+        const target=getSinglePlanTarget(r, entries, sDate, eDate);
+        const actualFallback=Number(r.achieved || r.Achieved || r.actual || r.Actual || r.achievement || r.Achievement || 0);
+        const actual=actualFromEntries>0 ? actualFromEntries : actualFallback;
+
+        const onceKey = (plan.planKey || plan.key || ((plan.sDate||'')+'|'+(plan.eDate||''))) + '||' + st + '||' + key;
+        if(!targetAdded[onceKey]){
+          summary[st].kpis[key].target += target;
+          targetAdded[onceKey] = true;
+        }
+        summary[st].kpis[key].actual += actual;
+        summary[st].kpis[key].rows.push({staff:st,manager,kpi,kpiKey:key,target,actual,source:r});
+      });
+    });
+
+    // If Apps Script gives only aggregate dashboard rows, keep them as fallback but do not create 0 KPI tables from them.
+    const fallbackSummary=buildStaffKpiSummaryFromDashboardOnly(manager);
+    Object.keys(fallbackSummary).forEach(st=>{
+      if(!summary[st]) summary[st]=fallbackSummary[st];
+      else summary[st].basePercent=fallbackSummary[st].basePercent || summary[st].basePercent;
+    });
+
+    Object.values(summary).forEach(st=>{
+      const active=Object.values(st.kpis).filter(k=>Number(k.target||0)>0 || Number(k.actual||0)>0);
+      Object.values(st.kpis).forEach(k=>k.percent=pctVal(k.actual,k.target));
+      st.percent=active.length ? avgPercent(active) : Number(st.basePercent||0);
+    });
+
+    const result={summary,loadedAt:new Date().toLocaleString('en-IN'),plans:monthPlans.length};
+    managerMonthlyCache[ck]=result;
+    safeSetCache('ANIK_MANAGER_SUMMARY_'+ck, result);
+    return result;
   }
 
   function fieldVal(obj, names, fallback=''){
@@ -961,19 +1239,18 @@
     return rows;
   }
 
-  function buildStaffKpiSummary(manager){
+  function buildStaffKpiSummaryFromDashboardOnly(manager){
     const mgr=buildManagerStats(lastDashboardData||{matrix:[]}).find(x=>x.manager===manager);
     const summary={};
     (mgr?mgr.staff:[]).forEach(s=>{
-      summary[s.staff]={staff:s.staff, manager, basePercent:Number(s.percent||0), percent:Number(s.percent||0), kpis:{}};
-    });
-    Object.keys(summary).forEach(stName=>{
-      KPI_BUCKETS.forEach(([key,label])=>{summary[stName].kpis[key]={key,label,target:0,actual:0,percent:0,rows:[]};});
+      summary[s.staff]={staff:s.staff, manager, basePercent:Number(s.percent||0), percent:Number(s.percent||0), kpis:initKpiBucketMap()};
     });
     getManagerKpiRows(manager).forEach(r=>{
-      if(!summary[r.staff]){
-        summary[r.staff]={staff:r.staff, manager, basePercent:0, percent:0, kpis:{}};
-        KPI_BUCKETS.forEach(([key,label])=>{summary[r.staff].kpis[key]={key,label,target:0,actual:0,percent:0,rows:[]};});
+      if(!summary[r.staff]) summary[r.staff]={staff:r.staff, manager, basePercent:0, percent:0, kpis:initKpiBucketMap()};
+      if(r.kpiKey==='overall'){
+        summary[r.staff].basePercent=Number(r.percent||summary[r.staff].basePercent||0);
+        summary[r.staff].percent=Number(r.percent||summary[r.staff].percent||0);
+        return;
       }
       const key=r.kpiKey || kpiKeyFromName(r.kpi);
       if(!summary[r.staff].kpis[key]) summary[r.staff].kpis[key]={key,label:kpiLabelFromKey(key,r.kpi),target:0,actual:0,percent:0,rows:[]};
@@ -989,6 +1266,12 @@
     return summary;
   }
 
+  function buildStaffKpiSummary(manager){
+    const cached=managerMonthlyCache[dashCacheKey(manager)];
+    if(cached && cached.summary) return cached.summary;
+    return buildStaffKpiSummaryFromDashboardOnly(manager);
+  }
+
   function getVisibleKpiKeys(summary){
     const keys=KPI_BUCKETS.map(([k])=>k);
     Object.values(summary).forEach(st=>Object.keys(st.kpis).forEach(k=>{ if(!keys.includes(k) && k!=='overall') keys.push(k); }));
@@ -1000,22 +1283,42 @@
     const keys=getVisibleKpiKeys(summary);
     const orderedStaff=(staffSorted||[]).map(x=>x.staff).filter(Boolean);
     Object.keys(summary).forEach(st=>{ if(!orderedStaff.includes(st)) orderedStaff.push(st); });
-    let html=`<div class="adminAtGlance"><div class="glanceHead"><div><h3>KPI-wise Staff Target / Achievement</h3><div class="tiny">प्रत्येक KPI स्वतंत्र आहे. Amount KPI आणि number KPI एकत्र total केलेले नाहीत.</div></div><span class="pill">${escapeHtml(manager)} • ${orderedStaff.length} Staff</span></div><div class="kpiSeparateNote">Note: Disbursement/Appraisal/OD/Collection/Past Due हे ₹ amount आहेत. Rocket Pay/Meetings/Pigmi/RD/FD हे number count आहेत. त्यामुळे grand total नाही.</div>`;
-    html += `<div class="kpiWiseWrap">`;
-    keys.forEach((key,idx)=>{
-      const label=kpiLabelFromKey(key);
-      html += `<div class="kpiWiseBox"><div class="kpiWiseHead"><div><div class="kpiWiseTitle">KPI ${idx+1}: ${escapeHtml(label)}</div><div class="kpiWiseUnit">${metricLabel(key)} wise view</div></div><span class="pill">Target • Achievement • %</span></div>`;
-      html += `<div class="glanceTableWrap"><table class="kpiWiseTable"><thead><tr><th>Staff Name</th><th class="num">Target</th><th class="num">Achievement</th><th class="center">Success %</th><th>Bar</th></tr></thead><tbody>`;
-      orderedStaff.forEach(stName=>{
-        const st=summary[stName] || {kpis:{}};
-        const x=st.kpis[key] || {target:0,actual:0,percent:0};
-        const pct=Number(x.percent||0);
-        html += `<tr><td class="staffClick staffDetailOpen" data-staff="${escapeAttr(stName)}">${escapeHtml(stName)}</td><td class="num bold">${fmtMetric(key,x.target)}</td><td class="num bold" style="color:#059669">${fmtMetric(key,x.actual)}</td><td class="center"><span class="status ${zoneClassFromPct(pct)}">${pct}%</span></td><td><div class="successBar"><i style="width:${Math.min(pct,100)}%"></i></div></td></tr>`;
-      });
-      html += `</tbody></table></div></div>`;
+    const active=activeKpiKeyByManager[manager] || keys[0] || 'disb';
+    activeKpiKeyByManager[manager]=active;
+    let tabs=keys.map((key,idx)=>`<button class="kpiTabBtn ${key===active?'active':''}" data-kpi="${escapeAttr(key)}" data-manager="${escapeAttr(manager)}">KPI ${idx+1}: ${escapeHtml(kpiLabelFromKey(key)).replace(' Target','')}</button>`).join('');
+    return `<div class="adminAtGlance"><div class="glanceHead"><div><h3>KPI-wise Staff Target / Achievement</h3><div class="tiny">Fast mode: एकावेळी एक KPI table दिसेल. यामुळे dashboard heavy load होत नाही.</div></div><span class="fastNote">⚡ ${escapeHtml(manager)} • ${orderedStaff.length} Staff</span></div><div class="kpiSeparateNote">प्रत्येक KPI स्वतंत्र आहे. Weekly/Monthly target एकदाच घेतला आहे; date-wise repeated target add नाही.</div><div class="kpiTabBar">${tabs}</div><div id="singleKpiTable" class="singleKpiTableBox">${renderSingleKpiTableHtml(manager, active, orderedStaff)}</div></div><div id="staffKpiDetailPanel" class="staffKpiDetail"><div class="warn">Staff नावावर click करा; त्याचे सर्व KPI detail खाली दिसतील.</div></div>`;
+  }
+
+  function renderSingleKpiTableHtml(manager, key, orderedStaff){
+    const summary=buildStaffKpiSummary(manager);
+    const label=kpiLabelFromKey(key);
+    let html = `<div class="kpiWiseBox"><div class="kpiWiseHead"><div><div class="kpiWiseTitle">${escapeHtml(label)}</div><div class="kpiWiseUnit">${metricLabel(key)} wise view • Target / Achievement / %</div></div><span class="pill">Fast single KPI view</span></div>`;
+    html += `<div class="glanceTableWrap"><table class="kpiWiseTable"><thead><tr><th>Staff Name</th><th class="num">Target</th><th class="num">Achievement</th><th class="center">Success %</th><th>Bar</th></tr></thead><tbody>`;
+    (orderedStaff||[]).forEach(stName=>{
+      const st=summary[stName] || {kpis:{}};
+      const x=st.kpis[key] || {target:0,actual:0,percent:0};
+      const pct=Number(x.percent||0);
+      html += `<tr><td class="staffClick staffDetailOpen" data-staff="${escapeAttr(stName)}">${escapeHtml(stName)}</td><td class="num bold">${fmtMetric(key,x.target)}</td><td class="num bold" style="color:#059669">${fmtMetric(key,x.actual)}</td><td class="center"><span class="status ${zoneClassFromPct(pct)}">${pct}%</span></td><td><div class="successBar"><i style="width:${Math.min(pct,100)}%"></i></div></td></tr>`;
     });
-    html += `</div></div><div id="staffKpiDetailPanel" class="staffKpiDetail hide"></div>`;
+    html += `</tbody></table></div></div>`;
     return html;
+  }
+
+  function selectKpiTab(manager, key){
+    activeKpiKeyByManager[manager]=key;
+    const summary=buildStaffKpiSummary(manager);
+    const staffNames=Object.keys(summary).sort((a,b)=>a.localeCompare(b));
+    const target=document.getElementById('singleKpiTable');
+    if(target) target.innerHTML=renderSingleKpiTableHtml(manager, key, staffNames);
+    document.querySelectorAll('.kpiTabBtn').forEach(b=>b.classList.toggle('active', b.dataset.kpi===key));
+    attachManagerDetailEvents(manager);
+  }
+
+  function attachManagerDetailEvents(manager){
+    const panel=document.getElementById('managerDetailPanel'); if(!panel) return;
+    panel.querySelectorAll('.staffDetailOpen').forEach(el=>{el.onclick=()=>renderStaffKpiDetail(manager, el.dataset.staff);});
+    panel.querySelectorAll('.printManagerPlanOpen').forEach(el=>{el.onclick=()=>printManagerPlan(el.dataset.manager);});
+    panel.querySelectorAll('.kpiTabBtn').forEach(el=>{el.onclick=()=>selectKpiTab(el.dataset.manager, el.dataset.kpi);});
   }
 
   function renderManagerDetail(manager){
@@ -1029,7 +1332,7 @@
     panel.classList.remove('hide');
 
     let html=`<div class="teamHeader">
-      <div><h3>👥 ${escapeHtml(manager)} - KPI-wise Team View</h3><div class="tiny bold">Total नाही. प्रत्येक KPI चे target/achievement/% वेगळे दाखवले आहे.</div></div>
+      <div><h3>👥 ${escapeHtml(manager)} - KPI-wise Team View</h3><div class="tiny bold">Monthly basis: प्रत्येक KPI चा plan target एकदाच घेतला आहे; date-wise repeated target add केलेले नाही.</div></div>
       <div class="actions"><button class="printBtn printManagerPlanOpen" data-manager="${escapeAttr(manager)}">🖨️ Simple Manager Print</button><div class="status ${zoneClassFromPct(m.percent)}">Achievement ${m.percent}%</div></div>
     </div>
     <div class="teamStats">
@@ -1057,9 +1360,7 @@
     });
     html += `</div>`;
     panel.innerHTML=html;
-    panel.querySelectorAll('.staffDetailOpen').forEach(el=>el.addEventListener('click',()=>renderStaffKpiDetail(manager, el.dataset.staff)));
-    panel.querySelectorAll('.printManagerPlanOpen').forEach(el=>el.addEventListener('click',()=>printManagerPlan(el.dataset.manager)));
-    if(staff[0]) renderStaffKpiDetail(manager, staff[0].staff, true);
+    attachManagerDetailEvents(manager);
   }
 
   function renderStaffKpiDetail(manager, staffName, silent){
@@ -1068,7 +1369,7 @@
     const st=summary[staffName];
     if(!st){box.classList.add('hide'); return;}
     const keys=getVisibleKpiKeys(summary);
-    let html=`<div class="staffKpiHead"><div><h3>🔎 ${escapeHtml(staffName)} - KPI Detail</h3><div class="tiny bold">प्रत्येक KPI वेगळा: Target, Achievement आणि Success %</div></div><span class="status ${zoneClassFromPct(st.percent)}">Overall ${st.percent}%</span></div>`;
+    let html=`<div class="staffKpiHead"><div><h3>🔎 ${escapeHtml(staffName)} - KPI Detail</h3><div class="tiny bold">Monthly Target, Achievement आणि Success %</div></div><span class="status ${zoneClassFromPct(st.percent)}">Avg ${st.percent}%</span></div>`;
     html += `<div class="staffKpiBody"><div class="simpleKpiGrid">`;
     keys.forEach(k=>{
       const x=st.kpis[k] || {target:0,actual:0,percent:0,label:kpiLabelFromKey(k)};
@@ -1119,12 +1420,17 @@
 
   function toggleFullMatrix(){
     const box=document.getElementById('adminMatrixBox');
-    if(box) box.classList.toggle('show');
+    if(!box) return;
+    box.classList.toggle('show');
+    if(box.classList.contains('show') && !matrixRendered){
+      renderMatrix(lastDashboardData || {matrix:[]});
+      matrixRendered = true;
+    }
   }
 
-  function printSelectedManagerPlan(){
+  async function printSelectedManagerPlan(){
     if(!selectedDashManager){alert('पहिले Manager card select करा.');return;}
-    printManagerPlan(selectedDashManager);
+    await printManagerPlan(selectedDashManager);
   }
 
   function planOverlapsPrint(p,s,e){
@@ -1136,55 +1442,58 @@
 
   async function printManagerPlan(manager){
     if(!manager){alert('Manager select करा.');return;}
-    showLoader('Manager plan print तयार होत आहे...');
     try{
+      // Fast print: use the dashboard data already loaded on screen. Do not fetch detailed plan rows.
+      if(!lastDashboardData || dashboardDirty){
+        showLoader('Dashboard data refresh होत आहे...');
+        const f={sDate:val('dashStart'),eDate:val('dashEnd'),manager:val('dashManager')||'all',staff:val('dashStaff')||'all',search:val('dashSearch')||''};
+        lastDashboardData = await gs('getDashboardData', f);
+        dashboardLoaded = true; dashboardDirty = false;
+        renderDashboard(lastDashboardData);
+      }
+      showLoader('Manager simple print data fast load होत आहे...');
+      await ensureManagerMonthlyData(manager);
       const sDate=val('dashStart'), eDate=val('dashEnd');
-      const plans=(await gs('getPlansForManager', manager) || []).filter(p=>planOverlapsPrint(p,sDate,eDate));
-      const details=await Promise.all(plans.map(p=>gs('getPlanForTA', manager, p.key).then(d=>Object.assign({planKey:p.key,planMeta:p},d)).catch(()=>({planKey:p.key,planMeta:p,rows:[]}))));
-      const printHtml=buildManagerPlanPrintHtml(manager, sDate, eDate, details);
+      const printHtml=buildSimpleManagerKpiPrintHtml(manager, sDate, eDate);
       const w=window.open('', '_blank');
       if(!w){alert('Popup blocked आहे. Browser मध्ये popup allow करा.');return;}
       w.document.open(); w.document.write(printHtml); w.document.close();
-      setTimeout(()=>{try{w.focus();w.print();}catch(e){}},650);
-    }catch(e){alert('Plan print error: '+e.message)} finally{hideLoader()}
+      setTimeout(()=>{try{w.focus();w.print();}catch(e){}},450);
+    }catch(e){alert('Print error: '+e.message)} finally{hideLoader()}
   }
 
-  function buildManagerPlanPrintHtml(manager,sDate,eDate,details){
+  function buildSimpleManagerKpiPrintHtml(manager,sDate,eDate){
     const logo='https://anikfin.com/wp-content/uploads/2024/06/anik-horizontal-1-1024x400.png';
-    let rows=''; let sr=0;
-    (details||[]).forEach(plan=>{
-      const pm=plan.planMeta||{};
-      (plan.rows||[]).forEach(r=>{
-        const key=kpiKeyFromName(r.kpi||'');
-        const entries=r.dailyEntries||{};
-        let target=0, actual=0;
-        Object.keys(entries).forEach(d=>{target+=Number((entries[d]||{}).dailyT||0); actual+=Number((entries[d]||{}).dailyA||0);});
-        if(!target) target=Number(r.weeklyTarget||0);
-        const pct=pctVal(actual,target);
-        sr++;
-        rows += `<tr><td>${sr}</td><td>${escapeHtml(r.staff||'')}</td><td>${escapeHtml(kpiLabelFromKey(key,r.kpi||''))}</td><td class="num">${fmtMetric(key,target)}</td><td class="num">${fmtMetric(key,actual)}</td><td class="center">${pct}%</td><td>${escapeHtml(pm.sDate||plan.sDate||'')} ते ${escapeHtml(pm.eDate||plan.eDate||'')}</td></tr>`;
-      });
+    const summary=buildStaffKpiSummary(manager);
+    const staffNames=Object.keys(summary).sort((a,b)=>a.localeCompare(b));
+    const keys=KPI_BUCKETS.map(([k])=>k);
+    let staffBlocks=''; let sr=0;
+
+    staffNames.forEach(stName=>{
+      const st=summary[stName] || {kpis:{}};
+      const kpiRows=keys.map(key=>{
+        const x=(st.kpis||{})[key] || {target:0,actual:0,percent:0};
+        const pct=Number(x.percent||0);
+        return `<tr><td>${escapeHtml(kpiLabelFromKey(key))}</td><td class="num">${fmtMetric(key,x.target)}</td><td class="num">${fmtMetric(key,x.actual)}</td><td class="center"><span class="pct ${pct>=90?'ok':(pct>=60?'mid':'low')}">${pct}%</span></td></tr>`;
+      }).join('');
+      sr++;
+      staffBlocks += `<section class="staffBlock"><div class="staffHead"><div><span>Staff ${sr}</span><b>${escapeHtml(stName)}</b></div><div class="staffPct">Achievement ${Number(st.percent||0)}%</div></div><table><thead><tr><th>KPI</th><th class="num">Target</th><th class="num">Achievement</th><th class="center">Success %</th></tr></thead><tbody>${kpiRows}</tbody></table></section>`;
     });
-    if(!rows){
-      const summary=buildStaffKpiSummary(manager);
-      Object.values(summary).forEach(st=>{
-        KPI_BUCKETS.forEach(([key,label])=>{
-          const x=st.kpis[key]||{target:0,actual:0,percent:0};
-          sr++;
-          rows += `<tr><td>${sr}</td><td>${escapeHtml(st.staff)}</td><td>${escapeHtml(label)}</td><td class="num">${fmtMetric(key,x.target)}</td><td class="num">${fmtMetric(key,x.actual)}</td><td class="center">${Number(x.percent||0)}%</td><td>${escapeHtml(sDate||'')} ते ${escapeHtml(eDate||'')}</td></tr>`;
-        });
-      });
+
+    if(!staffBlocks){
+      staffBlocks='<div class="empty">No staff KPI data found for selected manager/period.</div>';
     }
-    return `<!DOCTYPE html><html lang="mr"><head><meta charset="UTF-8"><title>${escapeHtml(manager)} KPI Print</title><style>
-      @page{size:A4;margin:10mm}body{font-family:'Nirmala UI','Noto Sans Devanagari',Arial,sans-serif;margin:0;color:#0f172a;background:#fff}.printWrap{padding:8px}.head{display:flex;justify-content:space-between;gap:18px;align-items:center;border-bottom:3px solid #1e40af;padding-bottom:12px;margin-bottom:12px}.logo{height:52px;object-fit:contain}.title{font-size:22px;font-weight:950;letter-spacing:-.4px}.sub{font-size:12px;color:#475569;font-weight:850;margin-top:4px}.badge{border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af;border-radius:999px;padding:8px 12px;font-weight:950;font-size:12px;white-space:nowrap}.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.meta div{border:1px solid #e2e8f0;border-radius:12px;padding:8px;background:#f8fafc}.meta span{display:block;font-size:9px;color:#64748b;text-transform:uppercase;font-weight:950}.meta b{display:block;margin-top:3px;font-size:13px}.note{font-size:11px;border:1px solid #fed7aa;background:#fff7ed;color:#9a3412;border-radius:12px;padding:8px;font-weight:900;margin:8px 0}table{width:100%;border-collapse:collapse;margin-top:10px}th{background:#1e40af;color:#fff;font-size:10px;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:7px;border:1px solid #1e3a8a}td{font-size:11px;padding:7px;border:1px solid #cbd5e1;vertical-align:top}tr:nth-child(even) td{background:#f8fafc}.num{text-align:right}.center{text-align:center}.foot{margin-top:16px;display:flex;justify-content:space-between;font-size:11px;color:#64748b}.sign{margin-top:30px;text-align:right;font-weight:950}
-    </style></head><body><div class="printWrap"><div class="head"><div><img class="logo" src="${logo}" alt="ANIK"><div class="title">Manager KPI Target & Achievement</div><div class="sub">Simple staff-wise KPI report. No mixed grand total.</div></div><div class="badge">ANIK Performance Control Room</div></div><div class="meta"><div><span>Manager</span><b>${escapeHtml(manager)}</b></div><div><span>From</span><b>${escapeHtml(sDate||'-')}</b></div><div><span>To</span><b>${escapeHtml(eDate||'-')}</b></div><div><span>Print Date</span><b>${new Date().toLocaleString('en-IN')}</b></div></div><div class="note">Amount KPI आणि number KPI वेगळे आहेत; म्हणून या print मध्ये कोणताही grand total दिलेला नाही.</div><table><thead><tr><th>Sr</th><th>Staff Name</th><th>KPI</th><th class="num">Target</th><th class="num">Achievement</th><th class="center">Success %</th><th>Period</th></tr></thead><tbody>${rows || '<tr><td colspan="7">No data</td></tr>'}</tbody></table><div class="foot"><div>Generated from ANIK Performance Control Room</div><div>For internal review only</div></div><div class="sign">Authorized Review</div></div></body></html>`;
+
+    return `<!DOCTYPE html><html lang="mr"><head><meta charset="UTF-8"><title>${escapeHtml(manager)} Simple KPI Print</title><style>
+      @page{size:A4;margin:9mm}*{box-sizing:border-box}body{font-family:'Nirmala UI','Noto Sans Devanagari',Arial,sans-serif;margin:0;color:#0f172a;background:#fff;font-size:11px}.printWrap{padding:4px}.head{display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:2px solid #1e40af;padding-bottom:9px;margin-bottom:8px}.logo{height:42px;object-fit:contain}.title{font-size:19px;font-weight:950;letter-spacing:-.25px;margin-top:4px}.sub{font-size:10px;color:#475569;font-weight:800;margin-top:2px}.badge{border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af;border-radius:999px;padding:6px 10px;font-weight:950;font-size:10px;white-space:nowrap}.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}.meta div{border:1px solid #e2e8f0;border-radius:9px;padding:6px;background:#f8fafc}.meta span{display:block;font-size:8px;color:#64748b;text-transform:uppercase;font-weight:950}.meta b{display:block;margin-top:2px;font-size:11px}.note{font-size:10px;border:1px solid #fed7aa;background:#fff7ed;color:#9a3412;border-radius:9px;padding:6px;font-weight:850;margin:7px 0}.staffBlock{break-inside:avoid;border:1px solid #cbd5e1;border-radius:10px;margin:8px 0 10px;overflow:hidden}.staffHead{display:flex;justify-content:space-between;gap:8px;align-items:center;background:#0f172a;color:#fff;padding:7px 9px}.staffHead span{display:block;font-size:8px;color:#bfdbfe;text-transform:uppercase;font-weight:950;letter-spacing:.08em}.staffHead b{font-size:14px}.staffPct{background:#eff6ff;color:#1e40af;border-radius:999px;padding:5px 8px;font-weight:950;font-size:10px;white-space:nowrap}table{width:100%;border-collapse:collapse}th{background:#1e40af;color:#fff;font-size:9px;text-transform:uppercase;letter-spacing:.03em;text-align:left;padding:6px;border:1px solid #1e3a8a}td{font-size:10.5px;padding:6px;border:1px solid #dbe4ef;vertical-align:middle}tr:nth-child(even) td{background:#f8fafc}.num{text-align:right}.center{text-align:center}.pct{display:inline-block;min-width:44px;border-radius:999px;padding:3px 6px;font-weight:950}.pct.ok{background:#dcfce7;color:#15803d}.pct.mid{background:#fef3c7;color:#b45309}.pct.low{background:#fee2e2;color:#b91c1c}.empty{border:1px dashed #cbd5e1;border-radius:12px;padding:18px;text-align:center;color:#64748b;font-weight:900}.foot{margin-top:12px;display:flex;justify-content:space-between;font-size:9px;color:#64748b}.sign{margin-top:22px;text-align:right;font-weight:950}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.staffBlock{page-break-inside:avoid}}
+    </style></head><body><div class="printWrap"><div class="head"><div><img class="logo" src="${logo}" alt="ANIK"><div class="title">Manager Monthly KPI Target & Achievement</div><div class="sub">Staff name once, all KPI target and achievement below. Date-wise repeated target not added.</div></div><div class="badge">ANIK Performance Control Room</div></div><div class="meta"><div><span>Manager</span><b>${escapeHtml(manager)}</b></div><div><span>From</span><b>${escapeHtml(sDate||'-')}</b></div><div><span>To</span><b>${escapeHtml(eDate||'-')}</b></div><div><span>Print Date</span><b>${new Date().toLocaleString('en-IN')}</b></div></div><div class="note">प्रत्येक KPI स्वतंत्र आहे. Sheet मध्ये target date-wise repeat असला तरी print मध्ये target एकदाच घेतला आहे. Amount आणि number KPI mixed total केलेले नाहीत.</div>${staffBlocks}<div class="foot"><div>Generated from ANIK Monthly Performance Control Room</div><div>For internal review only</div></div><div class="sign">Authorized Review</div></div></body></html>`;
   }
 
   function escapeAttr(s){return escapeHtml(s).replace(/'/g,'&#39;')}
 
   function formatDay(d){const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('mr-IN',{weekday:'short',day:'2-digit',month:'short'})+' ('+d+')'}
   function escapeHtml(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
-  window.addEventListener('load', reloadBase);
+  window.addEventListener('load', fastBoot);
 </script>
 </body>
 </html>
