@@ -1,4 +1,6 @@
 
+
+
 <!DOCTYPE html>
 <html lang="mr">
 <head>
@@ -74,6 +76,78 @@
     .toast{position:fixed;right:18px;bottom:18px;background:#071733;color:#fff;padding:14px 16px;border-radius:18px;font-weight:950;box-shadow:0 16px 38px rgba(0,0,0,.30);z-index:50;display:none}.loader{position:fixed;inset:0;background:rgba(7,23,51,.66);backdrop-filter:blur(8px);z-index:60;display:none;align-items:center;justify-content:center;color:#fff;flex-direction:column;font-weight:950}.spin{width:56px;height:56px;border:5px solid rgba(255,255,255,.28);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px}@keyframes spin{to{transform:rotate(360deg)}}
     .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.right{margin-left:auto}.sectionTitle{font-size:19px;font-weight:950;margin:0 0 12px;color:#0f172a}.warn{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:18px;padding:13px;font-weight:850}.summaryLine{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #f1f5f9}.miniChart{display:flex;gap:8px;align-items:end;height:178px;padding:18px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,#fff,#f8fafc)}.col{flex:1;background:linear-gradient(180deg,#2563eb,#93c5fd);border-radius:11px 11px 0 0;min-height:3px;position:relative;box-shadow:0 8px 18px rgba(37,99,235,.16)}.col span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:10px;font-weight:950;color:#475569;white-space:nowrap;margin-bottom:5px}.col label{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:8px;font-size:10px;text-align:center;color:#64748b}
     #overallPct{letter-spacing:-1.5px}#kpiCards .kpi:nth-child(2n) .fill{background:linear-gradient(90deg,#4f46e5,#60a5fa)}#kpiCards .kpi:nth-child(3n) .fill{background:linear-gradient(90deg,#059669,#34d399)}
+
+
+    .dashboardHelp{
+      margin-top:14px;padding:14px 16px;border-radius:20px;background:#eff6ff;border:1px solid #bfdbfe;
+      color:#1e40af;font-weight:950;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;
+    }
+    .managerOverview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:14px}
+    .managerCard{
+      background:#fff;border:1px solid #dbeafe;border-radius:24px;padding:16px;box-shadow:var(--shadow2);cursor:pointer;
+      transition:transform .15s ease,box-shadow .15s ease,border .15s ease;position:relative;overflow:hidden;min-height:170px;
+    }
+    .managerCard:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#93c5fd}
+    .managerCard.active{border:2px solid var(--blue2);box-shadow:0 18px 42px rgba(37,99,235,.20);background:linear-gradient(180deg,#fff,#eff6ff)}
+    .managerCard:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--green))}
+    .managerTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .managerName{font-size:17px;font-weight:950;color:#0f172a;line-height:1.25;letter-spacing:-.25px}
+    .scoreCircle{min-width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:950;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:16px}
+    .managerNumbers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+    .managerMini{background:#f8fafc;border:1px solid #edf2f7;border-radius:14px;padding:8px}.managerMini b{display:block;font-size:14px;color:#0f172a}.managerMini span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:#64748b;font-weight:950;margin-bottom:3px}
+    .meter{height:10px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-top:13px}.meterFill{height:100%;background:linear-gradient(90deg,#dc2626,#d97706,#059669);width:0;border-radius:99px}
+    .clickHint{font-size:11px;color:#2563eb;font-weight:950;margin-top:10px}
+    .teamPanel{margin-top:14px;border:1px solid #dbeafe;border-radius:28px;background:rgba(255,255,255,.96);box-shadow:var(--shadow2);overflow:hidden}
+    .teamHeader{padding:18px;background:linear-gradient(135deg,#071733,#1e40af);color:#fff;display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+    .teamHeader h3{margin:0;font-size:23px;letter-spacing:-.4px}.teamHeader .tiny{color:#bfdbfe}
+    .teamStats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding:14px;background:#f8fbff;border-bottom:1px solid #e2e8f0}
+    .teamStat{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:12px}.teamStat span{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:950}.teamStat b{display:block;font-size:22px;color:#0f172a;margin-top:5px}
+    .staffPerfGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px}
+    .staffPerfCard{border:1px solid #edf2f7;background:#fff;border-radius:20px;padding:13px;transition:transform .15s ease,border .15s ease}.staffPerfCard:hover{transform:translateY(-2px);border-color:#bfdbfe}
+    .staffPerfTop{display:flex;justify-content:space-between;gap:10px;align-items:center}.staffPerfName{font-weight:950;color:#0f172a;font-size:15px}.staffPerfMeta{font-size:11px;color:#64748b;font-weight:850;margin-top:2px}
+    .staffBar{height:12px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-top:10px}.staffBar span{display:block;height:100%;width:0;background:linear-gradient(90deg,#2563eb,#10b981);border-radius:99px}
+    .staffAmounts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.staffAmounts div{background:#f8fafc;border-radius:12px;padding:8px;font-size:11px;font-weight:950;color:#475569}.staffAmounts b{display:block;color:#0f172a;font-size:13px;margin-top:2px}
+    .miniBars{display:grid;gap:9px;padding:14px;border-top:1px solid #edf2f7}.miniBarItem{display:grid;grid-template-columns:145px 1fr 56px;gap:10px;align-items:center}.miniBarName{font-size:12px;font-weight:950;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.miniBarTrack{height:13px;background:#e2e8f0;border-radius:99px;overflow:hidden}.miniBarTrack span{display:block;height:100%;width:0;background:linear-gradient(90deg,#1e40af,#60a5fa);border-radius:99px}.miniBarPct{font-size:12px;font-weight:950;text-align:right;color:#0f172a}
+    .adminMatrix{display:none}.adminMatrix.show{display:block}
+    .softBtn{background:#fff;color:#1e40af;border:1px solid #bfdbfe}.softBtn:hover{background:#eff6ff}
+
+    .groupedBox{display:grid;gap:14px}
+    .staffGroup{
+      border:1px solid #dbeafe;border-radius:22px;background:linear-gradient(180deg,#fff,#f8fbff);
+      box-shadow:0 8px 22px rgba(30,64,175,.10);overflow:hidden;content-visibility:auto;contain-intrinsic-size:220px;
+    }
+    .staffHead{
+      display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;
+      background:linear-gradient(135deg,#eff6ff,#ecfdf5);border-bottom:1px solid #dbeafe;
+    }
+    .staffName{font-size:16px;font-weight:950;color:#0f172a;letter-spacing:-.2px}
+    .staffMeta{font-size:11px;font-weight:950;color:#2563eb;background:#dbeafe;border:1px solid #bfdbfe;border-radius:999px;padding:6px 10px;white-space:nowrap}
+    .questionList{display:grid;gap:8px;padding:12px}
+    .qRow{
+      display:grid;align-items:center;gap:10px;border:1px solid #eef2ff;background:#fff;border-radius:16px;padding:10px;
+      transition:background .15s ease,border .15s ease,transform .15s ease;
+    }
+    .qRow:hover{background:#f8fbff;border-color:#bfdbfe;transform:translateY(-1px)}
+    .planQRow{grid-template-columns:42px minmax(170px,1fr) minmax(135px,.75fr) minmax(210px,1.25fr)}
+    .taQRow{grid-template-columns:42px minmax(150px,1fr) repeat(4,minmax(92px,.7fr)) minmax(118px,.8fr)}
+    .qNo{width:34px;height:34px;border-radius:12px;background:#eff6ff;color:#1d4ed8;display:flex;align-items:center;justify-content:center;font-weight:950}
+    .qTitle{font-weight:950;color:#1e293b}
+    .qLabel{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:950;margin-bottom:3px}
+    .qValue{font-weight:950;color:#0f172a}
+    .quickInput{padding:11px 12px;border-radius:14px;background:#fff}
+
+
+    @media(max-width:1100px){.managerOverview{grid-template-columns:repeat(2,minmax(0,1fr))}.teamStats{grid-template-columns:repeat(2,minmax(0,1fr))}.staffPerfGrid{grid-template-columns:1fr}}
+    @media(max-width:650px){.managerOverview{grid-template-columns:1fr}.managerNumbers{grid-template-columns:1fr}.teamStats{grid-template-columns:1fr}.miniBarItem{grid-template-columns:1fr}.miniBarPct{text-align:left}.teamHeader h3{font-size:20px}.staffAmounts{grid-template-columns:1fr}}
+
+    @media(max-width:900px){
+      .staffHead{align-items:flex-start;flex-direction:column}
+      .planQRow,.taQRow{grid-template-columns:1fr}
+      .qRow{gap:8px}
+      .qNo{width:30px;height:30px}
+      .staffMeta{white-space:normal}
+    }
+
     @media(max-width:900px){.g2,.g3,.g4,.g7{grid-template-columns:1fr}.hero{display:block;padding:16px}.right{margin-left:0}.wrap,.main{padding-left:12px;padding-right:12px}.h1{font-size:24px}.top .wrap{padding-bottom:10px}button{flex:1}.nav button{padding:11px 10px}.card{padding:15px}.title{font-size:17px}.logo{height:34px}}
     @media print{.top,.noPrint,.toast,.loader{display:none!important}body{background:#fff}.main{max-width:none;padding:0}.page{display:none!important}#dashboardPage{display:block!important}.card,.kpi{box-shadow:none;border:1px solid #111;border-radius:0}.card:before{display:none}.tablebox{max-height:none;overflow:visible;border-radius:0}th{position:static}button{display:none}}
   </style>
@@ -103,7 +177,7 @@
         <div>
           <div class="pill">📌 Manager Dashboard</div>
           <div class="h1">टार्गेट प्लॅन</div>
-          <div class="hint">Manager / FX / KPI मध्ये बदल केल्यावर इथे <b>System Sync</b> करा. स्क्रीन लगेच update होईल.</div>
+          <div class="hint">CA-wise entry सोपी केली आहे. एक CA निवडा/शोधा, त्याखाली सर्व KPI/Questions भरून Plan Save करा. Manager / CA / KPI मध्ये बदल केल्यावर <b>System Sync</b> करा.</div>
         </div>
         <div class="actions noPrint"><button class="blue" onclick="savePlan()">Plan Save / Update</button><button onclick="window.print()">Print</button></div>
       </div>
@@ -112,6 +186,7 @@
         <div><label>Manager</label><select id="planManager" onchange="loadPlanTeam()"></select></div>
         <div><label>Week Start</label><input type="date" id="planStart"></div>
         <div><label>Week End</label><input type="date" id="planEnd"></div>
+        <div><label>Search CA / KPI</label><input id="planSearch" placeholder="CA नाव / KPI शोधा..." oninput="renderPlanRows()"></div>
         <div style="display:flex;align-items:end"><button class="blue" style="width:100%" onclick="loadPlanTeam()">Team Load</button></div>
       </div>
 
@@ -120,12 +195,9 @@
           <h3 class="sectionTitle" style="margin-right:auto">Target Entry</h3>
           <span id="planCount" class="pill">0 Rows</span>
         </div>
-        <div id="planEmpty" class="warn">मॅनेजर आणि तारीख निवडून Team Load करा.</div>
-        <div id="planTableBox" class="tablebox hide">
-          <table>
-            <thead><tr><th style="width:45px">Sr</th><th>FX Staff</th><th>KPI</th><th class="num">Weekly Target</th><th>Remark / Strategy</th></tr></thead>
-            <tbody id="planBody"></tbody>
-          </table>
+        <div id="planEmpty" class="warn">मॅनेजर आणि तारीख निवडून Team Load करा. CA नाव एकदाच दिसेल आणि खाली त्याचे सर्व KPI/Questions भरता येतील.</div>
+        <div id="planTableBox" class="groupedBox hide">
+          <div id="planBody"></div>
         </div>
       </div>
     </section>
@@ -135,7 +207,7 @@
         <div>
           <div class="pill" style="background:#dcfce7;color:#15803d;border-color:#bbf7d0">✅ TA Team</div>
           <div class="h1">Monthly Target Update</div>
-          <div class="hint">TA Team ला date-wise काही दाखवलेले नाही. Manager आणि month निवडा; monthly target, already achieved आणि balance लगेच दिसेल. Month मध्ये 2-3 वेळा update केले तरी latest achievement पुढे continue होईल.</div>
+          <div class="hint">TA Team साठी CA-wise कार्ड view आहे. Manager आणि month निवडा; प्रत्येक CA खाली KPI, target, achieved, balance आणि new update लगेच दिसेल. Month मध्ये 2-3 वेळा update केले तरी latest achievement पुढे continue होईल.</div>
         </div>
         <div class="actions noPrint"><button class="green" onclick="saveMonthlyTA()">Monthly Update Save</button></div>
       </div>
@@ -159,12 +231,9 @@
           <h3 class="sectionTitle" style="margin-right:auto">Monthly Entry Matrix</h3>
           <span id="taMonthLabel" class="pill">Month: -</span>
         </div>
-        <div id="taEmpty" class="warn">Manager आणि month निवडा.</div>
-        <div id="taTableBox" class="tablebox small hide">
-          <table>
-            <thead><tr><th style="width:45px">Sr</th><th>FX Staff</th><th>KPI</th><th class="num">Monthly Target</th><th class="num">Achieved</th><th class="num">Balance</th><th class="num">New Update</th><th class="num">After Save</th><th>Status</th></tr></thead>
-            <tbody id="taBody"></tbody>
-          </table>
+        <div id="taEmpty" class="warn">Manager आणि month निवडा. CA नाव एकदाच दिसेल आणि खाली सर्व KPI/Questions सोप्या कार्डमध्ये भरता येतील.</div>
+        <div id="taTableBox" class="groupedBox hide">
+          <div id="taBody"></div>
         </div>
       </div>
     </section>
@@ -203,6 +272,21 @@
 
       <div id="kpiCards" class="grid g7" style="margin-top:14px"></div>
 
+      <div class="dashboardHelp noPrint">
+        <span>👆 Admin साठी सोपा flow: Manager card वर click करा → खाली त्या Manager ची team performance, bars आणि focus staff दिसतील.</span>
+        <button class="softBtn" onclick="toggleFullMatrix()">Staff Matrix Show / Hide</button>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="actions" style="margin-bottom:10px">
+          <h3 class="sectionTitle" style="margin-right:auto">Manager-wise Performance - Click to Open Team</h3>
+          <span id="managerOverviewCount" class="pill">0 Managers</span>
+        </div>
+        <div id="managerCards" class="managerOverview"></div>
+      </div>
+
+      <div id="managerDetailPanel" class="teamPanel hide"></div>
+
       <div class="grid g2" style="margin-top:14px">
         <div class="card">
           <h3 class="sectionTitle">KPI Chart</h3>
@@ -225,8 +309,8 @@
         </div>
       </div>
 
-      <div class="card" style="margin-top:14px">
-        <h3 class="sectionTitle">Staff Matrix</h3>
+      <div id="adminMatrixBox" class="card adminMatrix" style="margin-top:14px">
+        <h3 class="sectionTitle">Full Staff Matrix</h3>
         <div class="tablebox small">
           <table>
             <thead><tr><th>Staff</th><th>Manager</th><th class="num">Target</th><th class="num">Actual</th><th class="center">%</th><th class="center">Zone</th></tr></thead>
@@ -249,6 +333,9 @@
   let taMonthly = null;
   let dashTimer = null;
   let taTotalTimer = null;
+  let teamCache = {};
+  let lastDashboardData = null;
+  let selectedDashManager = '';
   let dashboardLoaded = false;
   let dashboardDirty = true;
 
@@ -357,31 +444,61 @@
   async function loadPlanTeam(){
     const manager=val('planManager'), s=val('planStart'), e=val('planEnd');
     if(!manager || !s || !e) return;
-    showLoader('Team fast load होत आहे...');
+    showLoader('CA team fast load होत आहे...');
     try{
-      const res = await gs('getTeam', manager);
+      let res = teamCache[manager];
+      if(!res){
+        res = await gs('getTeam', manager);
+        teamCache[manager] = res;
+      }
       const staff = res.staff || [], kpis = res.kpis || [];
       planRows = [];
       staff.forEach(st => kpis.forEach(k => planRows.push({staff:st,kpi:k.name,type:k.type,weeklyTarget:'',remark:''})));
       renderPlanRows();
-      toast(staff.length+' staff loaded');
+      toast(staff.length+' CA loaded');
     }catch(err){alert('Team load error: '+err.message)} finally{hideLoader()}
+  }
+
+  function groupRowsByStaff(rows){
+    const map = {};
+    (rows||[]).forEach((r,i)=>{
+      const st = r.staff || 'Unknown';
+      if(!map[st]) map[st] = [];
+      map[st].push({row:r, i});
+    });
+    return Object.keys(map).sort().map(st=>({staff:st, items:map[st]}));
   }
 
   function renderPlanRows(){
     const body=document.getElementById('planBody'); body.innerHTML='';
-    document.getElementById('planEmpty').classList.toggle('hide', planRows.length>0);
-    document.getElementById('planTableBox').classList.toggle('hide', planRows.length===0);
-    document.getElementById('planCount').innerText = planRows.length+' Rows';
-    const frag=document.createDocumentFragment();
-    planRows.forEach((r,i)=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${i+1}</td><td class="bold">${escapeHtml(r.staff)}</td><td>${escapeHtml(r.kpi)}</td>
-        <td class="num"><input type="number" min="0" data-i="${i}" data-f="weeklyTarget" oninput="updatePlanRow(this)" placeholder="0"></td>
-        <td><input data-i="${i}" data-f="remark" oninput="updatePlanRow(this)" placeholder="Strategy / remark"></td>`;
-      frag.appendChild(tr);
+    const hasRows = planRows.length>0;
+    document.getElementById('planEmpty').classList.toggle('hide', hasRows);
+    document.getElementById('planTableBox').classList.toggle('hide', !hasRows);
+    const q=(val('planSearch')||'').toLowerCase();
+    const filtered = planRows.map((r,i)=>({row:r,i})).filter(x=>!q || (x.row.staff+' '+x.row.kpi).toLowerCase().indexOf(q)>-1);
+    document.getElementById('planCount').innerText = filtered.length+' Questions';
+    if(!filtered.length && hasRows){body.innerHTML='<div class="warn">Search प्रमाणे data नाही.</div>';return;}
+    const groups = groupRowsByStaff(filtered.map(x=>Object.assign({}, x.row, {__i:x.i})));
+    let html='';
+    groups.forEach(g=>{
+      html += `<div class="staffGroup">
+        <div class="staffHead">
+          <div><div class="staffName">👤 ${escapeHtml(g.staff)}</div><div class="tiny muted bold">या CA खाली सर्व KPI/Questions एकाच ठिकाणी भरा</div></div>
+          <div class="staffMeta">${g.items.length} Questions</div>
+        </div>
+        <div class="questionList">`;
+      g.items.forEach((x,idx)=>{
+        const r=x.row, i=Number(r.__i);
+        html += `<div class="qRow planQRow">
+          <div class="qNo">${idx+1}</div>
+          <div><div class="qLabel">KPI / Question</div><div class="qTitle">${escapeHtml(r.kpi)}</div></div>
+          <div><div class="qLabel">Weekly Target</div><input class="quickInput" type="number" min="0" data-i="${i}" data-f="weeklyTarget" oninput="updatePlanRow(this)" placeholder="0" value="${escapeHtml(r.weeklyTarget||'')}"></div>
+          <div><div class="qLabel">Remark / Strategy</div><input class="quickInput" data-i="${i}" data-f="remark" oninput="updatePlanRow(this)" placeholder="Remark लिहा..." value="${escapeHtml(r.remark||'')}"></div>
+        </div>`;
+      });
+      html += `</div></div>`;
     });
-    body.appendChild(frag);
+    body.innerHTML=html;
   }
   function updatePlanRow(el){planRows[Number(el.dataset.i)][el.dataset.f]=el.value}
 
@@ -471,23 +588,46 @@
     document.getElementById('taEmpty').classList.add('hide');
     document.getElementById('taTableBox').classList.remove('hide');
     const q=(val('taSearch')||'').toLowerCase();
-    const frag=document.createDocumentFragment();
-    let sr=0;
-    (taMonthly.rows||[]).forEach((r,i)=>{
-      if(q && (r.staff+' '+r.kpi).toLowerCase().indexOf(q)===-1) return;
-      sr++;
-      const balance=Math.max(0, Number(r.monthlyTarget||0)-Number(r.achieved||0));
-      const pct=r.monthlyTarget>0?Math.round(r.achieved/r.monthlyTarget*100):0;
-      const cls=pct>=100?'greenTag':(pct>=60?'yellowTag':'redTag');
-      const status=pct>=100?'Done':(pct>=60?'Running':'Focus');
-      const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${sr}</td><td class="bold">${escapeHtml(r.staff)}</td><td>${escapeHtml(r.kpi)}</td>
-        <td class="num bold">${fmt(r.monthlyTarget)}</td><td class="num bold" style="color:#059669">${fmt(r.achieved)}</td><td class="num bold" style="color:#dc2626">${fmt(balance)}</td>
-        <td class="num"><input type="number" min="0" data-i="${i}" oninput="updateTAMonthInput(this)" placeholder="0"></td>
-        <td class="num bold" id="taAfter_${i}">${fmt(r.achieved)}</td><td><span class="status ${cls}" id="taMonthStatus_${i}">${status} ${pct}%</span></td>`;
-      frag.appendChild(tr);
+    const indexed=(taMonthly.rows||[]).map((r,i)=>({row:r,i})).filter(x=>!q || (x.row.staff+' '+x.row.kpi).toLowerCase().indexOf(q)>-1);
+    if(!indexed.length){body.innerHTML='<div class="warn">Search प्रमाणे data नाही.</div>'; updateTAMonthTotals(); return;}
+    const grouped = {};
+    indexed.forEach(x=>{
+      const st=x.row.staff||'Unknown';
+      if(!grouped[st]) grouped[st]=[];
+      grouped[st].push(x);
     });
-    body.appendChild(frag);
+    let html='';
+    Object.keys(grouped).sort().forEach(st=>{
+      const items=grouped[st];
+      let stTarget=0, stAch=0, stAdd=0;
+      items.forEach(x=>{stTarget+=Number(x.row.monthlyTarget||0); stAch+=Number(x.row.achieved||0); stAdd+=Number(x.row.addActual||0);});
+      const stPct=stTarget>0?Math.round((stAch+stAdd)/stTarget*100):0;
+      html += `<div class="staffGroup">
+        <div class="staffHead">
+          <div><div class="staffName">👤 ${escapeHtml(st)}</div><div class="tiny muted bold">Target ${fmt(stTarget)} | Achieved ${fmt(stAch+stAdd)} | Balance ${fmt(Math.max(0,stTarget-stAch-stAdd))}</div></div>
+          <div class="staffMeta">${items.length} KPI • ${stPct}%</div>
+        </div>
+        <div class="questionList">`;
+      items.forEach((x,idx)=>{
+        const r=x.row, i=x.i;
+        const balance=Math.max(0, Number(r.monthlyTarget||0)-Number(r.achieved||0));
+        const after=Number(r.achieved||0)+Number(r.addActual||0);
+        const pct=r.monthlyTarget>0?Math.round(after/r.monthlyTarget*100):0;
+        const cls=pct>=100?'greenTag':(pct>=60?'yellowTag':'redTag');
+        const status=pct>=100?'Done':(pct>=60?'Running':'Focus');
+        html += `<div class="qRow taQRow">
+          <div class="qNo">${idx+1}</div>
+          <div><div class="qLabel">KPI / Question</div><div class="qTitle">${escapeHtml(r.kpi)}</div></div>
+          <div><div class="qLabel">Monthly Target</div><div class="qValue">${fmt(r.monthlyTarget)}</div></div>
+          <div><div class="qLabel">Achieved</div><div class="qValue" style="color:#059669">${fmt(r.achieved)}</div></div>
+          <div><div class="qLabel">Balance</div><div class="qValue" style="color:#dc2626">${fmt(balance)}</div></div>
+          <div><div class="qLabel">New Update</div><input class="quickInput" type="number" min="0" data-i="${i}" oninput="updateTAMonthInput(this)" placeholder="0" value="${escapeHtml(r.addActual||'')}"></div>
+          <div><div class="qLabel">After Save</div><div class="qValue" id="taAfter_${i}">${fmt(after)}</div><span class="status ${cls}" id="taMonthStatus_${i}" style="margin-top:5px">${status} ${pct}%</span></div>
+        </div>`;
+      });
+      html += `</div></div>`;
+    });
+    body.innerHTML=html;
     document.getElementById('taMonthLabel').innerText='Month: '+taMonthly.month+' | Save date: '+taMonthly.saveDate;
     updateTAMonthTotals();
   }
@@ -579,45 +719,180 @@
     }catch(e){console.error(e); if(withLoader) alert('Dashboard error: '+e.message)} finally{if(withLoader) hideLoader()}
   }
 
+  function zoneClassFromPct(pct){return pct>=90?'greenTag':(pct>=60?'yellowTag':'redTag')}
+  function zoneNameFromPct(pct){return pct>=90?'Green':(pct>=60?'Yellow':'Red')}
+  function pctVal(actual,target){return Number(target||0)>0?Math.round(Number(actual||0)/Number(target||0)*100):0}
+
+  function buildManagerStats(d){
+    const managerStats={};
+    (d.matrix||[]).forEach(x=>{
+      const m=x.manager||'--';
+      if(!managerStats[m]) managerStats[m]={manager:m,target:0,actual:0,count:0,staff:[]};
+      managerStats[m].target+=Number(x.target||0);
+      managerStats[m].actual+=Number(x.actual||0);
+      managerStats[m].count++;
+      managerStats[m].staff.push(x);
+    });
+    return Object.values(managerStats).map(x=>{
+      x.percent=pctVal(x.actual,x.target);
+      x.balance=Math.max(0,x.target-x.actual);
+      x.greenCount=x.staff.filter(s=>Number(s.percent||0)>=90 || s.status==='Green').length;
+      x.yellowCount=x.staff.filter(s=>Number(s.percent||0)>=60 && Number(s.percent||0)<90).length;
+      x.redCount=x.staff.filter(s=>Number(s.percent||0)<60 && Number(s.target||0)>0).length;
+      return x;
+    }).filter(x=>x.target>0 || x.actual>0 || x.count>0).sort((a,b)=>b.percent-a.percent || b.actual-a.actual);
+  }
+
   function renderDashboard(d){
-    const totalTarget=Number(d.overall.target||0), totalActual=Number(d.overall.actual||0), balance=Math.max(0,totalTarget-totalActual);
-    document.getElementById('overallPct').innerText=(d.overall.percent||0)+'%';
+    lastDashboardData = d || {overall:{},matrix:[],cards:{},leaderboard:[],filters:{}};
+    const totalTarget=Number(lastDashboardData.overall.target||0), totalActual=Number(lastDashboardData.overall.actual||0), balance=Math.max(0,totalTarget-totalActual);
+    document.getElementById('overallPct').innerText=(lastDashboardData.overall.percent||0)+'%';
     document.getElementById('overallSub').innerText='Target '+fmt(totalTarget)+' | Actual '+fmt(totalActual);
     document.getElementById('dashTotalTarget').innerText=fmt(totalTarget);
     document.getElementById('dashTotalActual').innerText=fmt(totalActual);
     document.getElementById('dashBalance').innerText=fmt(balance);
-    document.getElementById('rowCount').innerText=fmt(d.rowCount);
-    document.getElementById('lastUpdated').innerText=d.lastUpdated||'-';
-    document.getElementById('periodText').innerText=(d.filters.sDate||'')+' ते '+(d.filters.eDate||'');
+    document.getElementById('rowCount').innerText=fmt(lastDashboardData.rowCount);
+    document.getElementById('lastUpdated').innerText=lastDashboardData.lastUpdated||'-';
+    document.getElementById('periodText').innerText=((lastDashboardData.filters||{}).sDate||'')+' ते '+((lastDashboardData.filters||{}).eDate||'');
 
-    const managerStats={};
-    (d.matrix||[]).forEach(x=>{
-      const m=x.manager||'--';
-      if(!managerStats[m]) managerStats[m]={manager:m,target:0,actual:0,count:0};
-      managerStats[m].target+=Number(x.target||0); managerStats[m].actual+=Number(x.actual||0); managerStats[m].count++;
-    });
-    const mgrArr=Object.values(managerStats).map(x=>{x.percent=x.target>0?Math.round(x.actual/x.target*100):0; x.balance=Math.max(0,x.target-x.actual); return x;}).filter(x=>x.target>0);
-    mgrArr.sort((a,b)=>b.percent-a.percent || b.actual-a.actual);
+    const mgrArr=buildManagerStats(lastDashboardData);
     const best=mgrArr[0], low=mgrArr.slice().sort((a,b)=>a.percent-b.percent || b.balance-a.balance)[0];
     document.getElementById('bestManager').innerText=best?best.manager:'-';
     document.getElementById('bestManagerSub').innerText=best?(`${best.percent}% | Achieved ${fmt(best.actual)} / Target ${fmt(best.target)}`):'-';
     document.getElementById('lowManager').innerText=low?low.manager:'-';
     document.getElementById('lowManagerSub').innerText=low?(`${low.percent}% | Balance ${fmt(low.balance)}`):'-';
 
+    renderKpiCards(lastDashboardData);
+    renderSimpleKpiChart(lastDashboardData);
+    if(!selectedDashManager || !mgrArr.some(x=>x.manager===selectedDashManager)) selectedDashManager = mgrArr[0] ? mgrArr[0].manager : '';
+    renderManagerCards(mgrArr);
+
+    if(selectedDashManager) renderManagerDetail(selectedDashManager);
+    else document.getElementById('managerDetailPanel').classList.add('hide');
+
+    renderLeaderboardAndReading(lastDashboardData, best, low, balance);
+    renderMatrix(lastDashboardData);
+  }
+
+  function renderKpiCards(d){
     const box=document.getElementById('kpiCards'); box.innerHTML='';
     const frag=document.createDocumentFragment();
     KPI_BUCKETS.forEach(([key,label])=>{
-      const x=d.cards[key]||{actual:0,target:0,percent:0};
+      const x=(d.cards||{})[key]||{actual:0,target:0,percent:0};
       const div=document.createElement('div'); div.className='kpi';
       div.innerHTML=`<div class="name">${label}</div><div class="val">${(key==='rock'||key==='meet')?'': '₹ '}${fmt(x.actual)}</div><div class="bar"><div class="fill" style="width:${Math.min(x.percent||0,100)}%"></div></div><div class="tiny bold muted" style="margin-top:8px">${x.percent||0}% | T ${fmt(x.target)}</div>`;
       frag.appendChild(div);
     });
     box.appendChild(frag);
+  }
 
+  function renderSimpleKpiChart(d){
     const chart=document.getElementById('miniChart'); chart.innerHTML='';
-    const max=Math.max(1,...KPI_BUCKETS.map(([k])=>(d.cards[k]||{}).actual||0));
-    KPI_BUCKETS.forEach(([key,label])=>{const x=d.cards[key]||{actual:0}; const c=document.createElement('div'); c.className='col'; c.style.height=(Math.max(3, x.actual/max*135))+'px'; c.innerHTML=`<span>${fmt(x.actual)}</span><label>${label.split(' ')[0]}</label>`; chart.appendChild(c);});
+    const max=Math.max(1,...KPI_BUCKETS.map(([k])=>((d.cards||{})[k]||{}).actual||0));
+    KPI_BUCKETS.forEach(([key,label])=>{
+      const x=((d.cards||{})[key]||{actual:0});
+      const c=document.createElement('div'); c.className='col';
+      c.style.height=(Math.max(3, Number(x.actual||0)/max*135))+'px';
+      c.innerHTML=`<span>${fmt(x.actual)}</span><label>${label.split(' ')[0]}</label>`;
+      chart.appendChild(c);
+    });
+  }
 
+  function renderManagerCards(mgrArr){
+    const box=document.getElementById('managerCards');
+    if(!box) return;
+    box.innerHTML='';
+    document.getElementById('managerOverviewCount').innerText=(mgrArr||[]).length+' Managers';
+    if(!(mgrArr||[]).length){box.innerHTML='<div class="warn">Manager-wise data नाही.</div>';return;}
+    const frag=document.createDocumentFragment();
+    mgrArr.forEach(m=>{
+      const div=document.createElement('div');
+      div.className='managerCard'+(m.manager===selectedDashManager?' active':'');
+      div.onclick=()=>selectManagerView(m.manager);
+      div.innerHTML=`
+        <div class="managerTop">
+          <div><div class="managerName">${escapeHtml(m.manager)}</div><div class="tiny muted bold">${fmt(m.count)} Staff • Click करून team बघा</div></div>
+          <div class="scoreCircle">${m.percent}%</div>
+        </div>
+        <div class="meter"><div class="meterFill" style="width:${Math.min(m.percent,100)}%"></div></div>
+        <div class="managerNumbers">
+          <div class="managerMini"><span>Target</span><b>${fmt(m.target)}</b></div>
+          <div class="managerMini"><span>Achieved</span><b style="color:#059669">${fmt(m.actual)}</b></div>
+          <div class="managerMini"><span>Balance</span><b style="color:#dc2626">${fmt(m.balance)}</b></div>
+        </div>
+        <div class="clickHint">Team performance open करण्यासाठी click करा →</div>`;
+      frag.appendChild(div);
+    });
+    box.appendChild(frag);
+  }
+
+  function selectManagerView(manager){
+    selectedDashManager = manager;
+    const mgrArr=buildManagerStats(lastDashboardData || {matrix:[]});
+    renderManagerCards(mgrArr);
+    renderManagerDetail(manager);
+    const panel=document.getElementById('managerDetailPanel');
+    if(panel) panel.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function renderManagerDetail(manager){
+    const panel=document.getElementById('managerDetailPanel'); if(!panel || !lastDashboardData){return;}
+    const mgrArr=buildManagerStats(lastDashboardData);
+    const m=mgrArr.find(x=>x.manager===manager);
+    if(!m){panel.classList.add('hide'); return;}
+    const staff=(m.staff||[]).slice().sort((a,b)=>Number(a.percent||0)-Number(b.percent||0));
+    const topStaff=staff.slice().sort((a,b)=>Number(b.percent||0)-Number(a.percent||0)).slice(0,5);
+    const focusStaff=staff.filter(x=>Number(x.target||0)>0).slice(0,5);
+    panel.classList.remove('hide');
+
+    let html=`<div class="teamHeader">
+      <div><h3>👥 ${escapeHtml(manager)} - Team Performance</h3><div class="tiny bold">Click केलेल्या manager ची पूर्ण team खाली दिसत आहे</div></div>
+      <div class="status ${zoneClassFromPct(m.percent)}">${zoneNameFromPct(m.percent)} Zone • ${m.percent}%</div>
+    </div>
+    <div class="teamStats">
+      <div class="teamStat"><span>Total Target</span><b>${fmt(m.target)}</b></div>
+      <div class="teamStat"><span>Achieved</span><b style="color:#059669">${fmt(m.actual)}</b></div>
+      <div class="teamStat"><span>Balance</span><b style="color:#dc2626">${fmt(m.balance)}</b></div>
+      <div class="teamStat"><span>Team Staff</span><b>${fmt(m.count)}</b></div>
+      <div class="teamStat"><span>Efficiency</span><b style="color:#1e40af">${m.percent}%</b></div>
+    </div>`;
+
+    html += `<div class="grid g2" style="padding:14px">
+      <div class="card" style="box-shadow:none"><h3 class="sectionTitle">Top Staff</h3>${renderMiniBarList(topStaff, 'green')}</div>
+      <div class="card" style="box-shadow:none"><h3 class="sectionTitle">Focus Staff</h3>${renderMiniBarList(focusStaff, 'focus')}</div>
+    </div>`;
+
+    html += `<div class="staffPerfGrid">`;
+    staff.forEach((x,i)=>{
+      const pct=Number(x.percent||0), bal=Math.max(0,Number(x.target||0)-Number(x.actual||0));
+      html += `<div class="staffPerfCard">
+        <div class="staffPerfTop">
+          <div><div class="staffPerfName">${i+1}. ${escapeHtml(x.staff)}</div><div class="staffPerfMeta">Target ${fmt(x.target)} | Actual ${fmt(x.actual)} | Balance ${fmt(bal)}</div></div>
+          <span class="status ${zoneClassFromPct(pct)}">${pct}%</span>
+        </div>
+        <div class="staffBar"><span style="width:${Math.min(pct,100)}%"></span></div>
+        <div class="staffAmounts">
+          <div>Target<b>${fmt(x.target)}</b></div><div>Achieved<b style="color:#059669">${fmt(x.actual)}</b></div><div>Balance<b style="color:#dc2626">${fmt(bal)}</b></div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+    panel.innerHTML=html;
+  }
+
+  function renderMiniBarList(list, mode){
+    if(!(list||[]).length) return '<div class="muted bold">Data नाही</div>';
+    const max=Math.max(1,...list.map(x=>Number(x.percent||0)));
+    let html='<div class="miniBars">';
+    list.forEach(x=>{
+      const pct=Number(x.percent||0);
+      html += `<div class="miniBarItem"><div class="miniBarName">${escapeHtml(x.staff)}</div><div class="miniBarTrack"><span style="width:${Math.min(100, pct/max*100)}%;${mode==='focus'?'background:linear-gradient(90deg,#dc2626,#f97316)':''}"></span></div><div class="miniBarPct">${pct}%</div></div>`;
+    });
+    html+='</div>';
+    return html;
+  }
+
+  function renderLeaderboardAndReading(d,best,low,balance){
     const lb=document.getElementById('leaderboard'); lb.innerHTML='';
     (d.leaderboard||[]).slice(0,8).forEach((x,i)=>{const div=document.createElement('div');div.className='summaryLine';div.innerHTML=`<span><b>${i+1}. ${escapeHtml(x.staff)}</b><br><span class="tiny muted">${escapeHtml(x.manager)}</span></span><span class="bold">${x.percent}%</span>`;lb.appendChild(div)});
     if(!(d.leaderboard||[]).length) lb.innerHTML='<div class="muted bold">No data</div>';
@@ -628,15 +903,23 @@
     if(!lowStaff.length) lowList.innerHTML='<div class="muted bold">No low team data</div>';
 
     const qr=document.getElementById('quickReading');
-    qr.innerHTML=`<div class="summaryLine"><span class="bold">Target Achievement</span><span class="bold">${d.overall.percent||0}%</span></div>
+    qr.innerHTML=`<div class="summaryLine"><span class="bold">Overall Achievement</span><span class="bold">${(d.overall||{}).percent||0}%</span></div>
       <div class="summaryLine"><span class="bold">Pending Balance</span><span class="bold" style="color:#dc2626">${fmt(balance)}</span></div>
       <div class="summaryLine"><span class="bold">Best Team</span><span class="bold" style="color:#059669">${best?escapeHtml(best.manager):'-'}</span></div>
-      <div class="summaryLine"><span class="bold">Focus Team</span><span class="bold" style="color:#dc2626">${low?escapeHtml(low.manager):'-'}</span></div>`;
+      <div class="summaryLine"><span class="bold">Focus Team</span><span class="bold" style="color:#dc2626">${low?escapeHtml(low.manager):'-'}</span></div>
+      <div class="warn" style="margin-top:10px">Admin tip: Manager card वर click करा. Red/Yellow staff आधी follow-up करा.</div>`;
+  }
 
+  function renderMatrix(d){
     const mb=document.getElementById('matrixBody'); mb.innerHTML='';
     const mfrag=document.createDocumentFragment();
-    (d.matrix||[]).forEach(x=>{const cls=x.status==='Green'?'greenTag':(x.status==='Yellow'?'yellowTag':'redTag');const tr=document.createElement('tr');tr.innerHTML=`<td class="bold">${escapeHtml(x.staff)}</td><td>${escapeHtml(x.manager)}</td><td class="num">${fmt(x.target)}</td><td class="num">${fmt(x.actual)}</td><td class="center bold">${x.percent}%</td><td class="center"><span class="status ${cls}">${x.status}</span></td>`;mfrag.appendChild(tr)});
+    (d.matrix||[]).forEach(x=>{const pct=Number(x.percent||0);const cls=zoneClassFromPct(pct);const tr=document.createElement('tr');tr.innerHTML=`<td class="bold">${escapeHtml(x.staff)}</td><td>${escapeHtml(x.manager)}</td><td class="num">${fmt(x.target)}</td><td class="num">${fmt(x.actual)}</td><td class="center bold">${pct}%</td><td class="center"><span class="status ${cls}">${x.status||zoneNameFromPct(pct)}</span></td>`;mfrag.appendChild(tr)});
     mb.appendChild(mfrag);
+  }
+
+  function toggleFullMatrix(){
+    const box=document.getElementById('adminMatrixBox');
+    if(box) box.classList.toggle('show');
   }
 
   function formatDay(d){const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('mr-IN',{weekday:'short',day:'2-digit',month:'short'})+' ('+d+')'}
