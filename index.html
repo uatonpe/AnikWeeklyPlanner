@@ -1,6 +1,8 @@
 
 
 
+
+
 <!DOCTYPE html>
 <html lang="mr">
 <head>
@@ -376,13 +378,24 @@
   let managerPlanDetailCache = {};
   let matrixRendered = false;
   let dashboardReqToken = 0;
+  let dashboardRequestTokens = {};
   let activeKpiKeyByManager = {};
   let dashboardLoaded = false;
   let dashboardDirty = true;
   let loaderTicker = null;
   let loaderStartedAt = 0;
+  let pendingReads = {};
+  let pendingManagerLoads = {};
+  let dashboardMasterData = null;
+  let dashboardMasterKey = '';
+  let dashboardRefreshTimer = null;
   const FAST_CACHE_TTL = 30 * 60 * 1000;
   const PLAN_CACHE_TTL = 60 * 60 * 1000;
+  const TA_VIEW_CACHE_TTL = 5 * 60 * 1000;
+  const APPDATA_REFRESH_TTL = 10 * 60 * 1000;
+  const DASH_BACKGROUND_REFRESH_TTL = 2 * 60 * 1000;
+  const LAST_DASHBOARD_TTL = 24 * 60 * 60 * 1000;
+  const USE_FAST_BACKEND = false; // true only after deploying the optional .gs speed patch.
 
   const KPI_BUCKETS = [
     ['disb','Disbursement Target (₹)','amount'],
@@ -396,16 +409,27 @@
     ['rd','New RD Account','number'],
     ['fd','NEW FD For Lokparyay','number']
   ];
-  const READ_ACTIONS = new Set(['getAppData','getManagers','getKpis','getTeam','getPlansForManager','getPlanForTA','getDashboardData']);
+  const READ_ACTIONS = new Set(['getAppData','getManagers','getKpis','getTeam','getPlansForManager','getPlanForTA','getDashboardData','getDashboardFast','getManagerMonthBundle']);
 
   function gs(fn, ...args){
+    const isRead = READ_ACTIONS.has(fn);
+    const requestKey = isRead ? fn+'::'+JSON.stringify(args||[]) : '';
+    if(isRead && pendingReads[requestKey]) return pendingReads[requestKey];
+
+    let req;
     if (window.google && google.script && google.script.run) {
-      return new Promise((resolve, reject) => {
+      req = new Promise((resolve, reject) => {
         google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[fn](...args);
       });
+    } else if (isRead) {
+      req = gsJsonp(fn, args);
+    } else {
+      req = gsWrite(fn, args);
     }
-    if (READ_ACTIONS.has(fn)) return gsJsonp(fn, args);
-    return gsWrite(fn, args);
+
+    if(!isRead) return req;
+    pendingReads[requestKey] = Promise.resolve(req).finally(()=>{ delete pendingReads[requestKey]; });
+    return pendingReads[requestKey];
   }
 
   function gsJsonp(fn, args){
@@ -455,6 +479,12 @@
   }
 
   function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+  function withTimeout(promise,ms,message){
+    return Promise.race([
+      promise,
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error(message||'Fast endpoint timeout')),ms))
+    ]);
+  }
   function showLoader(txt, hint){
     const loader=document.getElementById('loader');
     const text=document.getElementById('loaderText');
@@ -485,13 +515,21 @@
     arr.forEach(x=>{const o=document.createElement('option');o.value=x.value!==undefined?x.value:x;o.textContent=x.text!==undefined?x.text:x;el.appendChild(o)});
   }
 
-  function safeGetCache(key, maxAge){
+  function safeGetCacheRecord(key, maxAge){
     try{
       const raw=localStorage.getItem(key); if(!raw) return null;
       const obj=JSON.parse(raw); if(!obj || !obj.t) return null;
       if(maxAge && Date.now()-obj.t>maxAge) return null;
-      return obj.v;
+      return obj;
     }catch(e){return null;}
+  }
+  function safeGetCache(key, maxAge){
+    const obj=safeGetCacheRecord(key,maxAge);
+    return obj ? obj.v : null;
+  }
+  function cacheAgeMs(key){
+    const obj=safeGetCacheRecord(key,0);
+    return obj ? Math.max(0,Date.now()-Number(obj.t||0)) : Infinity;
   }
   function safeSetCache(key, value){
     try{localStorage.setItem(key, JSON.stringify({t:Date.now(), v:value}));}catch(e){}
@@ -548,30 +586,47 @@
   }
 
   async function fastBoot(){
-    const cached=safeGetCache('ANIK_APPDATA_FAST', 24*60*60*1000);
-    if(cached){
-      applyAppData(cached);
+    const cachedRecord=safeGetCacheRecord('ANIK_APPDATA_FAST', 24*60*60*1000);
+    if(cachedRecord && cachedRecord.v){
+      applyAppData(cachedRecord.v);
       toast('System ready');
-      // Refresh base data in background; do not block first screen.
-      setTimeout(()=>reloadBase(true), 150);
+      // Do not hit Apps Script immediately on every page open. Refresh only when cache is old.
+      const baseOld=Date.now()-cachedRecord.t>APPDATA_REFRESH_TTL;
+      if(baseOld) setTimeout(()=>reloadBase(true),2500);
+      // Warm only after the first screen is fully interactive; avoid competing calls during boot.
+      setTimeout(()=>warmDashboardCache(),baseOld?6500:3000);
     }else{
       await reloadBase(false);
+      setTimeout(()=>warmDashboardCache(),3000);
     }
+  }
+
+  function appDataSignature(data){
+    try{
+      return JSON.stringify({
+        managers:(data&&data.managers)||[],
+        fxMap:(data&&data.fxMap)||{},
+        kpis:(data&&data.kpis)||[]
+      });
+    }catch(e){return '';}
   }
 
   async function reloadBase(silent){
     if(!silent) showLoader('System Sync होत आहे...', 'साधारण 2-4 सेकंद');
     try{
-      const fresh = await gs('getAppData', true);
+      const before=appDataSignature(APPDATA);
+      const fresh = await gs('getAppData', !silent);
+      const changed=before!==appDataSignature(fresh);
       applyAppData(fresh);
       safeSetCache('ANIK_APPDATA_FAST', fresh);
-      managerMonthlyCache = {};
-      managerPlanListCache = {};
-      managerPlanDetailCache = {};
-      selectedDashManager = '';
-      matrixRendered = false;
-      dashboardLoaded = false;
-      dashboardDirty = true;
+      if(changed){
+        managerMonthlyCache = {};
+        managerPlanListCache = {};
+        managerPlanDetailCache = {};
+        selectedDashManager = '';
+        matrixRendered = false;
+        dashboardDirty = true;
+      }
       if(!silent) toast('System Sync पूर्ण झाला');
     }catch(e){
       if(!silent) alert('डेटा लोड होत नाही: '+e.message);
@@ -592,11 +647,12 @@
     if(!manager || !s || !e) return;
     showLoader('CA team load होत आहे...', 'साधारण 2-4 सेकंद');
     try{
-      let res = teamCache[manager];
+      let res=teamCache[manager] || safeGetCache('ANIK_TEAM_'+manager,24*60*60*1000);
       if(!res){
-        res = await gs('getTeam', manager);
-        teamCache[manager] = res;
+        res=await gs('getTeam',manager);
+        safeSetCache('ANIK_TEAM_'+manager,res);
       }
+      teamCache[manager]=res;
       const staff = res.staff || [], kpis = res.kpis || [];
       planRows = [];
       staff.forEach(st => kpis.forEach(k => planRows.push({staff:st,kpi:k.name,type:k.type,weeklyTarget:'',remark:''})));
@@ -685,15 +741,24 @@
     taMonthly=null; renderTAMonthRows();
     if(!manager || !ym) return;
     const mb=monthBounds(ym);
-    showLoader('Monthly KPI data load होत आहे...', 'साधारण 3-6 सेकंद');
+    const taCacheKey='ANIK_TA_VIEW_'+manager+'_'+ym;
+    const cachedTA=safeGetCache(taCacheKey,TA_VIEW_CACHE_TTL);
+    if(cachedTA && Array.isArray(cachedTA.rows)){
+      taMonthly=cachedTA;
+      (taMonthly.rows||[]).forEach(r=>r.addActual=0);
+      renderTAMonthRows();
+      toast('Monthly data cache मधून लगेच loaded');
+      return;
+    }
+    showLoader('Monthly KPI data load होत आहे...', 'पहिल्या sync नंतर पुढे लगेच उघडेल');
     try{
-      const allPlans = await getManagerPlanList(manager);
-      const monthPlans = (allPlans||[]).filter(p=>planOverlaps(p, mb.start, mb.end));
+      const bundle=await getManagerMonthBundleData(manager,mb.start,mb.end);
+      const monthPlans=bundle.plans||[];
       if(!monthPlans.length){
         taMonthly={manager, month:ym, start:mb.start, end:mb.end, plans:[], rows:[], saveDate:getSaveDateForMonth(mb)};
         renderTAMonthRows(); toast('या month साठी target plan नाही'); return;
       }
-      const details = await getManagerPlanDetails(manager, monthPlans);
+      const details=bundle.details||[];
       const map={};
       const todaySave = getSaveDateForMonth(mb);
       details.filter(Boolean).forEach(plan=>{
@@ -722,6 +787,7 @@
       });
       const rows=Object.values(map).sort((a,b)=>(a.staff+a.kpi).localeCompare(b.staff+b.kpi));
       taMonthly={manager, month:ym, start:mb.start, end:mb.end, plans:details.filter(Boolean), rows, saveDate:todaySave};
+      safeSetCache(taCacheKey,taMonthly);
       renderTAMonthRows();
       toast('Monthly target loaded');
     }catch(e){alert('Monthly load error: '+e.message)} finally{hideLoader()}
@@ -904,6 +970,7 @@
       r.todayActual=Number(r.todayActual||0)+Number(r.addActual||0);
       r.addActual=0;
     });
+    if(taMonthly) safeSetCache('ANIK_TA_VIEW_'+taMonthly.manager+'_'+taMonthly.month,taMonthly);
   }
 
   function invalidateManagerCachesAfterTA(manager){
@@ -958,42 +1025,203 @@
     staff=[...new Set(staff)].sort();
     setSelect('dashStaff', [{value:'all',text:'सर्व Staff'}].concat(staff.map(s=>({value:s,text:s}))));
   }
-  function delayDashboard(){clearTimeout(dashTimer);dashTimer=setTimeout(()=>loadDashboard(false),450)}
-
-  function dashboardCacheKey(){return 'ANIK_DASH_FAST_'+[val('dashStart')||'',val('dashEnd')||'',val('dashManager')||'all',val('dashStaff')||'all',val('dashSearch')||''].join('||')}
-
-  async function loadDashboard(withLoader=true, forceLive=false){
-    const ck=dashboardCacheKey();
-    if(!forceLive){
-      const cached=safeGetCache(ck, FAST_CACHE_TTL);
-      if(cached && (cached.matrix || cached.overall || cached.cards)){
-        renderDashboard(cached);
-        dashboardLoaded = true;
-        dashboardDirty = false;
-        return;
+  function delayDashboard(){
+    clearTimeout(dashTimer);
+    dashTimer=setTimeout(()=>{
+      const source=getBestDashboardSource();
+      if(source){
+        renderDashboard(filterDashboardClient(source,currentDashFilters()));
+        dashboardLoaded=true;
       }
-    }
-    return refreshDashboardLive(withLoader, ck);
+    },120);
   }
 
-  async function refreshDashboardLive(withLoader=true, ck){
-    const token=++dashboardReqToken;
-    if(withLoader) showLoader('Dashboard load होत आहे...', 'साधारण 2-5 सेकंद');
+  function currentDashFilters(){
+    return {
+      sDate:val('dashStart'),
+      eDate:val('dashEnd'),
+      manager:val('dashManager')||'all',
+      staff:val('dashStaff')||'all',
+      search:val('dashSearch')||''
+    };
+  }
+
+  function dashboardCacheKey(filters){
+    const f=filters||currentDashFilters();
+    return 'ANIK_DASH_FAST_'+[f.sDate||'',f.eDate||'',f.manager||'all',f.staff||'all',f.search||''].join('||');
+  }
+
+  function dashboardBaseCacheKey(filters){
+    const f=filters||currentDashFilters();
+    return 'ANIK_DASH_MASTER_'+[f.sDate||'',f.eDate||''].join('||');
+  }
+
+  function isAllDashboardFilter(f){
+    return (!f.manager || f.manager==='all') && (!f.staff || f.staff==='all') && !String(f.search||'').trim();
+  }
+
+  function getBestDashboardSource(){
+    const f=currentDashFilters();
+    const exact=safeGetCache(dashboardCacheKey(f), FAST_CACHE_TTL);
+    if(exact) return exact;
+    if(dashboardMasterData && dashboardMasterKey===dashboardBaseCacheKey(f)) return dashboardMasterData;
+    const master=safeGetCache(dashboardBaseCacheKey(f), LAST_DASHBOARD_TTL);
+    if(master) return master;
+    return safeGetCache('ANIK_DASH_LAST', LAST_DASHBOARD_TTL);
+  }
+
+  function dashboardRowsForClient(base){
+    const rows=getRawKpiRows(base||{});
+    const staffManager={};
+    ((base||{}).matrix||[]).forEach(x=>{if(x.staff) staffManager[x.staff]=x.manager||'';});
+    return rows.map(r=>Object.assign({},r,{manager:r.manager||staffManager[r.staff]||''}));
+  }
+
+  function buildCardsFromClientRows(rows){
+    const cards={};
+    (rows||[]).forEach(r=>{
+      const key=r.kpiKey||kpiKeyFromName(r.kpi);
+      if(!cards[key]) cards[key]={target:0,actual:0};
+      cards[key].target+=Number(r.target||0);
+      cards[key].actual+=Number(r.actual||0);
+    });
+    Object.keys(cards).forEach(k=>cards[k].percent=pctVal(cards[k].actual,cards[k].target));
+    return cards;
+  }
+
+  function filterDashboardClient(base, filters){
+    const f=filters||currentDashFilters();
+    const q=String(f.search||'').trim().toLowerCase();
+    const allRows=dashboardRowsForClient(base);
+    const matchedStaff=new Set();
+
+    const rows=allRows.filter(r=>{
+      if(f.manager && f.manager!=='all' && r.manager!==f.manager) return false;
+      if(f.staff && f.staff!=='all' && r.staff!==f.staff) return false;
+      const hay=(r.staff+' '+r.manager+' '+r.kpi).toLowerCase();
+      const ok=!q || hay.includes(q);
+      if(ok && r.staff) matchedStaff.add(r.staff);
+      return ok;
+    });
+
+    const matrix=((base||{}).matrix||[]).filter(x=>{
+      if(f.manager && f.manager!=='all' && (x.manager||'')!==f.manager) return false;
+      if(f.staff && f.staff!=='all' && x.staff!==f.staff) return false;
+      if(!q) return true;
+      return ((x.staff||'')+' '+(x.manager||'')+' '+(x.status||'')).toLowerCase().includes(q) || matchedStaff.has(x.staff);
+    });
+
+    const cards=rows.length ? buildCardsFromClientRows(rows) : (isAllDashboardFilter(f) ? ((base||{}).cards||{}) : {});
+    const out=Object.assign({},base||{});
+    const rawKeys=['details','detailRows','rawRows','kpiRows','entries','staffKpi','staffKpis','matrixRows','data'];
+    rawKeys.forEach(k=>{out[k]=[];});
+    out.rows=rows;
+    out.matrix=matrix;
+    out.cards=cards;
+    out.rowCount=matrix.length;
+    out.filters=Object.assign({},((base||{}).filters||{}),f);
+    out.leaderboard=matrix.slice().sort((a,b)=>Number(b.percent||0)-Number(a.percent||0));
+    out.clientFiltered=true;
+    return out;
+  }
+
+  function scheduleDashboardRefresh(filters, ck, delay){
+    clearTimeout(dashboardRefreshTimer);
+    dashboardRefreshTimer=setTimeout(()=>{
+      refreshDashboardLive(false,ck,filters).catch(()=>{});
+    },delay===undefined?80:delay);
+  }
+
+  async function warmDashboardCache(){
+    const f=currentDashFilters();
+    if(!f.sDate || !f.eDate) return;
+    const masterFilters={sDate:f.sDate,eDate:f.eDate,manager:'all',staff:'all',search:''};
+    const masterKey=dashboardBaseCacheKey(masterFilters);
+    const cached=safeGetCache(masterKey,LAST_DASHBOARD_TTL);
+    if(cached){
+      dashboardMasterData=cached;
+      dashboardMasterKey=masterKey;
+      if(cacheAgeMs(masterKey)<DASH_BACKGROUND_REFRESH_TTL) return;
+    }
+    await refreshDashboardLive(false,masterKey,masterFilters);
+  }
+
+  async function loadDashboard(withLoader=true, forceLive=false){
+    const f=currentDashFilters();
+    const ck=dashboardCacheKey(f);
+
+    if(forceLive) return refreshDashboardLive(withLoader,ck,f);
+
+    const exactRecord=safeGetCacheRecord(ck,FAST_CACHE_TTL);
+    if(exactRecord && exactRecord.v){
+      const needsRefresh=dashboardDirty || Date.now()-exactRecord.t>DASH_BACKGROUND_REFRESH_TTL;
+      renderDashboard(exactRecord.v);
+      dashboardLoaded=true;
+      dashboardDirty=false;
+      if(needsRefresh) scheduleDashboardRefresh(f,ck,180);
+      return;
+    }
+
+    const masterKey=dashboardBaseCacheKey(f);
+    let source=(dashboardMasterData && dashboardMasterKey===masterKey) ? dashboardMasterData : safeGetCache(masterKey,LAST_DASHBOARD_TTL);
+    if(!source) source=safeGetCache('ANIK_DASH_LAST',LAST_DASHBOARD_TTL);
+
+    if(source){
+      renderDashboard(filterDashboardClient(source,f));
+      dashboardLoaded=true;
+      dashboardDirty=false;
+      scheduleDashboardRefresh(f,ck,60);
+      return;
+    }
+
+    return refreshDashboardLive(withLoader,ck,f);
+  }
+
+  async function fetchDashboardDataFast(filters,forceFresh){
+    if(!USE_FAST_BACKEND) return gs('getDashboardData',filters);
+    const fastFilters=Object.assign({},filters||{},{forceFresh:!!forceFresh});
+    try{
+      return await withTimeout(gs('getDashboardFast',fastFilters),3500,'Fast dashboard endpoint timeout');
+    }catch(e){
+      return await gs('getDashboardData',filters);
+    }
+  }
+
+  async function refreshDashboardLive(withLoader=true, ck, filters){
+    const f=filters||currentDashFilters();
+    const exactKey=ck || dashboardCacheKey(f);
+    const token=(dashboardRequestTokens[exactKey]||0)+1;
+    dashboardRequestTokens[exactKey]=token;
+    if(withLoader) showLoader('Dashboard load होत आहे...', 'Live sync सुरू आहे');
     else showQuickDashboardLoader();
     try{
-      const f={sDate:val('dashStart'),eDate:val('dashEnd'),manager:val('dashManager')||'all',staff:val('dashStaff')||'all',search:val('dashSearch')||''};
-      const d=await gs('getDashboardData', f);
-      if(token!==dashboardReqToken) return;
-      safeSetCache(ck || dashboardCacheKey(), d);
-      renderDashboard(d);
-      dashboardLoaded = true;
-      dashboardDirty = false;
-    }catch(e){console.error(e); if(withLoader) alert('Dashboard error: '+e.message)} finally{if(withLoader) hideLoader(); hideQuickDashboardLoader();}
+      const d=await fetchDashboardDataFast(f,withLoader);
+      if(token!==dashboardRequestTokens[exactKey]) return;
+      safeSetCache(exactKey,d);
+      safeSetCache('ANIK_DASH_LAST',d);
+      if(isAllDashboardFilter(f)){
+        const masterKey=dashboardBaseCacheKey(f);
+        dashboardMasterData=d;
+        dashboardMasterKey=masterKey;
+        safeSetCache(masterKey,d);
+      }
+      if(dashboardCacheKey(currentDashFilters())===exactKey){
+        renderDashboard(d);
+        dashboardLoaded=true;
+        dashboardDirty=false;
+      }
+    }catch(e){
+      console.error(e);
+      if(withLoader) alert('Dashboard error: '+e.message);
+    }finally{
+      if(withLoader) hideLoader();
+      hideQuickDashboardLoader();
+    }
   }
 
   function showQuickDashboardLoader(){
     const box=document.getElementById('managerCards');
-    if(box && !dashboardLoaded) box.innerHTML='<div class="fastSkeleton">Dashboard load होत आहे...</div>';
+    if(box && !dashboardLoaded) box.innerHTML='<div class="fastSkeleton">Cached data शोधत आहे... Live sync background मध्ये सुरू आहे.</div>';
   }
   function hideQuickDashboardLoader(){}
 
@@ -1054,11 +1282,15 @@
 
     renderKpiCards(lastDashboardData);
     renderSimpleKpiChart(lastDashboardData);
-    selectedDashManager = '';
+    const previousManager=selectedDashManager;
+    const managerStillVisible=previousManager && mgrArr.some(x=>x.manager===previousManager);
+    selectedDashManager=managerStillVisible?previousManager:'';
     renderManagerCards(mgrArr);
 
     const detailPanel=document.getElementById('managerDetailPanel');
-    if(detailPanel){
+    if(managerStillVisible){
+      renderManagerDetail(previousManager);
+    }else if(detailPanel){
       detailPanel.classList.remove('hide');
       detailPanel.innerHTML='<div class="warn" style="margin:14px">⚡ Manager card वर click करा. त्या manager ची team KPI performance खाली दिसेल.</div>';
     }
@@ -1136,25 +1368,36 @@
   }
 
   async function selectManagerView(manager){
-    selectedDashManager = manager;
-    const mgrArr=buildManagerStats(lastDashboardData || {matrix:[]});
+    selectedDashManager=manager;
+    const mgrArr=buildManagerStats(lastDashboardData||{matrix:[]});
     renderManagerCards(mgrArr);
     const panel=document.getElementById('managerDetailPanel');
     const ck=dashCacheKey(manager);
-    const hasCached=!!(managerMonthlyCache[ck] || safeGetCache('ANIK_MANAGER_SUMMARY_'+ck, PLAN_CACHE_TTL));
+    const local=safeGetCache('ANIK_MANAGER_SUMMARY_'+ck,PLAN_CACHE_TTL);
+    if(local && local.summary) managerMonthlyCache[ck]=local;
+
+    // Show available dashboard data immediately. Never block the screen on manager click.
+    renderManagerDetail(manager);
+    if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+
+    const rawDetailed=getManagerKpiRows(manager).some(r=>r.kpiKey && r.kpiKey!=='overall');
+    if(managerMonthlyCache[ck] || rawDetailed) return;
+
     if(panel){
-      panel.classList.remove('hide');
-      panel.innerHTML=`<div class="card" style="margin-top:14px"><div class="actions"><div class="spin" style="width:32px;height:32px;border-width:4px;margin:0 10px 0 0"></div><div><h3 class="sectionTitle" style="margin:0">${escapeHtml(manager)} KPI target आणि achievement load होत आहे...</h3><div class="tiny muted bold">कृपया थांबा, manager team performance तयार होत आहे.</div></div></div></div>`;
-      panel.scrollIntoView({behavior:'smooth', block:'start'});
+      const note=document.createElement('div');
+      note.className='fastSkeleton';
+      note.id='managerBackgroundSync';
+      note.innerText='Detailed KPI data background मध्ये sync होत आहे. वरचा उपलब्ध data लगेच दाखवला आहे.';
+      panel.prepend(note);
     }
-    if(!hasCached) showLoader('Manager KPI data load होत आहे...', 'पहिल्यांदा 3-8 सेकंद, नंतर cache मुळे लगेच');
+
     try{
       await ensureManagerMonthlyData(manager);
-      renderManagerDetail(manager);
+      if(selectedDashManager===manager) renderManagerDetail(manager);
     }catch(e){
-      if(panel) panel.innerHTML='<div class="warn" style="margin:14px">Manager target load error: '+escapeHtml(e.message)+'</div>';
-    }finally{
-      if(!hasCached) hideLoader();
+      console.error('Manager detail background load error',e);
+      const note=document.getElementById('managerBackgroundSync');
+      if(note) note.innerText='Detailed sync झाला नाही; dashboard summary data दाखवला आहे.';
     }
   }
 
@@ -1238,7 +1481,41 @@
   }
 
 
+  async function getManagerMonthBundleData(manager,sDate,eDate){
+    if(USE_FAST_BACKEND){
+      try{
+        const bundle=await withTimeout(gs('getManagerMonthBundle',manager,sDate,eDate),3500,'Fast manager bundle timeout');
+        if(bundle && Array.isArray(bundle.plans) && Array.isArray(bundle.details)){
+          const plans=dedupePlans(bundle.plans);
+          managerPlanListCache['ANIK_PLAN_LIST_'+manager]=plans;
+          safeSetCache('ANIK_PLAN_LIST_'+manager,plans);
+          bundle.details.forEach((d,i)=>{
+            const p=plans[i]||{};
+            const key=manager+'||'+(d.planKey||p.key||p.planKey||p.id||'');
+            if(key!==manager+'||'){
+              managerPlanDetailCache[key]=d;
+              safeSetCache('ANIK_PLAN_DETAIL_'+key,d);
+            }
+          });
+          return {plans,details:bundle.details.filter(Boolean)};
+        }
+      }catch(e){console.warn('Fast bundle fallback',e);}
+    }
+    const allPlans=await getManagerPlanList(manager);
+    const plans=(allPlans||[]).filter(p=>planOverlapsDash(p,sDate,eDate));
+    const details=await getManagerPlanDetails(manager,plans);
+    return {plans,details:details.filter(Boolean)};
+  }
+
+
   async function ensureManagerMonthlyData(manager){
+    const ck=dashCacheKey(manager);
+    if(pendingManagerLoads[ck]) return pendingManagerLoads[ck];
+    pendingManagerLoads[ck]=ensureManagerMonthlyDataCore(manager).finally(()=>{delete pendingManagerLoads[ck];});
+    return pendingManagerLoads[ck];
+  }
+
+  async function ensureManagerMonthlyDataCore(manager){
     const ck=dashCacheKey(manager);
     if(managerMonthlyCache[ck]) return managerMonthlyCache[ck];
     const local=safeGetCache('ANIK_MANAGER_SUMMARY_'+ck, PLAN_CACHE_TTL);
@@ -1249,9 +1526,9 @@
     const summary={};
     staffList.forEach(st=>{summary[st]={staff:st, manager, basePercent:0, percent:0, kpis:initKpiBucketMap()};});
 
-    const allPlans = await getManagerPlanList(manager);
-    const monthPlans = (allPlans||[]).filter(p=>planOverlapsDash(p, sDate, eDate));
-    const details = await getManagerPlanDetails(manager, monthPlans);
+    const bundle=await getManagerMonthBundleData(manager,sDate,eDate);
+    const monthPlans=bundle.plans||[];
+    const details=bundle.details||[];
 
     const targetAdded = {};
     details.filter(Boolean).forEach(plan=>{
