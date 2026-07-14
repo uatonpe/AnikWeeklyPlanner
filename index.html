@@ -3,6 +3,8 @@
 
 
 
+
+
 <!DOCTYPE html>
 <html lang="mr">
 <head>
@@ -143,6 +145,17 @@
     .staffKpiDetail .warn{margin:12px}
     .fastSkeleton{border:1px dashed #bfdbfe;background:#eff6ff;color:#1e40af;border-radius:18px;padding:14px;font-weight:950;margin-top:14px}
 
+    .dashboardStatusBar{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:950;border:1px solid #dbeafe;background:#eff6ff;color:#1d4ed8;white-space:nowrap}
+    .dashboardStatusBar.loading{border-color:#fde68a;background:#fffbeb;color:#a16207}
+    .dashboardStatusBar.cached{border-color:#bfdbfe;background:#eff6ff;color:#1d4ed8}
+    .dashboardStatusBar.live{border-color:#bbf7d0;background:#ecfdf5;color:#047857}
+    .dashboardStatusBar.error{border-color:#fecaca;background:#fee2e2;color:#b91c1c}
+    .dashSkeletonGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;width:100%}
+    .dashSkeletonCard{height:118px;border-radius:20px;border:1px solid #dbeafe;background:linear-gradient(90deg,#eff6ff 25%,#f8fbff 38%,#eff6ff 55%);background-size:240% 100%;animation:dashShimmer 1.25s linear infinite}
+    .dashSkeletonTable{height:210px;border-radius:20px;border:1px solid #dbeafe;background:linear-gradient(90deg,#eff6ff 25%,#f8fbff 38%,#eff6ff 55%);background-size:240% 100%;animation:dashShimmer 1.25s linear infinite;grid-column:1/-1}
+    @keyframes dashShimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+    @media(max-width:900px){.dashSkeletonGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
     .adminMatrix{display:none}.adminMatrix.show{display:block}
     .softBtn{background:#fff;color:#1e40af;border:1px solid #bfdbfe}.softBtn:hover{background:#eff6ff}
 
@@ -282,7 +295,7 @@
           <div class="h1">Plan vs Achievement</div>
           <div class="hint">Manager card वर click करा. त्या manager च्या staff चे KPI-wise target, achievement आणि success % clear दिसेल.</div>
         </div>
-        <div class="actions noPrint"><button class="blue" onclick="loadDashboard(true,true)">Refresh Dashboard</button><button onclick="window.print()">Print</button></div>
+        <div class="actions noPrint"><span id="dashLoadStatus" class="dashboardStatusBar loading">⏳ Dashboard अजून load झालेला नाही</span><button class="blue" onclick="loadDashboard(true,true)">Refresh Dashboard</button><button onclick="window.print()">Print</button></div>
       </div>
 
       <div class="card grid g4 noPrint">
@@ -294,17 +307,17 @@
       </div>
 
       <div class="grid g4" style="margin-top:14px">
-        <div class="card" style="background:linear-gradient(135deg,#1e40af,#0f172a);color:white"><div class="tiny bold">Average Achievement</div><div id="overallPct" style="font-size:46px;font-weight:900;margin-top:10px">0%</div><div id="overallSub" class="tiny">Staff-wise average success %</div></div>
-        <div class="card"><div class="tiny bold muted">Green Staff</div><div id="dashTotalTarget" style="font-size:30px;font-weight:950;margin-top:10px;color:#059669">0</div><div class="tiny muted">90% and above</div></div>
-        <div class="card"><div class="tiny bold muted">Yellow Staff</div><div id="dashTotalActual" style="font-size:30px;font-weight:950;margin-top:10px;color:#d97706">0</div><div class="tiny muted">60% to 89%</div></div>
-        <div class="card"><div class="tiny bold muted">Focus Staff</div><div id="dashBalance" style="font-size:30px;font-weight:950;margin-top:10px;color:#dc2626">0</div><div class="tiny muted">Below 60%</div></div>
+        <div class="card" style="background:linear-gradient(135deg,#1e40af,#0f172a);color:white"><div class="tiny bold">Average Achievement</div><div id="overallPct" style="font-size:46px;font-weight:900;margin-top:10px">—</div><div id="overallSub" class="tiny">Staff-wise average success %</div></div>
+        <div class="card"><div class="tiny bold muted">Green Staff</div><div id="dashTotalTarget" style="font-size:30px;font-weight:950;margin-top:10px;color:#059669">—</div><div class="tiny muted">90% and above</div></div>
+        <div class="card"><div class="tiny bold muted">Yellow Staff</div><div id="dashTotalActual" style="font-size:30px;font-weight:950;margin-top:10px;color:#d97706">—</div><div class="tiny muted">60% to 89%</div></div>
+        <div class="card"><div class="tiny bold muted">Focus Staff</div><div id="dashBalance" style="font-size:30px;font-weight:950;margin-top:10px;color:#dc2626">—</div><div class="tiny muted">Below 60%</div></div>
       </div>
 
       <div class="grid g4" style="margin-top:14px">
         <div class="card"><div class="tiny bold muted">Best Manager Team</div><div id="bestManager" style="font-size:21px;font-weight:950;margin-top:10px;color:#059669">-</div><div id="bestManagerSub" class="tiny muted">-</div></div>
         <div class="card"><div class="tiny bold muted">Low Team Focus</div><div id="lowManager" style="font-size:21px;font-weight:950;margin-top:10px;color:#dc2626">-</div><div id="lowManagerSub" class="tiny muted">-</div></div>
-        <div class="card"><div class="tiny bold muted">Records</div><div id="rowCount" style="font-size:30px;font-weight:950;margin-top:10px">0</div><div class="tiny muted">Processed Rows</div></div>
-        <div class="card"><div class="tiny bold muted">Last Updated / Period</div><div id="lastUpdated" style="font-size:17px;font-weight:950;margin-top:10px">-</div><div id="periodText" class="tiny muted" style="margin-top:6px">-</div></div>
+        <div class="card"><div class="tiny bold muted">Records</div><div id="rowCount" style="font-size:30px;font-weight:950;margin-top:10px">—</div><div class="tiny muted">Processed Rows</div></div>
+        <div class="card"><div class="tiny bold muted">Last Updated / Period</div><div id="lastUpdated" style="font-size:17px;font-weight:950;margin-top:10px">Data load होत आहे...</div><div id="periodText" class="tiny muted" style="margin-top:6px">-</div></div>
       </div>
 
       <div id="kpiCards" class="grid g7" style="margin-top:14px"></div>
@@ -319,7 +332,7 @@
           <h3 class="sectionTitle" style="margin-right:auto">Manager-wise Achievement % - Click to Open Team</h3>
           <span id="managerOverviewCount" class="pill">0 Managers</span>
         </div>
-        <div id="managerCards" class="managerOverview"></div>
+        <div id="managerCards" class="managerOverview"><div class="fastSkeleton">Dashboard उघडल्यावर saved data लगेच दिसेल आणि latest data background मध्ये sync होईल.</div></div>
       </div>
 
       <div id="managerDetailPanel" class="teamPanel hide"></div>
@@ -395,7 +408,10 @@
   const APPDATA_REFRESH_TTL = 10 * 60 * 1000;
   const DASH_BACKGROUND_REFRESH_TTL = 2 * 60 * 1000;
   const LAST_DASHBOARD_TTL = 24 * 60 * 60 * 1000;
-  const USE_FAST_BACKEND = false; // true only after deploying the optional .gs speed patch.
+  const LIGHT_DASHBOARD_TTL = 7 * 24 * 60 * 60 * 1000;
+  const DASH_WARM_DELAY = 250;
+  const USE_FAST_BACKEND = true; // ANIK_SPEED_PATCH.gs deploy केल्यानंतर maximum speed.
+  let fastBackendAvailable = true;
 
   const KPI_BUCKETS = [
     ['disb','Disbursement Target (₹)','amount'],
@@ -532,7 +548,8 @@
     return obj ? Math.max(0,Date.now()-Number(obj.t||0)) : Infinity;
   }
   function safeSetCache(key, value){
-    try{localStorage.setItem(key, JSON.stringify({t:Date.now(), v:value}));}catch(e){}
+    try{localStorage.setItem(key, JSON.stringify({t:Date.now(), v:value})); return true;}
+    catch(e){console.warn('Cache full / unavailable:', key, e); return false;}
   }
 
   function removeCachePrefix(prefix){
@@ -555,6 +572,97 @@
       }
       keys.forEach(k=>localStorage.removeItem(k));
     }catch(e){}
+  }
+
+
+  function lightDashboardCacheKey(filters){
+    const f=filters||currentDashFilters();
+    return 'ANIK_DASH_LIGHT_'+[f.sDate||'',f.eDate||'',f.manager||'all',f.staff||'all',f.search||''].join('||');
+  }
+
+  function dashboardPeriodMatches(data, filters){
+    if(!data) return false;
+    const f=filters||currentDashFilters();
+    const df=(data||{}).filters||{};
+    if(!f.sDate || !f.eDate) return true;
+    return String(df.sDate||'')===String(f.sDate||'') && String(df.eDate||'')===String(f.eDate||'');
+  }
+
+  function withDashboardUiMeta(data, source, ageMs){
+    return Object.assign({},data||{}, {__uiSource:source||'cache', __uiAgeMs:Number(ageMs||0)});
+  }
+
+  function compactDashboardForCache(data){
+    const d=data||{};
+    const matrix=(d.matrix||[]).map(x=>({
+      staff:x.staff||'', manager:x.manager||'', percent:Number(x.percent||0), status:x.status||'',
+      target:Number(x.target||0), actual:Number(x.actual||0)
+    })).filter(x=>x.staff);
+    const rows=getRawKpiRows(d).slice(0,5000).map(x=>({
+      staff:x.staff||'', manager:x.manager||'', kpi:x.kpi||'', kpiKey:x.kpiKey||kpiKeyFromName(x.kpi),
+      target:Number(x.target||0), actual:Number(x.actual||0), percent:Number(x.percent||0)
+    }));
+    return {
+      overall:d.overall||{}, matrix, rows, cards:d.cards||{},
+      leaderboard:matrix.slice().sort((a,b)=>Number(b.percent||0)-Number(a.percent||0)),
+      filters:d.filters||{}, rowCount:Number(d.rowCount||matrix.length),
+      lastUpdated:d.lastUpdated||new Date().toLocaleString('en-IN'), compact:true
+    };
+  }
+
+  function saveLightDashboardCache(filters, data){
+    const light=compactDashboardForCache(data);
+    safeSetCache(lightDashboardCacheKey(filters),light);
+    safeSetCache('ANIK_DASH_LIGHT_LAST',light);
+    return light;
+  }
+
+  function getLightDashboardCache(filters){
+    const f=filters||currentDashFilters();
+    const exact=safeGetCache(lightDashboardCacheKey(f),LIGHT_DASHBOARD_TTL);
+    if(exact && dashboardPeriodMatches(exact,f)) return exact;
+    const last=safeGetCache('ANIK_DASH_LIGHT_LAST',LIGHT_DASHBOARD_TTL);
+    return (last && dashboardPeriodMatches(last,f)) ? last : null;
+  }
+
+  function setDashboardStatus(type, text){
+    const el=document.getElementById('dashLoadStatus');
+    if(!el) return;
+    el.className='dashboardStatusBar '+(type||'cached');
+    el.textContent=text||'';
+  }
+
+  function setDashboardLoadingState(message){
+    setDashboardStatus('loading','⏳ '+(message||'Latest data sync होत आहे...'));
+    ['overallPct','dashTotalTarget','dashTotalActual','dashBalance','rowCount'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.textContent='…';
+    });
+    const lu=document.getElementById('lastUpdated'); if(lu) lu.textContent='Data load होत आहे...';
+    const kc=document.getElementById('kpiCards');
+    if(kc) kc.innerHTML='<div class="dashSkeletonGrid" style="grid-column:1/-1">'+Array.from({length:4},()=>'<div class="dashSkeletonCard"></div>').join('')+'</div>';
+    const mc=document.getElementById('managerCards');
+    if(mc) mc.innerHTML='<div class="dashSkeletonGrid" style="grid-column:1/-1">'+Array.from({length:4},()=>'<div class="dashSkeletonCard"></div>').join('')+'<div class="dashSkeletonTable"></div></div>';
+    const cnt=document.getElementById('managerOverviewCount'); if(cnt) cnt.textContent='Loading...';
+  }
+
+  function scheduleDashboardWarm(delay){
+    const run=()=>warmDashboardCache().catch(e=>console.warn('Dashboard warm error',e));
+    const ms=delay===undefined?DASH_WARM_DELAY:delay;
+    setTimeout(()=>{
+      if('requestIdleCallback' in window) requestIdleCallback(run,{timeout:700});
+      else run();
+    },ms);
+  }
+
+  function hydrateDashboardPreview(){
+    const f=currentDashFilters();
+    if(!f.sDate || !f.eDate) return false;
+    const source=getBestDashboardSource();
+    if(!source) return false;
+    renderDashboard(withDashboardUiMeta(filterDashboardClient(source,f),'cache',0));
+    dashboardLoaded=true;
+    dashboardDirty=cacheAgeMs(dashboardCacheKey(f))>DASH_BACKGROUND_REFRESH_TTL;
+    return true;
   }
 
   function showActionStatus(type, title, detail){
@@ -589,15 +697,16 @@
     const cachedRecord=safeGetCacheRecord('ANIK_APPDATA_FAST', 24*60*60*1000);
     if(cachedRecord && cachedRecord.v){
       applyAppData(cachedRecord.v);
+      hydrateDashboardPreview();
       toast('System ready');
-      // Do not hit Apps Script immediately on every page open. Refresh only when cache is old.
       const baseOld=Date.now()-cachedRecord.t>APPDATA_REFRESH_TTL;
-      if(baseOld) setTimeout(()=>reloadBase(true),2500);
-      // Warm only after the first screen is fully interactive; avoid competing calls during boot.
-      setTimeout(()=>warmDashboardCache(),baseOld?6500:3000);
+      if(baseOld) setTimeout(()=>reloadBase(true),1800);
+      // Dashboard warm-up now starts almost immediately instead of waiting 3-6 seconds.
+      scheduleDashboardWarm(baseOld?450:120);
     }else{
       await reloadBase(false);
-      setTimeout(()=>warmDashboardCache(),3000);
+      hydrateDashboardPreview();
+      scheduleDashboardWarm(120);
     }
   }
 
@@ -1063,11 +1172,14 @@
   function getBestDashboardSource(){
     const f=currentDashFilters();
     const exact=safeGetCache(dashboardCacheKey(f), FAST_CACHE_TTL);
-    if(exact) return exact;
-    if(dashboardMasterData && dashboardMasterKey===dashboardBaseCacheKey(f)) return dashboardMasterData;
+    if(exact && dashboardPeriodMatches(exact,f)) return exact;
+    if(dashboardMasterData && dashboardMasterKey===dashboardBaseCacheKey(f) && dashboardPeriodMatches(dashboardMasterData,f)) return dashboardMasterData;
     const master=safeGetCache(dashboardBaseCacheKey(f), LAST_DASHBOARD_TTL);
-    if(master) return master;
-    return safeGetCache('ANIK_DASH_LAST', LAST_DASHBOARD_TTL);
+    if(master && dashboardPeriodMatches(master,f)) return master;
+    const light=getLightDashboardCache(f);
+    if(light) return light;
+    const last=safeGetCache('ANIK_DASH_LAST', LAST_DASHBOARD_TTL);
+    return (last && dashboardPeriodMatches(last,f)) ? last : null;
   }
 
   function dashboardRowsForClient(base){
@@ -1137,8 +1249,8 @@
     if(!f.sDate || !f.eDate) return;
     const masterFilters={sDate:f.sDate,eDate:f.eDate,manager:'all',staff:'all',search:''};
     const masterKey=dashboardBaseCacheKey(masterFilters);
-    const cached=safeGetCache(masterKey,LAST_DASHBOARD_TTL);
-    if(cached){
+    const cached=safeGetCache(masterKey,LAST_DASHBOARD_TTL) || getLightDashboardCache(masterFilters);
+    if(cached && dashboardPeriodMatches(cached,masterFilters)){
       dashboardMasterData=cached;
       dashboardMasterKey=masterKey;
       if(cacheAgeMs(masterKey)<DASH_BACKGROUND_REFRESH_TTL) return;
@@ -1153,9 +1265,9 @@
     if(forceLive) return refreshDashboardLive(withLoader,ck,f);
 
     const exactRecord=safeGetCacheRecord(ck,FAST_CACHE_TTL);
-    if(exactRecord && exactRecord.v){
+    if(exactRecord && exactRecord.v && dashboardPeriodMatches(exactRecord.v,f)){
       const needsRefresh=dashboardDirty || Date.now()-exactRecord.t>DASH_BACKGROUND_REFRESH_TTL;
-      renderDashboard(exactRecord.v);
+      renderDashboard(withDashboardUiMeta(exactRecord.v,'cache',Date.now()-exactRecord.t));
       dashboardLoaded=true;
       dashboardDirty=false;
       if(needsRefresh) scheduleDashboardRefresh(f,ck,180);
@@ -1163,26 +1275,31 @@
     }
 
     const masterKey=dashboardBaseCacheKey(f);
-    let source=(dashboardMasterData && dashboardMasterKey===masterKey) ? dashboardMasterData : safeGetCache(masterKey,LAST_DASHBOARD_TTL);
-    if(!source) source=safeGetCache('ANIK_DASH_LAST',LAST_DASHBOARD_TTL);
+    let source=(dashboardMasterData && dashboardMasterKey===masterKey && dashboardPeriodMatches(dashboardMasterData,f)) ? dashboardMasterData : safeGetCache(masterKey,LAST_DASHBOARD_TTL);
+    if(!source || !dashboardPeriodMatches(source,f)) source=getLightDashboardCache(f);
 
     if(source){
-      renderDashboard(filterDashboardClient(source,f));
+      renderDashboard(withDashboardUiMeta(filterDashboardClient(source,f),'cache',0));
       dashboardLoaded=true;
       dashboardDirty=false;
       scheduleDashboardRefresh(f,ck,60);
       return;
     }
 
+    if(!dashboardLoaded) setDashboardLoadingState('पहिल्यांदा data आणत आहे — कृपया थोडे थांबा');
     return refreshDashboardLive(withLoader,ck,f);
   }
 
   async function fetchDashboardDataFast(filters,forceFresh){
-    if(!USE_FAST_BACKEND) return gs('getDashboardData',filters);
+    if(!USE_FAST_BACKEND || fastBackendAvailable===false) return gs('getDashboardData',filters);
     const fastFilters=Object.assign({},filters||{},{forceFresh:!!forceFresh});
     try{
-      return await withTimeout(gs('getDashboardFast',fastFilters),3500,'Fast dashboard endpoint timeout');
+      const out=await withTimeout(gs('getDashboardFast',fastFilters),2200,'Fast dashboard endpoint timeout');
+      fastBackendAvailable=true;
+      return out;
     }catch(e){
+      fastBackendAvailable=false;
+      console.warn('Fast backend unavailable; normal dashboard fallback used.',e);
       return await gs('getDashboardData',filters);
     }
   }
@@ -1197,21 +1314,26 @@
     try{
       const d=await fetchDashboardDataFast(f,withLoader);
       if(token!==dashboardRequestTokens[exactKey]) return;
-      safeSetCache(exactKey,d);
-      safeSetCache('ANIK_DASH_LAST',d);
+      const liveData=Object.assign({},d||{}, {filters:Object.assign({},(d||{}).filters||{},f)});
+      safeSetCache(exactKey,liveData);
+      safeSetCache('ANIK_DASH_LAST',liveData);
+      saveLightDashboardCache(f,liveData);
       if(isAllDashboardFilter(f)){
         const masterKey=dashboardBaseCacheKey(f);
-        dashboardMasterData=d;
+        dashboardMasterData=liveData;
         dashboardMasterKey=masterKey;
-        safeSetCache(masterKey,d);
+        safeSetCache(masterKey,liveData);
+        safeSetCache(lightDashboardCacheKey({sDate:f.sDate,eDate:f.eDate,manager:'all',staff:'all',search:''}),compactDashboardForCache(liveData));
       }
       if(dashboardCacheKey(currentDashFilters())===exactKey){
-        renderDashboard(d);
+        renderDashboard(withDashboardUiMeta(liveData,'live',0));
         dashboardLoaded=true;
         dashboardDirty=false;
       }
     }catch(e){
       console.error(e);
+      if(!dashboardLoaded) setDashboardStatus('error','⚠️ Data load झाला नाही — Refresh करा');
+      else setDashboardStatus('error','⚠️ Saved data दाखवला आहे; latest sync failed');
       if(withLoader) alert('Dashboard error: '+e.message);
     }finally{
       if(withLoader) hideLoader();
@@ -1220,8 +1342,8 @@
   }
 
   function showQuickDashboardLoader(){
-    const box=document.getElementById('managerCards');
-    if(box && !dashboardLoaded) box.innerHTML='<div class="fastSkeleton">Cached data शोधत आहे... Live sync background मध्ये सुरू आहे.</div>';
+    if(!dashboardLoaded) setDashboardLoadingState('Saved data शोधत आहे; latest sync background मध्ये सुरू आहे');
+    else setDashboardStatus('loading','⏳ Saved data दिसत आहे • latest sync सुरू आहे');
   }
   function hideQuickDashboardLoader(){}
 
@@ -1260,16 +1382,19 @@
     lastDashboardData = d || {overall:{},matrix:[],cards:{},leaderboard:[],filters:{}};
     matrixRendered = false;
     const staffRows=(lastDashboardData.matrix||[]).filter(x=>x.staff);
+    const hasDashboardData=staffRows.length>0 || Object.keys(lastDashboardData.cards||{}).length>0 || getRawKpiRows(lastDashboardData).length>0;
     const avg=avgPercent(staffRows);
+    if(lastDashboardData.__uiSource==='live') setDashboardStatus('live','✓ Latest data updated');
+    else if(lastDashboardData.__uiSource==='cache') setDashboardStatus('cached','⚡ Saved data लगेच दाखवला • latest sync background मध्ये');
     const green=staffRows.filter(x=>Number(x.percent||0)>=90 || x.status==='Green').length;
     const yellow=staffRows.filter(x=>Number(x.percent||0)>=60 && Number(x.percent||0)<90).length;
     const red=staffRows.filter(x=>Number(x.percent||0)<60).length;
-    document.getElementById('overallPct').innerText=avg+'%';
-    document.getElementById('overallSub').innerText='Staff-wise average success % | '+fmt(staffRows.length)+' staff';
-    document.getElementById('dashTotalTarget').innerText=fmt(green);
-    document.getElementById('dashTotalActual').innerText=fmt(yellow);
-    document.getElementById('dashBalance').innerText=fmt(red);
-    document.getElementById('rowCount').innerText=fmt(lastDashboardData.rowCount || staffRows.length);
+    document.getElementById('overallPct').innerText=hasDashboardData?(avg+'%'):'—';
+    document.getElementById('overallSub').innerText=hasDashboardData?('Staff-wise average success % | '+fmt(staffRows.length)+' staff'):'या period साठी data उपलब्ध नाही';
+    document.getElementById('dashTotalTarget').innerText=hasDashboardData?fmt(green):'—';
+    document.getElementById('dashTotalActual').innerText=hasDashboardData?fmt(yellow):'—';
+    document.getElementById('dashBalance').innerText=hasDashboardData?fmt(red):'—';
+    document.getElementById('rowCount').innerText=hasDashboardData?fmt(lastDashboardData.rowCount || staffRows.length):'—';
     document.getElementById('lastUpdated').innerText=lastDashboardData.lastUpdated||'-';
     document.getElementById('periodText').innerText=((lastDashboardData.filters||{}).sDate||val('dashStart')||'')+' ते '+((lastDashboardData.filters||{}).eDate||val('dashEnd')||'');
 
@@ -1289,7 +1414,10 @@
 
     const detailPanel=document.getElementById('managerDetailPanel');
     if(managerStillVisible){
-      renderManagerDetail(previousManager);
+      const ck=dashCacheKey(previousManager);
+      const rawDetailed=getManagerKpiRows(previousManager).some(r=>r.kpiKey && r.kpiKey!=='overall');
+      if(managerMonthlyCache[ck] || rawDetailed) renderManagerDetail(previousManager);
+      else renderManagerDetailLoading(previousManager);
     }else if(detailPanel){
       detailPanel.classList.remove('hide');
       detailPanel.innerHTML='<div class="warn" style="margin:14px">⚡ Manager card वर click करा. त्या manager ची team KPI performance खाली दिसेल.</div>';
@@ -1305,10 +1433,12 @@
     const box=document.getElementById('kpiCards'); box.innerHTML='';
     const totals=getLightGlobalKpiTotals(d);
     const frag=document.createDocumentFragment();
+    const hasKpiData=Object.values(totals).some(x=>Number(x.target||0)>0 || Number(x.actual||0)>0);
     KPI_BUCKETS.forEach(([key,label])=>{
       const x=totals[key]||{actual:0,target:0,percent:0};
       const div=document.createElement('div'); div.className='kpi';
-      div.innerHTML=`<div class="name">${escapeHtml(label)}</div><div class="val">${Number(x.percent||0)}%</div><div class="bar"><div class="fill" style="width:${Math.min(x.percent||0,100)}%"></div></div><div class="tiny bold muted" style="margin-top:8px">KPI Success %</div>`;
+      const pctText=hasKpiData?(Number(x.percent||0)+'%'):'—';
+      div.innerHTML=`<div class="name">${escapeHtml(label)}</div><div class="val">${pctText}</div><div class="bar"><div class="fill" style="width:${hasKpiData?Math.min(x.percent||0,100):0}%"></div></div><div class="tiny bold muted" style="margin-top:8px">${hasKpiData?'KPI Success %':'Data sync झाल्यावर दिसेल'}</div>`;
       frag.appendChild(div);
     });
     box.appendChild(frag);
@@ -1376,29 +1506,33 @@
     const local=safeGetCache('ANIK_MANAGER_SUMMARY_'+ck,PLAN_CACHE_TTL);
     if(local && local.summary) managerMonthlyCache[ck]=local;
 
-    // Show available dashboard data immediately. Never block the screen on manager click.
-    renderManagerDetail(manager);
-    if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
-
     const rawDetailed=getManagerKpiRows(manager).some(r=>r.kpiKey && r.kpiKey!=='overall');
-    if(managerMonthlyCache[ck] || rawDetailed) return;
-
-    if(panel){
-      const note=document.createElement('div');
-      note.className='fastSkeleton';
-      note.id='managerBackgroundSync';
-      note.innerText='Detailed KPI data background मध्ये sync होत आहे. वरचा उपलब्ध data लगेच दाखवला आहे.';
-      panel.prepend(note);
-    }
+    const detailReady=!!managerMonthlyCache[ck] || rawDetailed;
+    if(detailReady) renderManagerDetail(manager);
+    else renderManagerDetailLoading(manager);
+    if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+    if(detailReady) return;
 
     try{
       await ensureManagerMonthlyData(manager);
       if(selectedDashManager===manager) renderManagerDetail(manager);
     }catch(e){
       console.error('Manager detail background load error',e);
-      const note=document.getElementById('managerBackgroundSync');
-      if(note) note.innerText='Detailed sync झाला नाही; dashboard summary data दाखवला आहे.';
+      if(selectedDashManager===manager) renderManagerDetailLoadError(manager,e.message||String(e));
     }
+  }
+
+  function renderManagerDetailLoading(manager){
+    const panel=document.getElementById('managerDetailPanel'); if(!panel) return;
+    const m=buildManagerStats(lastDashboardData||{matrix:[]}).find(x=>x.manager===manager);
+    panel.classList.remove('hide');
+    panel.innerHTML=`<div class="teamHeader"><div><h3>👥 ${escapeHtml(manager)} - KPI-wise Team View</h3><div class="tiny bold">Summary ready आहे; detailed KPI Target / Achievement आता load होत आहे.</div></div><div class="status ${zoneClassFromPct(m?m.percent:0)}">Achievement ${m?m.percent:0}%</div></div><div style="padding:14px"><div class="fastSkeleton">⏳ Detailed KPI data load होत आहे. Data येईपर्यंत चुकीचे ₹0 दाखवले जाणार नाहीत.</div><div class="dashSkeletonGrid" style="margin-top:12px">${Array.from({length:4},()=>'<div class="dashSkeletonCard"></div>').join('')}<div class="dashSkeletonTable"></div></div></div>`;
+  }
+
+  function renderManagerDetailLoadError(manager,msg){
+    const panel=document.getElementById('managerDetailPanel'); if(!panel) return;
+    panel.classList.remove('hide');
+    panel.innerHTML=`<div class="teamHeader"><div><h3>👥 ${escapeHtml(manager)} - KPI-wise Team View</h3><div class="tiny bold">Summary data available</div></div></div><div class="warn" style="margin:14px">Detailed KPI data load झाला नाही: ${escapeHtml(msg||'Unknown error')}. Refresh करून पुन्हा try करा.</div>`;
   }
 
   function dashCacheKey(manager){
@@ -1484,7 +1618,7 @@
   async function getManagerMonthBundleData(manager,sDate,eDate){
     if(USE_FAST_BACKEND){
       try{
-        const bundle=await withTimeout(gs('getManagerMonthBundle',manager,sDate,eDate),3500,'Fast manager bundle timeout');
+        const bundle=await withTimeout(gs('getManagerMonthBundle',manager,sDate,eDate),2200,'Fast manager bundle timeout');
         if(bundle && Array.isArray(bundle.plans) && Array.isArray(bundle.details)){
           const plans=dedupePlans(bundle.plans);
           managerPlanListCache['ANIK_PLAN_LIST_'+manager]=plans;
