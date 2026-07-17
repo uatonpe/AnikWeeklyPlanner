@@ -5,6 +5,8 @@
 
 
 
+
+
 <!DOCTYPE html>
 <html lang="mr">
 <head>
@@ -232,7 +234,7 @@
 
       <div class="card grid g4">
         <div><label>Manager</label><select id="planManager" onchange="loadPlanTeam()"></select></div>
-        <div><label>Week Start</label><input type="date" id="planStart"></div>
+        <div><label>Week Start</label><input type="date" id="planStart" onchange="setPlannerWeekFromStart()"></div>
         <div><label>Week End</label><input type="date" id="planEnd"></div>
         <div><label>Search CA / KPI</label><input id="planSearch" placeholder="CA नाव / KPI शोधा..." oninput="renderPlanRows()"></div>
         <div style="display:flex;align-items:end"><button class="blue" style="width:100%" onclick="loadPlanTeam()">Team Load</button></div>
@@ -425,7 +427,7 @@
     ['rd','New RD Account','number'],
     ['fd','NEW FD For Lokparyay','number']
   ];
-  const READ_ACTIONS = new Set(['getAppData','getManagers','getKpis','getTeam','getPlansForManager','getPlanForTA','getDashboardData','getDashboardFast','getManagerMonthBundle']);
+  const READ_ACTIONS = new Set(['getAppData','getManagers','getKpis','getTeam','getPlanEditorData','getPlansForManager','getPlanForTA','getDashboardData','getDashboardFast','getManagerMonthBundle']);
 
   function gs(fn, ...args){
     const isRead = READ_ACTIONS.has(fn);
@@ -678,6 +680,29 @@
       .forEach(btn=>{btn.disabled=!!isBusy; btn.style.opacity=isBusy?'.72':'1'; btn.style.cursor=isBusy?'wait':'pointer';});
   }
 
+  function ymdLocal(d){
+    return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+  }
+
+  function plannerWeekBounds(dateText){
+    const base=new Date((dateText||new Date().toISOString().slice(0,10))+'T12:00:00');
+    const day=base.getDay();
+    const back=day===0?6:day-1;
+    const start=new Date(base); start.setDate(base.getDate()-back);
+    const end=new Date(start); end.setDate(start.getDate()+5);
+    return {start:ymdLocal(start),end:ymdLocal(end)};
+  }
+
+  function setPlannerWeekFromStart(){
+    const start=val('planStart');
+    if(!start) return;
+    const wb=plannerWeekBounds(start);
+    document.getElementById('planStart').value=wb.start;
+    document.getElementById('planEnd').value=wb.end;
+    planRows=[];
+    renderPlanRows();
+  }
+
   function applyAppData(data){
     if(!data) return;
     APPDATA=data;
@@ -685,8 +710,9 @@
     setSelect('planManager', managers, {value:'', text:'-- Manager निवडा --'});
     setSelect('taManager', managers, {value:'', text:'-- Manager निवडा --'});
     setSelect('dashManager', [{value:'all',text:'सर्व Managers'}].concat(managers.map(m=>({value:m,text:m}))));
-    document.getElementById('planStart').value = APPDATA.today || document.getElementById('planStart').value;
-    document.getElementById('planEnd').value = APPDATA.today || document.getElementById('planEnd').value;
+    const wb=plannerWeekBounds(APPDATA.today || new Date().toISOString().slice(0,10));
+    document.getElementById('planStart').value = wb.start;
+    document.getElementById('planEnd').value = wb.end;
     document.getElementById('dashStart').value = APPDATA.monthStart || document.getElementById('dashStart').value;
     document.getElementById('dashEnd').value = APPDATA.today || document.getElementById('dashEnd').value;
     if(document.getElementById('taMonth')) document.getElementById('taMonth').value = (APPDATA.today || new Date().toISOString().slice(0,10)).slice(0,7);
@@ -754,19 +780,33 @@
   async function loadPlanTeam(){
     const manager=val('planManager'), s=val('planStart'), e=val('planEnd');
     if(!manager || !s || !e) return;
-    showLoader('CA team load होत आहे...', 'साधारण 2-4 सेकंद');
+    showLoader('CA team आणि saved plan load होत आहे...', 'Compact storage मधून fast load');
     try{
-      let res=teamCache[manager] || safeGetCache('ANIK_TEAM_'+manager,24*60*60*1000);
-      if(!res){
-        res=await gs('getTeam',manager);
-        safeSetCache('ANIK_TEAM_'+manager,res);
-      }
-      teamCache[manager]=res;
-      const staff = res.staff || [], kpis = res.kpis || [];
-      planRows = [];
-      staff.forEach(st => kpis.forEach(k => planRows.push({staff:st,kpi:k.name,type:k.type,weeklyTarget:'',remark:''})));
+      const res=await gs('getPlanEditorData',manager,s,e);
+      teamCache[manager]={ok:true,manager,staff:res.staff||[],kpis:res.kpis||[]};
+      safeSetCache('ANIK_TEAM_'+manager,teamCache[manager]);
+
+      const staff=res.staff||[], kpis=res.kpis||[];
+      const existing={};
+      (res.existingRows||[]).forEach(r=>{
+        existing[(r.staff||'')+'||'+(r.kpi||'')]=r;
+      });
+
+      planRows=[];
+      staff.forEach(st=>kpis.forEach(k=>{
+        const old=existing[st+'||'+k.name]||{};
+        planRows.push({
+          staff:st,
+          kpi:k.name,
+          type:k.type,
+          weeklyTarget:Number(old.weeklyTarget||0)>0?Number(old.weeklyTarget):'',
+          remark:old.remark||''
+        });
+      }));
+
       renderPlanRows();
-      toast(staff.length+' CA loaded');
+      const savedCount=(res.existingRows||[]).length;
+      toast(staff.length+' CA loaded'+(savedCount?' • '+savedCount+' saved KPI found':''));
     }catch(err){alert('Team load error: '+err.message)} finally{hideLoader()}
   }
 
@@ -821,12 +861,20 @@
       .map(r=>({staff:r.staff,kpi:r.kpi,weeklyTarget:Number(r.weeklyTarget||0),remark:r.remark||''}));
     if(!rows.length){alert('किमान एक target किंवा remark भरा.');return}
     if(!confirm('हा Weekly Plan save/update करायचा आहे का?')) return;
-    showLoader('Weekly Plan fast save होत आहे...');
+    showLoader('Weekly Plan compact format मध्ये save होत आहे...','एक manager plan = फक्त 1 sheet row');
     try{
       const res = await gs('saveWeeklyPlan', {manager,sDate,eDate,rows});
       dashboardDirty = true;
-      toast(res.fireAndForget ? 'Plan save request पाठवली' : ('Plan saved: '+res.savedRows+' rows'));
-      if(val('taManager')===manager) setTimeout(loadTAPlans, 700);
+      delete managerPlanListCache['ANIK_PLAN_LIST_'+manager];
+      Object.keys(managerPlanDetailCache||{}).forEach(k=>{if(k.indexOf(manager+'||')===0) delete managerPlanDetailCache[k]});
+      Object.keys(managerMonthlyCache||{}).forEach(k=>{if(k.indexOf(manager)>-1) delete managerMonthlyCache[k]});
+      removeCacheContains('ANIK_PLAN_LIST_'+manager);
+      removeCacheContains('ANIK_PLAN_DETAIL_'+manager+'||');
+      removeCacheContains('ANIK_MANAGER_SUMMARY_'+manager);
+      removeCacheContains('ANIK_TA_VIEW_'+manager+'_');
+      removeCacheContains('ANIK_DASH_');
+      toast(res.fireAndForget ? 'Plan save request पाठवली' : ('Plan saved: '+res.savedRows+' KPI • Sheet मध्ये 1 row'));
+      if(val('taManager')===manager) setTimeout(loadTAPlans, 500);
     }catch(e){alert('Save error: '+e.message)} finally{hideLoader()}
   }
 
@@ -1038,7 +1086,7 @@
           staff:r.staff,
           kpi:r.kpi,
           weeklyTarget:planRow.weeklyTarget||r.monthlyTarget||0,
-          dailyTarget:Number(ed.dailyT||ed.target||0),
+          dailyTarget:Number(ed.dailyT||ed.target||planRow.dailyTarget||0),
           actual:oldActual+Number(r.addActual||0),
           remark:''
         });
