@@ -7,6 +7,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="mr">
 <head>
@@ -55,7 +56,7 @@
     button.active{background:#fff;color:var(--blue);box-shadow:0 12px 28px rgba(255,255,255,.16)}
     button.green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;border-color:transparent;box-shadow:0 12px 25px rgba(5,150,105,.22)}
     button.blue{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border-color:transparent;box-shadow:0 12px 25px rgba(37,99,235,.22)}
-    button.dark{background:#020617;color:#fff;border-color:rgba(255,255,255,.10)} button.red{background:var(--red);color:#fff;border-color:transparent}
+    button.dark{background:#020617;color:#fff;border-color:rgba(255,255,255,.10)} button.orange{background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff;border-color:transparent;box-shadow:0 12px 25px rgba(217,119,6,.22)} button.red{background:var(--red);color:#fff;border-color:transparent}
     .main{max-width:1450px;margin:auto;padding:24px 18px 60px}.page{display:none}.page.active{display:block;animation:fadeUp .25s ease both}@keyframes fadeUp{from{opacity:.35;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g7{grid-template-columns:repeat(7,minmax(0,1fr))}
     .card{
@@ -259,14 +260,18 @@
           <div class="h1">Monthly KPI Achievement Update</div>
           <div class="hint">Manager आणि month निवडा. प्रत्येक CA खाली KPI-wise target, achievement आणि update clear दिसेल. Save झाल्यावर लगेच status आणि dashboard refresh दिसेल.</div>
         </div>
-        <div class="actions noPrint"><button class="green" onclick="saveMonthlyTA()">Monthly Achievement Save</button></div>
+        <div class="actions noPrint">
+          <button class="green taActionBtn" onclick="saveMonthlyTA()">Monthly Achievement Save</button>
+          <button class="orange taActionBtn" onclick="clearTASelected('target')">🧹 Clear Target</button>
+          <button class="red taActionBtn" onclick="clearTASelected('achievement')">🗑️ Clear Achievement</button>
+        </div>
       </div>
 
       <div class="card grid g4">
         <div><label>Manager</label><select id="taManager" onchange="loadTAMonthly()"></select></div>
         <div><label>Month</label><input type="month" id="taMonth" onchange="loadTAMonthly()"></div>
         <div><label>Search CA / KPI</label><input id="taSearch" placeholder="नाव / KPI शोधा..." oninput="renderTAMonthRows()"></div>
-        <div style="display:flex;align-items:end"><button class="green" style="width:100%" onclick="saveMonthlyTA()">Save Monthly Update</button></div>
+        <div style="display:flex;align-items:end"><button class="green taActionBtn" style="width:100%" onclick="saveMonthlyTA()">Save Monthly Update</button></div>
       </div>
 
       <div id="taSaveStatus" class="actionStatus hide"></div>
@@ -377,7 +382,7 @@
   <div id="toast" class="toast"></div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbylYtkORdfP8FmGqvzL6-5HmPQMiSdwSNbpRBCFW06v3TrK2C518nBNklQ35b_48dVj/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwygJh90-21mWFyvbotbJ1VXz8Y1Zu1bRgxNCywRgBy7Y2eahoNdk7iU6fHUb6MzJF0/exec";
 
   let APPDATA = { managers: [], fxMap: {}, kpis: [] };
   let planRows = [];
@@ -676,7 +681,7 @@
   }
 
   function setSaveButtonsBusy(isBusy){
-    document.querySelectorAll('button[onclick="saveMonthlyTA()"],button[onclick^="saveMonthlyTA()"]')
+    document.querySelectorAll('.taActionBtn,button[onclick="saveMonthlyTA()"],button[onclick^="saveMonthlyTA()"]')
       .forEach(btn=>{btn.disabled=!!isBusy; btn.style.opacity=isBusy?'.72':'1'; btn.style.cursor=isBusy?'wait':'pointer';});
   }
 
@@ -1116,6 +1121,61 @@
       showActionStatus('error','Save error', e.message || String(e));
       alert('Monthly save error: '+e.message);
     } finally{
+      setSaveButtonsBusy(false);
+      hideLoader();
+    }
+  }
+
+  async function clearTASelected(mode){
+    const manager=val('taManager'), ym=val('taMonth');
+    if(!manager || !ym){alert('Manager आणि month निवडा.');return}
+    if(mode!=='target' && mode!=='achievement'){alert('Invalid clear option');return}
+
+    const mb=monthBounds(ym);
+    const isTarget=mode==='target';
+    const title=isTarget?'Clear Target':'Clear Achievement';
+    const warning=isTarget
+      ? 'निवडलेल्या Manager आणि Month शी संबंधित सर्व plan targets शून्य होतील. आधीचे achievements delete होणार नाहीत. पुढे target पुन्हा Weekly Planner मधून भरता येतील.'
+      : 'निवडलेल्या Manager आणि Month मधील आजपर्यंतचे सर्व achievement entries कायमचे delete होतील. Targets सुरक्षित राहतील आणि TA पुन्हा achievement भरू शकेल.';
+
+    if(!confirm(`⚠️ ${title}\n\n${warning}\n\nही action करायची आहे का?`)) return;
+    if(!confirm('Final Confirmation: '+manager+' | '+ym+' साठी '+title+' करायचे निश्चित आहे का?')) return;
+
+    setSaveButtonsBusy(true);
+    showActionStatus('info',title+' सुरू आहे...',manager+' • '+ym+' • कृपया browser बंद करू नका.');
+    showLoader(title+' होत आहे...', 'Selected Manager + Month पुरताच data clear केला जाईल');
+    try{
+      const result=await gs('clearTAData',{manager:manager,sDate:mb.start,eDate:mb.end,mode:mode});
+
+      localStorage.removeItem('ANIK_TA_VIEW_'+manager+'_'+ym);
+      localStorage.removeItem('ANIK_LAST_TA_SIG');
+      localStorage.removeItem('ANIK_LAST_TA_SIG_AT');
+      localStorage.removeItem('ANIK_TA_LAST_'+manager+'_'+ym);
+      invalidateManagerCachesAfterTA(manager);
+      removeCacheContains('ANIK_PLAN_DETAIL_'+manager+'||');
+      removeCacheContains('ANIK_TA_VIEW_'+manager+'_');
+      dashboardDirty=true;
+      taMonthly=null;
+
+      if(result && result.fireAndForget) await sleep(2200);
+      else await sleep(250);
+      await loadTAMonthly();
+      updateDashboardAfterTASave(manager);
+
+      const sentOnly=!!(result && result.fireAndForget);
+      const cleared=isTarget ? Number(result && result.clearedTargets || 0) : Number(result && result.clearedEntries || 0);
+      const touched=Number(result && result.touchedPlans || 0);
+      const detail=sentOnly
+        ? 'Clear request server कडे पाठवली आहे • screen fresh reload केली आहे'
+        : (isTarget
+          ? cleared+' target rows cleared • '+touched+' plans updated • achievements सुरक्षित'
+          : cleared+' achievement entries deleted • '+touched+' plans updated • targets सुरक्षित');
+      showActionStatus('', '✅ '+(sentOnly ? title+' request sent' : title+' successful'), detail);
+      toast(sentOnly ? title+' request sent' : title+' successful');
+    }catch(e){
+      showActionStatus('error',title+' error',e.message || String(e));
+      alert(title+' error: '+(e.message || String(e)));
+    }finally{
       setSaveButtonsBusy(false);
       hideLoader();
     }
